@@ -1,13 +1,13 @@
 [package]
 name = "rlbot_flatbuffers"
-version = "0.16.0"
+version = "0.16.1"
 edition = "2024"
 description = "A Python module implemented in Rust for serializing and deserializing RLBot's flatbuffers"
 repository = "https://github.com/VirxEC/rlbot_flatbuffers_py"
 build = "codegen/main.rs"
 license = "MIT"
 readme = "README.md"
-exclude = [".github", "pytest.py", "pybench.py", "rustfmt.toml", ".gitignore", ".gitmodules", "flatc_mac"]
+exclude = [".github", "pytest.py", "pybench.py", "rustfmt.toml", ".gitignore", ".gitmodules", "flatc*", "FLATBUFFERS-LICENSE", "**/README.md"]
 publish = false
 
 [lints.clippy]
@@ -24,6 +24,10 @@ flatbuffers = "=25.2.10"
 # get-size appears to be unmaintained but it's too useful here
 # forked and updated deps
 get-size = { git = "https://github.com/VirxEC/get-size", branch = "update", features = ["derive"] }
+
+[build-dependencies]
+reqwest = { version = "0.12.15", features = ["blocking"] }
+zip = "2.6.1"
 
 [profile.dev]
 opt-level = 2

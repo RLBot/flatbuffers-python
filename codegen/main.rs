@@ -7,15 +7,17 @@ mod pyi;
 mod structs;
 mod unions;
 
-use std::{borrow::Cow, env::set_current_dir, fs, io, path::Path, process::Command};
-
 use generator::Generator;
+use std::{borrow::Cow, env::set_current_dir, fs, io, path::Path, process::Command};
 use structs::StructBindGenerator;
+use zip::ZipArchive;
 
 const FLATC_BINARY: &str = if cfg!(windows) { "flatc.exe" } else { "flatc" };
 const OUT_FOLDER: &str = "./src/generated";
 const SCHEMA_FOLDER: &str = "./flatbuffers-schema";
 const SCHEMA_FOLDER_BACKUP: &str = "../flatbuffers-schema";
+
+const FLATC_DOWNLOAD_URL: &str = "https://github.com/google/flatbuffers/releases/download/v25.2.10/";
 
 pub const PYTHON_OUT_FOLDER: &str = "./src/python";
 
@@ -191,8 +193,33 @@ fn run_flatc() -> io::Result<()> {
     }
 
     let schema_folder_str = schema_folder.display();
+    let flatc_str = format!("{schema_folder_str}/{FLATC_BINARY}");
+    let flatc_path = Path::new(&flatc_str);
 
-    let mut proc = Command::new(format!("{schema_folder_str}/{FLATC_BINARY}"));
+    if !flatc_path.exists() {
+        // if the flatc binary isn't found, download it
+        let file_name = if cfg!(windows) {
+            "Windows.flatc.binary.zip"
+        } else {
+            "Linux.flatc.binary.g++-13.zip"
+        };
+        let response = reqwest::blocking::get(format!("{FLATC_DOWNLOAD_URL}/{file_name}")).map_err(|e| {
+            eprintln!("Failed to download flatc binary: {e}");
+            io::Error::other("Failed to download flatc binary")
+        })?;
+        let bytes = response.bytes().map_err(|e| {
+            eprintln!("Failed to read response stream when downloading flatc binary: {e}");
+            io::Error::other("Failed to read response stream when downloading flatc binary")
+        })?;
+
+        // extract zip
+        let mut zip = ZipArchive::new(io::Cursor::new(bytes))?;
+        zip.extract(schema_folder)?;
+
+        assert!(flatc_path.exists(), "Failed to download flatc binary");
+    }
+
+    let mut proc = Command::new(flatc_str);
 
     proc.args([
         "--rust",
