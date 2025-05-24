@@ -29,8 +29,8 @@ impl UnionBindGenerator {
         let is_no_set = PythonBindType::NO_SET_TYPES.contains(&struct_name.as_str());
 
         let file_contents = vec![
-            Cow::Borrowed("use crate::{generated::rlbot::flat, FromGil, UnpackFrom};"),
-            Cow::Borrowed("use pyo3::{pyclass, pymethods, Bound, Py, PyAny, Python};"),
+            Cow::Borrowed("use crate::{FromGil, generated::rlbot::flat};"),
+            Cow::Borrowed("use pyo3::{Bound, Py, PyAny, Python, pyclass, pymethods};"),
             Cow::Borrowed(""),
         ];
 
@@ -120,63 +120,6 @@ impl UnionBindGenerator {
         write_str!(self, "        }");
         write_str!(self, "    }");
     }
-
-    fn generate_unpack_from(&mut self) {
-        write_fmt!(
-            self,
-            "impl UnpackFrom<flat::{}> for {} {{",
-            self.struct_t_name,
-            self.struct_name
-        );
-        write_str!(self, "    #[allow(unused_variables)]");
-        write_fmt!(
-            self,
-            "    fn unpack_from(&mut self, py: Python, flat_t: flat::{}) {{",
-            self.struct_t_name
-        );
-        write_str!(self, "        match flat_t {");
-
-        for variable_info in &self.types {
-            let variable_name = variable_info.name.as_str();
-
-            if variable_name == "NONE" {
-                write_fmt!(self, "            flat::{}::NONE => unreachable!(),", self.struct_t_name);
-                continue;
-            }
-
-            write_fmt!(
-                self,
-                "            flat::{}::{variable_name}(flat_item) => {{",
-                self.struct_t_name
-            );
-            write_fmt!(
-                self,
-                "                if let {}Union::{variable_name}(item) = &self.item {{",
-                self.struct_name
-            );
-            write_fmt!(
-                self,
-                "                    item.bind_borrowed(py).borrow_mut().unpack_from(py, *flat_item);"
-            );
-            write_str!(self, "                } else {");
-            write_fmt!(
-                self,
-                "                    self.item = {}Union::{variable_name}(",
-                self.struct_name
-            );
-            write_fmt!(
-                self,
-                "                        Py::new(py, super::{variable_name}::from_gil(py, *flat_item)).unwrap()"
-            );
-            write_str!(self, "                    );");
-            write_str!(self, "                }");
-            write_str!(self, "            },");
-        }
-
-        write_str!(self, "        }");
-        write_str!(self, "    }");
-        write_str!(self, "}");
-    }
 }
 
 impl Generator for UnionBindGenerator {
@@ -262,10 +205,6 @@ impl Generator for UnionBindGenerator {
         write_str!(self, "    }");
         write_str!(self, "}");
         write_str!(self, "");
-
-        if !self.is_frozen {
-            self.generate_unpack_from();
-        }
     }
 
     fn generate_from_flat_impls(&mut self) {

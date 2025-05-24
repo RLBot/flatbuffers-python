@@ -64,7 +64,7 @@ impl EnumBindGenerator {
             Cow::Borrowed("use crate::{flat_err_to_py, generated::rlbot::flat};"),
             Cow::Borrowed("use flatbuffers::root;"),
             Cow::Borrowed(
-                "use pyo3::{exceptions::PyValueError, pyclass, pymethods, types::PyBytes, Bound, PyResult, Python};",
+                "use pyo3::{Bound, PyResult, Python, exceptions::PyValueError, pyclass, pymethods, types::PyBytes};",
             ),
             Cow::Borrowed(""),
         ];

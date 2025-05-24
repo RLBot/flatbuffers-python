@@ -29,13 +29,7 @@ def test_gtp():
         flat.GamePacket.unpack(packed)
         unpack_times.append(time_ns() - start)
 
-        start = time_ns()
-        gtp.unpack_with(packed)
-        unpack_with_times.append(time_ns() - start)
-
-    print(
-        f"Total time: {(sum(pack_times) + sum(unpack_times) + sum(unpack_with_times)) / 1_000_000_000:.3f}s"
-    )
+    print(f"Total time: {(sum(pack_times) + sum(unpack_times)) / 1_000_000_000:.3f}s")
 
     avg_time_ns = sum(pack_times) / len(pack_times)
     print(f"Average pack time per: {avg_time_ns / 1000:.1f}us")
@@ -44,10 +38,6 @@ def test_gtp():
     avg_time_ns = sum(unpack_times) / len(unpack_times)
     print(f"Average unpack time per: {avg_time_ns / 1000:.1f}us")
     print(f"Minimum unpack time per: {min(unpack_times) / 1000:.1f}us")
-
-    avg_time_ns = sum(unpack_with_times) / len(unpack_with_times)
-    print(f"Average unpack_with time per: {avg_time_ns / 1000:.1f}us")
-    print(f"Minimum unpack_with time per: {min(unpack_with_times) / 1000:.1f}us")
 
     print()
     print("Testing normal GamePacket")
@@ -74,13 +64,7 @@ def test_gtp():
         flat.GamePacket.unpack(packed)
         unpack_times.append(time_ns() - start)
 
-        start = time_ns()
-        gtp.unpack_with(packed)
-        unpack_with_times.append(time_ns() - start)
-
-    print(
-        f"Total time: {(sum(pack_times) + sum(unpack_times) + sum(unpack_with_times)) / 1_000_000_000:.3f}s"
-    )
+    print(f"Total time: {(sum(pack_times) + sum(unpack_times)) / 1_000_000_000:.3f}s")
 
     avg_time_ns = sum(pack_times) / len(pack_times)
     print(f"Average pack time per: {avg_time_ns / 1000:.1f}us")
@@ -90,17 +74,12 @@ def test_gtp():
     print(f"Average unpack time per: {avg_time_ns / 1000:.1f}us")
     print(f"Minimum unpack time per: {min(unpack_times) / 1000:.1f}us")
 
-    avg_time_ns = sum(unpack_with_times) / len(unpack_with_times)
-    print(f"Average unpack_with time per: {avg_time_ns / 1000:.1f}us")
-    print(f"Minimum unpack_with time per: {min(unpack_with_times) / 1000:.1f}us")
-
 
 def test_ballpred():
     print("Testing 10s BallPrediction")
 
     pack_times = []
     unpack_times = []
-    unpack_with_times = []
 
     ballPred = flat.BallPrediction([flat.PredictionSlice(1) for _ in range(120 * 10)])
 
@@ -115,13 +94,7 @@ def test_ballpred():
         flat.BallPrediction.unpack(packed)
         unpack_times.append(time_ns() - start)
 
-        start = time_ns()
-        ballPred.unpack_with(packed)
-        unpack_with_times.append(time_ns() - start)
-
-    print(
-        f"Total time: {(sum(pack_times) + sum(unpack_times) + sum(unpack_with_times)) / 1_000_000_000:.3f}s"
-    )
+    print(f"Total time: {(sum(pack_times) + sum(unpack_times)) / 1_000_000_000:.3f}s")
 
     avg_time_ns = sum(pack_times) / len(pack_times)
     print(f"Average pack time per: {avg_time_ns / 1000:.1f}us")
@@ -130,10 +103,6 @@ def test_ballpred():
     avg_time_ns = sum(unpack_times) / len(unpack_times)
     print(f"Average unpack time per: {avg_time_ns / 1000:.1f}us")
     print(f"Minimum unpack time per: {min(unpack_times) / 1000:.1f}us")
-
-    avg_time_ns = sum(unpack_with_times) / len(unpack_with_times)
-    print(f"Average unpack_with time per: {avg_time_ns / 1000:.1f}us")
-    print(f"Minimum unpack_with time per: {min(unpack_with_times) / 1000:.1f}us")
 
     print()
     print("Testing 6s BallPrediction")
@@ -155,13 +124,7 @@ def test_ballpred():
         flat.BallPrediction.unpack(packed)
         unpack_times.append(time_ns() - start)
 
-        start = time_ns()
-        ballPred.unpack_with(packed)
-        unpack_with_times.append(time_ns() - start)
-
-    print(
-        f"Total time: {(sum(pack_times) + sum(unpack_times) + sum(unpack_with_times)) / 1_000_000_000:.3f}s"
-    )
+    print(f"Total time: {(sum(pack_times) + sum(unpack_times)) / 1_000_000_000:.3f}s")
 
     avg_time_ns = sum(pack_times) / len(pack_times)
     print(f"Average pack time per: {avg_time_ns / 1000:.1f}us")
@@ -170,10 +133,6 @@ def test_ballpred():
     avg_time_ns = sum(unpack_times) / len(unpack_times)
     print(f"Average unpack time per: {avg_time_ns / 1000:.1f}us")
     print(f"Minimum unpack time per: {min(unpack_times) / 1000:.1f}us")
-
-    avg_time_ns = sum(unpack_with_times) / len(unpack_with_times)
-    print(f"Average unpack_with time per: {avg_time_ns / 1000:.1f}us")
-    print(f"Minimum unpack_with time per: {min(unpack_with_times) / 1000:.1f}us")
 
 
 def find_slice_at_time(ball_prediction: flat.BallPrediction, game_time: float):
