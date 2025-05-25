@@ -56,6 +56,7 @@ pub struct StructBindGenerator {
     is_no_set: bool,
     pub default_override: Option<(&'static str, &'static str)>,
     freelist_size: usize,
+    aliases: Vec<(&'static str, &'static str)>,
 }
 
 macro_rules! write_str {
@@ -81,6 +82,16 @@ impl StructBindGenerator {
     ) -> Option<Self> {
         let is_frozen = PythonBindType::FROZEN_TYPES.contains(&struct_name.as_str());
         let is_no_set = PythonBindType::NO_SET_TYPES.contains(&struct_name.as_str());
+        let aliases: Vec<_> = PythonBindType::FIELD_ALIASES
+            .iter()
+            .filter_map(|&(name, real, alias)| {
+                if name == struct_name.as_str() {
+                    Some((real, alias))
+                } else {
+                    None
+                }
+            })
+            .collect();
 
         let has_complex_pack = contents.contains("pub fn pack<'b, A: flatbuffers::Allocator + 'b>(");
 
@@ -100,6 +111,10 @@ impl StructBindGenerator {
         }
 
         file_contents.push(Cow::Borrowed("use pyo3::{prelude::*, types::*};"));
+        if !aliases.is_empty() {
+            file_contents.push(Cow::Borrowed("use std::sync::atomic::{AtomicBool, Ordering};"));
+        }
+
         file_contents.push(Cow::Borrowed(""));
 
         let default_override = PythonBindType::DEFAULT_OVERRIDES.iter().find_map(|&(name, field, value)| {
@@ -127,6 +142,7 @@ impl StructBindGenerator {
             is_no_set,
             default_override,
             freelist_size,
+            aliases,
         })
     }
 
@@ -440,6 +456,70 @@ impl StructBindGenerator {
 
         write_str!(self, "        }");
         write_str!(self, "    }");
+
+        for (real_name, alias) in &self.aliases {
+            let variable_info = self.types.iter().find(|info| info.name == *real_name).unwrap();
+
+            let variable_type = match &variable_info.rust_type {
+                RustType::Vec(InnerVecType::U8) => String::from("Py<PyBytes>"),
+                RustType::Vec(InnerVecType::String) => String::from("Vec<String>"),
+                RustType::Vec(InnerVecType::Base(inner_type)) => format!("Vec<{}>", inner_type),
+                RustType::Vec(InnerVecType::Custom(_)) => String::from("Py<PyList>"),
+                RustType::Box(inner_type) => format!("Py<super::{inner_type}>"),
+                RustType::Option(InnerOptionType::BaseType, inner_type) => {
+                    format!("Option<Py<{inner_type}>>")
+                }
+                RustType::Option(InnerOptionType::String, _) => String::from("Option<Py<PyString>>"),
+                RustType::Union(inner_type, true) | RustType::Option(_, inner_type) => {
+                    format!("Option<Py<super::{inner_type}>>")
+                }
+                RustType::Base(inner_type) => match inner_type.as_str() {
+                    "f32" => String::from("Py<PyFloat>"),
+                    _ => inner_type.clone(),
+                },
+                RustType::String => String::from("Py<PyString>"),
+                RustType::Union(inner_type, false) | RustType::Custom(inner_type) => {
+                    format!("Py<super::{inner_type}>")
+                }
+                RustType::Other(inner_type) => format!("super::{inner_type}"),
+            };
+
+            write_str!(self, "\n    #[getter]");
+            write_fmt!(self, "    pub fn get_{alias}(&self) -> {variable_type} {{");
+            write_str!(self, "        static PRINTED_WARNING: AtomicBool = AtomicBool::new(false);");
+            write_str!(
+                self,
+                "        if PRINTED_WARNING.compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed).is_ok() {"
+            );
+            write_fmt!(
+                self,
+                "            println!(\"WARNING: '{alias}' getter accessed, which is deprecated in favor of '{real_name}'.\");"
+            );
+            write_str!(self, "        }");
+            write_str!(self, "");
+            write_fmt!(self, "        self.{real_name}");
+            write_str!(self, "    }");
+
+            if self.is_frozen || self.is_no_set {
+                continue;
+            }
+
+            write_str!(self, "\n    #[setter]");
+            write_fmt!(self, "    pub fn set_{alias}(&mut self, new: {variable_type}) {{");
+            write_str!(self, "        static PRINTED_WARNING: AtomicBool = AtomicBool::new(false);");
+            write_str!(
+                self,
+                "        if PRINTED_WARNING.compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed).is_ok() {"
+            );
+            write_fmt!(
+                self,
+                "            println!(\"WARNING: '{alias}' setter accessed, which is deprecated in favor of '{real_name}'.\");"
+            );
+            write_str!(self, "        }");
+            write_str!(self, "");
+            write_fmt!(self, "        self.{real_name} = new;");
+            write_str!(self, "    }");
+        }
 
         if self.is_frozen || self.is_no_set {
             return;
