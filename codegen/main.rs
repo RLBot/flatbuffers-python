@@ -12,13 +12,18 @@ use std::{borrow::Cow, env::set_current_dir, fs, io, path::Path, process::Comman
 use structs::StructBindGenerator;
 use zip::ZipArchive;
 
-const FLATC_BINARY: &str = if cfg!(windows) { "flatc.exe" } else { "flatc" };
-const OUT_FOLDER: &str = "./src/generated";
-const SCHEMA_FOLDER: &str = "./flatbuffers-schema";
-const SCHEMA_FOLDER_BACKUP: &str = "../flatbuffers-schema";
-
 const FLATC_DOWNLOAD_URL: &str = "https://github.com/google/flatbuffers/releases/download/v25.2.10/";
 
+const SCHEMA_FOLDER: &str = "./flatbuffers-schema";
+const SCHEMA_FOLDER_BACKUP: &str = "../flatbuffers-schema";
+const RLBOT_FBS: &str = "schema/rlbot.fbs";
+const FLATC_BINARY: &str = if cfg!(windows) {
+    "binaries\\flatc.exe"
+} else {
+    "binaries/flatc"
+};
+
+const OUT_FOLDER: &str = "./src/generated";
 pub const PYTHON_OUT_FOLDER: &str = "./src/python";
 
 pub enum PythonBindType {
@@ -29,15 +34,14 @@ pub enum PythonBindType {
 
 impl PythonBindType {
     pub const BASE_TYPES: [&'static str; 6] = ["bool", "i32", "u32", "f32", "String", "u8"];
-    pub const FROZEN_TYPES: [&'static str; 6] = [
+    pub const FROZEN_TYPES: [&'static str; 26] = [
+        "ControllableInfo",
+        "ControllableTeamInfo",
+        "PredictionSlice",
+        "BallPrediction",
         "GoalInfo",
         "BoostPad",
         "FieldInfo",
-        "ControllableInfo",
-        "ControllableTeamInfo",
-        "PlayerClass",
-    ];
-    pub const NO_SET_TYPES: [&'static str; 16] = [
         "Physics",
         "GamePacket",
         "PlayerInfo",
@@ -52,13 +56,25 @@ impl PythonBindType {
         "MatchInfo",
         "TeamInfo",
         "Vector2",
-        "PredictionSlice",
-        "BallPrediction",
+        "CoreMessage",
+        "InterfaceMessage",
+        "CorePacket",
+        "InterfacePacket",
+        "PlayerInput",
     ];
-    pub const UNIONS: [&'static str; 4] = ["PlayerClass", "CollisionShape", "RelativeAnchor", "RenderType"];
+    pub const NO_SET_TYPES: [&'static str; 1] = ["PlayerClass"];
+    pub const UNIONS: [&'static str; 6] = [
+        "PlayerClass",
+        "CollisionShape",
+        "RelativeAnchor",
+        "RenderType",
+        "CoreMessage",
+        "InterfaceMessage",
+    ];
 
     pub const OPTIONAL_UNIONS: [&'static str; 1] = ["RelativeAnchor"];
     pub const DEFAULT_OVERRIDES: [(&'static str, &'static str, &'static str); 1] = [("Color", "a", "255")];
+    pub const FIELD_ALIASES: [(&'static str, &'static str, &'static str); 1] = [("PlayerInfo", "player_id", "spawn_id")];
     pub const FREELIST_TYPES: [(&'static str, usize); 0] = [];
 
     fn new(path: &Path) -> Option<Self> {
@@ -176,7 +192,7 @@ fn mod_rs_generator(type_data: &[PythonBindType]) -> io::Result<()> {
     Ok(())
 }
 
-fn run_flatc() -> io::Result<()> {
+fn run_flatc() {
     println!("cargo:rerun-if-changed=flatbuffers-schema/comms.fbs");
     println!("cargo:rerun-if-changed=flatbuffers-schema/gamedata.fbs");
     println!("cargo:rerun-if-changed=flatbuffers-schema/gamestatemanip.fbs");
@@ -184,7 +200,7 @@ fn run_flatc() -> io::Result<()> {
     println!("cargo:rerun-if-changed=flatbuffers-schema/rendering.fbs");
     println!("cargo:rerun-if-changed=flatbuffers-schema/rlbot.fbs");
 
-    set_current_dir(env!("CARGO_MANIFEST_DIR"))?;
+    set_current_dir(env!("CARGO_MANIFEST_DIR")).unwrap();
 
     let mut schema_folder = Path::new(SCHEMA_FOLDER);
     if !schema_folder.exists() {
@@ -197,24 +213,31 @@ fn run_flatc() -> io::Result<()> {
     let flatc_path = Path::new(&flatc_str);
 
     if !flatc_path.exists() {
+        fs::create_dir_all(flatc_path).unwrap();
+
         // if the flatc binary isn't found, download it
         let file_name = if cfg!(windows) {
             "Windows.flatc.binary.zip"
         } else {
             "Linux.flatc.binary.g++-13.zip"
         };
-        let response = reqwest::blocking::get(format!("{FLATC_DOWNLOAD_URL}/{file_name}")).map_err(|e| {
-            eprintln!("Failed to download flatc binary: {e}");
-            io::Error::other("Failed to download flatc binary")
-        })?;
-        let bytes = response.bytes().map_err(|e| {
-            eprintln!("Failed to read response stream when downloading flatc binary: {e}");
-            io::Error::other("Failed to read response stream when downloading flatc binary")
-        })?;
+        let response = reqwest::blocking::get(format!("{FLATC_DOWNLOAD_URL}/{file_name}"))
+            .map_err(|e| {
+                eprintln!("Failed to download flatc binary: {e}");
+                io::Error::other("Failed to download flatc binary")
+            })
+            .unwrap();
+        let bytes = response
+            .bytes()
+            .map_err(|e| {
+                eprintln!("Failed to read response stream when downloading flatc binary: {e}");
+                io::Error::other("Failed to read response stream when downloading flatc binary")
+            })
+            .unwrap();
 
         // extract zip
-        let mut zip = ZipArchive::new(io::Cursor::new(bytes))?;
-        zip.extract(schema_folder)?;
+        let mut zip = ZipArchive::new(io::Cursor::new(bytes)).unwrap();
+        zip.extract(schema_folder).unwrap();
 
         assert!(flatc_path.exists(), "Failed to download flatc binary");
     }
@@ -222,26 +245,26 @@ fn run_flatc() -> io::Result<()> {
     let mut proc = Command::new(flatc_str);
 
     proc.args([
-        "--rust",
-        "--gen-object-api",
-        "--gen-all",
-        "--filename-suffix",
-        "",
-        "--rust-module-root-file",
-        "-o",
-        OUT_FOLDER,
-        &format!("{schema_folder_str}/rlbot.fbs"),
+        "--rust".as_ref(),
+        "--gen-object-api".as_ref(),
+        "--gen-all".as_ref(),
+        "--filename-suffix".as_ref(),
+        "".as_ref(),
+        "--rust-module-root-file".as_ref(),
+        "-o".as_ref(),
+        OUT_FOLDER.as_ref(),
+        schema_folder.join(RLBOT_FBS).as_os_str(),
     ])
-    .spawn()?
-    .wait()?;
+    .spawn()
+    .unwrap()
+    .wait()
+    .unwrap();
 
-    assert!(proc.status()?.success(), "flatc failed to run");
-
-    Ok(())
+    assert!(proc.status().unwrap().success(), "flatc failed to run");
 }
 
-fn main() -> io::Result<()> {
-    run_flatc()?;
+fn main() {
+    run_flatc();
 
     let out_folder = Path::new(OUT_FOLDER).join("rlbot").join("flat");
 
@@ -252,9 +275,11 @@ fn main() -> io::Result<()> {
     );
 
     // read the current contents of the generated folder
-    let generated_files = fs::read_dir(out_folder)?
+    let generated_files = fs::read_dir(out_folder)
+        .unwrap()
         .map(|res| res.map(|e| e.path()))
-        .collect::<Result<Vec<_>, io::Error>>()?;
+        .collect::<Result<Vec<_>, io::Error>>()
+        .unwrap();
 
     let mut type_data = Vec::new();
 
@@ -263,13 +288,11 @@ fn main() -> io::Result<()> {
             continue;
         };
 
-        bind_generator.generate(&path)?;
+        bind_generator.generate(&path).unwrap();
         type_data.push(bind_generator);
     }
 
-    mod_rs_generator(&type_data)?;
-    pyi::generator(&type_data)?;
-    class_inject::classes_to_lib_rs(&type_data)?;
-
-    Ok(())
+    mod_rs_generator(&type_data).unwrap();
+    pyi::generator(&type_data).unwrap();
+    class_inject::classes_to_lib_rs(&type_data).unwrap();
 }

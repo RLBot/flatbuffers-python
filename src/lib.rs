@@ -15,7 +15,7 @@ pub mod generated;
 #[allow(clippy::enum_variant_names, clippy::useless_conversion, unused_imports)]
 mod python;
 
-use pyo3::{PyClass, create_exception, exceptions::PyValueError, prelude::*, pyclass::boolean_struct::False, types::*};
+use pyo3::{PyClass, create_exception, exceptions::PyValueError, prelude::*, types::*};
 use python::*;
 use std::{panic::Location, path::MAIN_SEPARATOR};
 
@@ -125,36 +125,6 @@ pub fn pydefault_string(py: Python) -> Py<PyString> {
     PyString::intern(py, "").unbind()
 }
 
-pub trait UnpackFrom<T> {
-    fn unpack_from(&mut self, py: Python, flat_t: T);
-}
-
-pub fn update_list<T, U>(py: Python, items: Borrowed<PyList>, flat_t: Vec<T>)
-where
-    T: IntoGil<U>,
-    U: pyo3::PyClass<Frozen = False> + Into<PyClassInitializer<U>> + UnpackFrom<T>,
-{
-    let scripts_len = flat_t.len();
-    let mut script_iter = flat_t.into_iter();
-
-    for py_item in items.iter() {
-        match script_iter.next() {
-            Some(item) => py_item.downcast_into_exact::<U>().unwrap().borrow_mut().unpack_from(py, item),
-            None => {
-                let items_len = items.len();
-                for i in 0..items_len - scripts_len {
-                    items.del_item(items_len - i - 1).unwrap();
-                }
-                return;
-            }
-        }
-    }
-
-    for x in script_iter {
-        items.append(crate::into_py_from::<_, U>(py, x)).unwrap();
-    }
-}
-
 #[derive(FromPyObject)]
 pub enum PartFloats {
     Float(f64),
@@ -236,6 +206,8 @@ pynamedmodule! {
         ControllableInfo,
         ControllableTeamInfo,
         ControllerState,
+        CoreMessage,
+        CorePacket,
         CustomBot,
         CylinderShape,
         DemolishMutator,
@@ -245,6 +217,7 @@ pynamedmodule! {
         DesiredGameState,
         DesiredMatchInfo,
         DesiredPhysics,
+        DisconnectSignal,
         DodgeTimerMutator,
         ExistingMatchBehavior,
         FieldInfo,
@@ -256,7 +229,10 @@ pynamedmodule! {
         GoalInfo,
         GravityMutator,
         Human,
+        InitComplete,
         InputRestrictionMutator,
+        InterfaceMessage,
+        InterfacePacket,
         JumpMutator,
         Launcher,
         Line3D,
