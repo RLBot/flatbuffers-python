@@ -16,14 +16,16 @@ def random_string():
 
 def random_player_config():
     return PlayerConfiguration(
-        variety=Psyonix(PsyonixSkill.AllStar),
-        name=random_string(),
-        root_dir=random_string(),
-        run_command=random_string(),
-        loadout=PlayerLoadout(
-            loadout_paint=LoadoutPaint(),
-            primary_color_lookup=Color(),
-            secondary_color_lookup=Color(),
+        variety=CustomBot(
+            name=random_string(),
+            root_dir=random_string(),
+            run_command=random_string(),
+            loadout=PlayerLoadout(
+                loadout_paint=LoadoutPaint(),
+                primary_color_lookup=Color(),
+                secondary_color_lookup=Color(),
+            ),
+            agent_id=random_string(),
         ),
     )
 
