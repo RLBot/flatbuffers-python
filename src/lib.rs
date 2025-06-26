@@ -274,6 +274,7 @@ pynamedmodule! {
         RotatorPartial,
         RumbleMutator,
         ScoreInfo,
+        ScoringRule,
         ScriptConfiguration,
         SeriesLengthMutator,
         SetLoadout,
