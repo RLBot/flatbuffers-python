@@ -1,9 +1,11 @@
-use crate::{
-    PythonBindType,
-    generator::Generator,
-    structs::{InnerOptionType, InnerVecType, RustType},
+use indexmap::IndexMap;
+use planus_types::{
+    ast::IntegerType,
+    intermediate::{AbsolutePath, AssignMode, Declaration, DeclarationKind, SimpleType, TypeKind},
 };
 use std::{borrow::Cow, fs, io};
+
+use crate::structs::DEFAULT_OVERRIDES;
 
 macro_rules! write_str {
     ($self:ident, $s:expr) => {
@@ -17,11 +19,11 @@ macro_rules! write_fmt {
     };
 }
 
-pub fn generator(type_data: &[PythonBindType]) -> io::Result<()> {
+pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<()> {
     let mut file = vec![
         Cow::Borrowed("from __future__ import annotations"),
         Cow::Borrowed(""),
-        Cow::Borrowed("from typing import Optional, Sequence"),
+        Cow::Borrowed("from typing import Sequence"),
         Cow::Borrowed(""),
         Cow::Borrowed("__doc__: str"),
         Cow::Borrowed("__version__: str"),
@@ -30,32 +32,37 @@ pub fn generator(type_data: &[PythonBindType]) -> io::Result<()> {
         Cow::Borrowed(""),
     ];
 
-    let primitive_map = [
-        ("bool", "bool"),
-        ("i32", "int"),
-        ("u32", "int"),
-        ("f32", "float"),
-        ("String", "str"),
-        ("u8", "int"),
-        ("Vec<u8>", "bytes"),
-    ];
+    // let primitive_map = [
+    //     ("bool", "bool"),
+    //     ("i32", "int"),
+    //     ("u32", "int"),
+    //     ("f32", "float"),
+    //     ("String", "str"),
+    //     ("u8", "int"),
+    //     ("Vec<u8>", "bytes"),
+    // ];
 
-    let mut sorted_types: Vec<&PythonBindType> = type_data.iter().collect();
-    sorted_types.sort_by(|a, b| a.struct_name().cmp(b.struct_name()));
+    let mut sorted_types: Vec<_> = type_data.iter().collect();
+    sorted_types.sort_by(|(a, _), (b, _)| a.0.last().unwrap().cmp(b.0.last().unwrap()));
 
-    for item in sorted_types {
-        let type_name = item.struct_name();
+    for (full_type_name, item) in sorted_types {
+        let type_name = full_type_name.0.last().unwrap();
 
         write_fmt!(file, "class {type_name}:");
 
-        match item {
-            PythonBindType::Union(bind) => {
-                let types = bind
-                    .types
-                    .iter()
-                    .map(|variable_info| variable_info.name.as_str())
-                    .filter(|variable_name| *variable_name != "NONE")
-                    .collect::<Vec<_>>();
+        if !item.docstrings.docstrings.is_empty() {
+            write_str!(file, "    \"\"\"");
+
+            for docstring in &item.docstrings.docstrings {
+                write_fmt!(file, "    {}", docstring.value.trim());
+            }
+
+            write_str!(file, "    \"\"\"\n");
+        }
+
+        match &item.kind {
+            DeclarationKind::Union(info) => {
+                let types: Vec<_> = info.variants.keys().cloned().collect();
                 let default_value = types.first().unwrap();
                 let union_str = types.join(" | ");
 
@@ -68,21 +75,15 @@ pub fn generator(type_data: &[PythonBindType]) -> io::Result<()> {
                 write_fmt!(file, "        self, item: {union_str} = {default_value}()");
                 write_str!(file, "    ): ...\n");
             }
-            PythonBindType::Enum(bind) => {
-                for variable_info in &bind.types {
-                    let variable_name = variable_info.name.as_str();
-                    if variable_name == "NONE" {
-                        continue;
-                    }
+            DeclarationKind::Enum(info) => {
+                for (var_val, var_info) in &info.variants {
+                    write_fmt!(file, "    {} = {type_name}({var_val})", var_info.name);
 
-                    let variable_type = variable_info.raw_type.as_str();
-                    write_fmt!(file, "    {variable_name} = {type_name}({variable_type})");
-
-                    if let Some(docs) = variable_info.doc_str.as_ref() {
+                    if !var_info.docstrings.docstrings.is_empty() {
                         write_str!(file, "    \"\"\"");
 
-                        for line in docs {
-                            write_fmt!(file, "    {line}");
+                        for line in &var_info.docstrings.docstrings {
+                            write_fmt!(file, "    {}", line.value.trim());
                         }
 
                         write_str!(file, "    \"\"\"");
@@ -93,221 +94,320 @@ pub fn generator(type_data: &[PythonBindType]) -> io::Result<()> {
                 write_str!(file, "    def __new__(cls, value: int = 0): ...");
                 write_str!(file, "    def __init__(self, value: int = 0):");
                 write_str!(file, "        \"\"\"");
-                write_str!(file, "        :raises ValueError: If the `value` is not a valid enum value");
+                write_str!(
+                    file,
+                    "        :raises ValueError: If the `value` is not a valid enum value"
+                );
                 write_str!(file, "        \"\"\"");
                 write_str!(file, "    def __int__(self) -> int: ...");
-                write_fmt!(file, "    def __eq__(self, other: {type_name}) -> bool: ...");
-                write_str!(file, "    def __hash__(self) -> str: ...");
+                write_str!(file, "    def __eq__(self, other) -> bool: ...");
+                write_str!(file, "    def __hash__(self) -> int: ...");
             }
-            PythonBindType::Struct(bind) => {
-                if let Some(docs) = bind.struct_doc_str.as_ref() {
-                    write_str!(file, "    \"\"\"");
-
-                    for line in docs {
-                        write_fmt!(file, "    {line}");
-                    }
-
-                    write_str!(file, "    \"\"\"");
-                }
-
-                let mut python_types = Vec::new();
-
-                'outer: for variable_info in &bind.types {
-                    let variable_name = variable_info.name.as_str();
-                    let variable_type = variable_info.raw_type.as_str();
-
-                    for (rust_type, python_type) in primitive_map {
-                        if variable_type == rust_type {
-                            python_types.push(python_type.to_string());
-                            write_fmt!(file, "    {variable_name}: {python_type}");
-
-                            if let Some(docs) = variable_info.doc_str.as_ref() {
-                                write_str!(file, "    \"\"\"");
-
-                                for line in docs {
-                                    write_fmt!(file, "    {line}");
-                                }
-
-                                write_str!(file, "    \"\"\"");
-                            }
-
-                            continue 'outer;
+            DeclarationKind::Struct(info) => {
+                for (field_name, field_info) in &info.fields {
+                    let python_type = Cow::Borrowed(match &field_info.type_ {
+                        SimpleType::Bool => "bool",
+                        SimpleType::Float(_) => "float",
+                        SimpleType::Integer(_) => "int",
+                        SimpleType::Enum(idx) => {
+                            let (path, _) = type_data.get_index(idx.0).unwrap();
+                            path.0.last().unwrap()
                         }
-                    }
+                        SimpleType::Struct(idx) => {
+                            let (path, _) = type_data.get_index(idx.0).unwrap();
+                            path.0.last().unwrap()
+                        }
+                    });
 
-                    match &variable_info.rust_type {
-                        RustType::Vec(InnerVecType::U8) => {
-                            python_types.push("bytes".to_string());
-                            write_fmt!(file, "    {variable_name}: bytes");
-                        }
-                        RustType::Vec(InnerVecType::Base(type_name)) => {
-                            let python_type = if type_name == "bool" {
-                                "bool"
-                            } else if type_name == "i32" || type_name == "u32" {
-                                "int"
-                            } else if type_name == "f32" {
-                                "float"
-                            } else {
-                                type_name
-                            };
+                    write_fmt!(file, "    {field_name}: {python_type}");
 
-                            python_types.push(format!("Sequence[{python_type}]"));
-                            write_fmt!(file, "    {variable_name}: Sequence[{python_type}]");
-                        }
-                        RustType::Vec(InnerVecType::String) => {
-                            python_types.push("Sequence[str]".to_string());
-                            write_fmt!(file, "    {variable_name}: Sequence[str]");
-                        }
-                        RustType::Vec(InnerVecType::Custom(inner_type)) => {
-                            python_types.push(format!("Sequence[{inner_type}]"));
-                            write_fmt!(file, "    {variable_name}: Sequence[{inner_type}]");
-                        }
-                        RustType::Option(InnerOptionType::String, _) => {
-                            python_types.push("Optional[str]".to_string());
-                            write_fmt!(file, "    {variable_name}: Optional[str]");
-                        }
-                        RustType::Option(InnerOptionType::BaseType, type_name) => {
-                            let python_type = if type_name == "bool" {
-                                "bool"
-                            } else if type_name == "i32" || type_name == "u32" {
-                                "int"
-                            } else if type_name == "f32" {
-                                "float"
-                            } else {
-                                type_name
-                            };
-
-                            python_types.push(format!("Optional[{python_type}]"));
-                            write_fmt!(file, "    {variable_name}: Optional[{python_type}]");
-                        }
-                        RustType::Option(InnerOptionType::Custom, type_name)
-                        | RustType::Option(InnerOptionType::Box, type_name) => {
-                            write_fmt!(file, "    {variable_name}: Optional[{type_name}]");
-
-                            let python_type = if type_name == "Float" {
-                                "Float | float"
-                            } else if type_name == "Bool" {
-                                "Bool | bool"
-                            } else {
-                                type_name.as_str()
-                            };
-
-                            python_types.push(format!("Optional[{python_type}]"));
-                        }
-                        RustType::Box(inner_type) => {
-                            python_types.push(inner_type.to_string());
-                            write_fmt!(file, "    {variable_name}: {inner_type}");
-                        }
-                        RustType::String => {
-                            python_types.push("str".to_string());
-                            write_fmt!(file, "    {variable_name}: str");
-                        }
-                        RustType::Union(type_name, is_optional) => {
-                            if *is_optional {
-                                write_fmt!(file, "    {variable_name}: Optional[{type_name}]");
-                            } else {
-                                write_fmt!(file, "    {variable_name}: {type_name}");
-                            }
-
-                            // search for the union with the name `type_name` and get the types
-                            let union_types = type_data
-                                .iter()
-                                .find_map(|item| match item {
-                                    PythonBindType::Union(bind) if bind.struct_name() == type_name => {
-                                        Some(bind.types.iter().skip(1).map(|v| v.name.as_str()).collect::<Vec<_>>())
-                                    }
-                                    _ => None,
-                                })
-                                .unwrap();
-
-                            let python_type = union_types.join(" | ");
-                            python_types.push(if *is_optional {
-                                format!("Optional[{python_type}]")
-                            } else {
-                                python_type
-                            });
-                        }
-                        RustType::Custom(type_name) | RustType::Other(type_name) | RustType::Base(type_name) => {
-                            python_types.push(type_name.to_string());
-                            write_fmt!(file, "    {variable_name}: {type_name}");
-                        }
-                    }
-
-                    if let Some(docs) = variable_info.doc_str.as_ref() {
+                    if !field_info.docstrings.docstrings.is_empty() {
                         write_str!(file, "    \"\"\"");
 
-                        for line in docs {
-                            write_fmt!(file, "    {line}");
+                        for line in &field_info.docstrings.docstrings {
+                            write_fmt!(file, "    {}", line.value.trim());
                         }
 
                         write_str!(file, "    \"\"\"");
                     }
                 }
 
-                if !bind.types.is_empty() {
-                    write_str!(file, "");
-                    write_str!(file, "    __match_args__ = (");
-
-                    for variable_info in &bind.types {
-                        write_fmt!(file, "        \"{}\",", variable_info.name);
-                    }
-                    write_str!(file, "    )");
-                }
-
-                if bind.types.is_empty() {
+                if info.fields.is_empty() {
                     write_str!(file, "    def __init__(self): ...");
-                } else {
-                    write_str!(file, "");
+                    continue;
+                }
 
-                    let inits = [("new", "cls"), ("init", "self")];
+                write_str!(file, "");
+                write_str!(file, "    __match_args__ = (");
 
-                    for (func, first_arg) in inits {
-                        write_fmt!(file, "    def __{func}__(");
-                        write_fmt!(file, "        {first_arg},");
+                for field_name in info.fields.keys() {
+                    write_fmt!(file, "        \"{field_name}\",");
+                }
+                write_str!(file, "    )");
+                write_str!(file, "");
 
-                        for (variable_info, python_type) in bind.types.iter().zip(&python_types) {
-                            let variable_name = variable_info.name.as_str();
+                let inits = [("new", "cls"), ("init", "self")];
 
-                            if let Some((field, value)) = bind.default_override {
-                                if field == variable_name {
-                                    write_fmt!(file, "        {variable_name}: {python_type} = {value},");
-                                    continue;
+                let default_overrides: Vec<_> = DEFAULT_OVERRIDES
+                    .into_iter()
+                    .filter_map(|(struct_name, field_name, value)| {
+                        if struct_name == type_name {
+                            Some((field_name, value))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+
+                for (func, first_arg) in inits {
+                    write_fmt!(file, "    def __{func}__(");
+                    write_fmt!(file, "        {first_arg},");
+
+                    for (field_name, field_info) in &info.fields {
+                        let python_type = Cow::Borrowed(match &field_info.type_ {
+                            SimpleType::Bool => "bool",
+                            SimpleType::Float(_) => "float",
+                            SimpleType::Integer(_) => "int",
+                            SimpleType::Enum(idx) => {
+                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                path.0.last().unwrap()
+                            }
+                            SimpleType::Struct(idx) => {
+                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                match path.0.last().unwrap().as_str() {
+                                    "Float" => "Float | float",
+                                    "Bool" => "Bool | bool",
+                                    name => name,
                                 }
                             }
+                        });
 
-                            let default_value = match variable_info.raw_type.as_str() {
-                                "bool" => Cow::Borrowed("False"),
-                                "i32" | "u32" | "f32" | "u8" => Cow::Borrowed("0"),
-                                "String" => Cow::Borrowed("\"\""),
-                                "Vec<u8>" => Cow::Borrowed("b\"\""),
-                                t => {
-                                    if python_type.starts_with("Optional") || t.starts_with("Option<") {
-                                        Cow::Borrowed("None")
-                                    } else if let Some(pos) = python_type.find('|') {
-                                        Cow::Owned(format!("{}()", &python_type[..pos - 1]))
-                                    } else if t.starts_with("Vec<") {
-                                        Cow::Borrowed("[]")
-                                    } else if t.starts_with("Box<") {
-                                        let inner_type =
-                                            t.trim_start_matches("Box<").trim_end_matches('>').trim_end_matches('T');
-                                        Cow::Owned(format!("{inner_type}()"))
-                                    } else {
-                                        Cow::Owned(format!("{}()", t.trim_end_matches('T')))
-                                    }
-                                }
-                            };
-
-                            write_fmt!(file, "        {variable_name}: {python_type} = {default_value},");
+                        if let Some((_, value)) = default_overrides
+                            .iter()
+                            .find(|(field, _)| field == field_name)
+                        {
+                            write_fmt!(file, "        {field_name}: {python_type} = {value},");
+                            continue;
                         }
 
-                        write_str!(file, "    ): ...");
+                        let default_value = match &field_info.type_ {
+                            SimpleType::Bool => Cow::Borrowed("False"),
+                            SimpleType::Float(_) => Cow::Borrowed("0.0"),
+                            SimpleType::Integer(_) => Cow::Borrowed("0"),
+                            SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
+                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let name = path.0.last().unwrap();
+                                Cow::Owned(format!("{name}()"))
+                            }
+                        };
+
+                        write_fmt!(
+                            file,
+                            "        {field_name}: {python_type} = {default_value},"
+                        );
                     }
+
+                    write_str!(file, "    ): ...");
+                }
+            }
+            DeclarationKind::Table(info) => {
+                for (field_name, field_info) in &info.fields {
+                    let mut python_type = match &field_info.type_.kind {
+                        TypeKind::SimpleType(simple_type) => Cow::Borrowed(match simple_type {
+                            SimpleType::Bool => "bool",
+                            SimpleType::Float(_) => "float",
+                            SimpleType::Integer(_) => "int",
+                            SimpleType::Enum(idx) => {
+                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                path.0.last().unwrap()
+                            }
+                            SimpleType::Struct(idx) => {
+                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                path.0.last().unwrap()
+                            }
+                        }),
+                        TypeKind::Union(idx) | TypeKind::Table(idx) => {
+                            let (path, _) = type_data.get_index(idx.0).unwrap();
+                            Cow::Borrowed(path.0.last().unwrap().as_str())
+                        }
+                        TypeKind::String => Cow::Borrowed("str"),
+                        TypeKind::Vector(inner_type) => match inner_type.kind {
+                            TypeKind::SimpleType(simple_type) => match simple_type {
+                                SimpleType::Bool => Cow::Borrowed("Sequence[bool]"),
+                                SimpleType::Float(_) => Cow::Borrowed("Sequence[float]"),
+                                SimpleType::Integer(IntegerType::U8) => Cow::Borrowed("bytes"),
+                                SimpleType::Integer(_) => Cow::Borrowed("Sequence[int]"),
+                                SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
+                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    let name = path.0.last().unwrap().as_str();
+                                    Cow::Owned(format!("Sequence[{name}]"))
+                                }
+                            },
+                            TypeKind::String => Cow::Borrowed("Sequence[str]"),
+                            TypeKind::Table(idx) => {
+                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let name = path.0.last().unwrap().as_str();
+                                Cow::Owned(format!("Sequence[{name}]"))
+                            }
+                            _ => unimplemented!(),
+                        },
+                        _ => unimplemented!(),
+                    };
+
+                    if matches!(field_info.assign_mode, AssignMode::Optional) {
+                        let mut new_type = python_type.to_string();
+                        new_type.push_str(" | None");
+                        python_type = Cow::Owned(new_type);
+                    }
+
+                    write_fmt!(file, "    {field_name}: {python_type}");
+
+                    if !field_info.docstrings.docstrings.is_empty() {
+                        write_str!(file, "    \"\"\"");
+
+                        for line in &field_info.docstrings.docstrings {
+                            write_fmt!(file, "    {}", line.value.trim());
+                        }
+
+                        write_str!(file, "    \"\"\"");
+                    }
+                }
+
+                if info.fields.is_empty() {
+                    write_str!(file, "    def __init__(self): ...");
+                    continue;
+                }
+
+                write_str!(file, "");
+                write_str!(file, "    __match_args__ = (");
+
+                for field_name in info.fields.keys() {
+                    write_fmt!(file, "        \"{field_name}\",");
+                }
+                write_str!(file, "    )");
+                write_str!(file, "");
+
+                let inits = [("new", "cls"), ("init", "self")];
+
+                for (func, first_arg) in inits {
+                    write_fmt!(file, "    def __{func}__(");
+                    write_fmt!(file, "        {first_arg},");
+
+                    for (field_name, field_info) in &info.fields {
+                        let mut python_type = match &field_info.type_.kind {
+                            TypeKind::SimpleType(simple_type) => Cow::Borrowed(match simple_type {
+                                SimpleType::Bool => "bool",
+                                SimpleType::Float(_) => "float",
+                                SimpleType::Integer(_) => "int",
+                                SimpleType::Enum(idx) => {
+                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    path.0.last().unwrap()
+                                }
+                                SimpleType::Struct(idx) => {
+                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    match path.0.last().unwrap().as_str() {
+                                        "Float" => "Float | float",
+                                        "Bool" => "Bool | bool",
+                                        name => name,
+                                    }
+                                }
+                            }),
+                            TypeKind::Table(idx) => {
+                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                Cow::Borrowed(path.0.last().unwrap().as_str())
+                            }
+                            TypeKind::Union(idx) => {
+                                let (_, info) = type_data.get_index(idx.0).unwrap();
+                                let DeclarationKind::Union(union_info) = &info.kind else {
+                                    unreachable!()
+                                };
+
+                                let mut keys: Vec<_> =
+                                    union_info.variants.keys().cloned().collect();
+                                keys.sort_unstable();
+
+                                Cow::Owned(keys.join(" | "))
+                            }
+                            TypeKind::String => Cow::Borrowed("str"),
+                            TypeKind::Vector(inner_type) => match inner_type.kind {
+                                TypeKind::SimpleType(simple_type) => match simple_type {
+                                    SimpleType::Bool => Cow::Borrowed("Sequence[bool]"),
+                                    SimpleType::Float(_) => Cow::Borrowed("Sequence[float]"),
+                                    SimpleType::Integer(IntegerType::U8) => Cow::Borrowed("bytes"),
+                                    SimpleType::Integer(_) => Cow::Borrowed("Sequence[int]"),
+                                    SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
+                                        let (path, _) = type_data.get_index(idx.0).unwrap();
+                                        let name = path.0.last().unwrap().as_str();
+                                        Cow::Owned(format!("Sequence[{name}]"))
+                                    }
+                                },
+                                TypeKind::String => Cow::Borrowed("Sequence[str]"),
+                                TypeKind::Table(idx) => {
+                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    let name = path.0.last().unwrap().as_str();
+                                    Cow::Owned(format!("Sequence[{name}]"))
+                                }
+                                _ => unimplemented!(),
+                            },
+                            _ => unimplemented!(),
+                        };
+
+                        if matches!(field_info.assign_mode, AssignMode::Optional) {
+                            let mut new_type = python_type.to_string();
+                            new_type.push_str(" | None");
+                            python_type = Cow::Owned(new_type);
+                        }
+
+                        let default_value = match &field_info.type_.kind {
+                            TypeKind::SimpleType(simple_type) => match simple_type {
+                                SimpleType::Bool => Cow::Borrowed("False"),
+                                SimpleType::Float(_) => Cow::Borrowed("0.0"),
+                                SimpleType::Integer(_) => Cow::Borrowed("0"),
+                                SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
+                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    let name = path.0.last().unwrap();
+                                    Cow::Owned(format!("{name}()"))
+                                }
+                            },
+                            TypeKind::String => Cow::Borrowed("\"\""),
+                            TypeKind::Vector(inner_type) => match &inner_type.kind {
+                                TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
+                                    Cow::Borrowed("bytes()")
+                                }
+                                _ => Cow::Borrowed("[]"),
+                            },
+                            TypeKind::Table(idx) => {
+                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let name = path.0.last().unwrap();
+                                Cow::Owned(format!("{name}()"))
+                            }
+                            TypeKind::Union(idx) => {
+                                let (_, info) = type_data.get_index(idx.0).unwrap();
+                                let DeclarationKind::Union(union_info) = &info.kind else {
+                                    unreachable!()
+                                };
+
+                                let mut keys: Vec<_> = union_info.variants.keys().collect();
+                                keys.sort_unstable();
+
+                                Cow::Owned(format!("{}()", keys[0]))
+                            }
+                            _ => unimplemented!(),
+                        };
+
+                        write_fmt!(
+                            file,
+                            "        {field_name}: {python_type} = {default_value},"
+                        );
+                    }
+
+                    write_str!(file, "    ): ...");
                 }
 
                 write_str!(file, "    def pack(self) -> bytes:");
                 write_str!(file, "        \"\"\"");
                 write_str!(file, "        Serializes this instance into a byte array");
-                write_str!(file, "        \"\"\"");
+                write_str!(file, "        \"\"\"\n");
 
                 write_str!(file, "    @staticmethod");
                 write_fmt!(file, "    def unpack(data: bytes) -> {type_name}:");
@@ -317,8 +417,9 @@ pub fn generator(type_data: &[PythonBindType]) -> io::Result<()> {
                     file,
                     "        :raises InvalidFlatbuffer: If the `data` is invalid for this type"
                 );
-                write_str!(file, "        \"\"\"");
+                write_str!(file, "        \"\"\"\n");
             }
+            _ => unimplemented!(),
         }
 
         write_str!(file, "    def __str__(self) -> str: ...");

@@ -1,29 +1,23 @@
-#[allow(
-    clippy::extra_unused_lifetimes,
-    clippy::missing_safety_doc,
-    clippy::derivable_impls,
-    clippy::unnecessary_cast,
-    clippy::size_of_in_element_count,
-    clippy::needless_lifetimes,
-    clippy::too_long_first_doc_paragraph,
-    unsafe_op_in_unsafe_fn,
-    non_snake_case,
-    unused_imports
-)]
-pub mod generated;
+mod planus_flat;
+pub use planus_flat::rlbot::flat;
 
-#[allow(clippy::enum_variant_names, clippy::useless_conversion, unused_imports)]
+#[allow(clippy::enum_variant_names, unused_imports)]
 mod python;
 
 use pyo3::{PyClass, create_exception, exceptions::PyValueError, prelude::*, types::*};
 use python::*;
 use std::{panic::Location, path::MAIN_SEPARATOR};
 
-create_exception!(rlbot_flatbuffers, InvalidFlatbuffer, PyValueError, "Invalid FlatBuffer");
+create_exception!(
+    rlbot_flatbuffers,
+    InvalidFlatbuffer,
+    PyValueError,
+    "Invalid FlatBuffer"
+);
 
 #[inline(never)]
 #[track_caller]
-pub fn flat_err_to_py(err: flatbuffers::InvalidFlatbuffer) -> PyErr {
+pub fn flat_err_to_py(err: planus::Error) -> PyErr {
     let caller = Location::caller();
     let err_msg = format!(
         "Can't make flatbuffer @ \"rlbot_flatbuffers{MAIN_SEPARATOR}{}\":\n  {err}",
@@ -82,6 +76,20 @@ where
     (&*obj.downcast_into::<T>().unwrap().borrow()).into_gil(py)
 }
 
+fn into_pystringlist_from(py: Python, obj: Vec<String>) -> Py<PyList> {
+    PyList::new(py, obj.into_iter().map(|x| PyString::new(py, &x).unbind()))
+        .unwrap()
+        .unbind()
+}
+
+fn from_pystring_into(obj: Bound<PyAny>) -> String {
+    obj.downcast_into::<PyString>()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_string()
+}
+
 pub trait PyDefault: Sized + PyClass {
     fn py_default(py: Python) -> Py<Self>;
 }
@@ -134,14 +142,8 @@ pub enum PartFloats {
 impl FromGil<PartFloats> for Py<Float> {
     fn from_gil(py: Python, floats: PartFloats) -> Self {
         match floats {
-            PartFloats::Float(num) => Py::new(
-                py,
-                Float {
-                    val: PyFloat::new(py, num).unbind(),
-                },
-            )
-            .unwrap(),
             PartFloats::Flat(float) => float,
+            PartFloats::Float(num) => Py::new(py, Float::new(py, num)).unwrap(),
         }
     }
 }
