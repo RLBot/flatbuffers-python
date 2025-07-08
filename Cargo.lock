@@ -834,7 +834,6 @@ dependencies = [
  "planus-translation",
  "planus-types",
  "pyo3",
- "serde",
 ]
 
 [[package]]

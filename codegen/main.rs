@@ -177,7 +177,14 @@ fn main() -> eyre::Result<()> {
         python_mod.into_iter().collect::<String>(),
     )?;
 
-    let generated_planus = planus_codegen::generate_rust(&declarations)?.replace("RlBot", "RLBot");
+    let mut generated_planus =
+        planus_codegen::generate_rust(&declarations)?.replace("RlBot", "RLBot");
+
+    // remove all serde-related code
+    generated_planus = generated_planus
+        .replace("::serde::Serialize,", "")
+        .replace("::serde::Deserialize,", "");
+
     fs::write(OUT_FILE, generated_planus.as_bytes())?;
 
     class_inject::classes_to_lib_rs(class_names)?;
