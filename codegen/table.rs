@@ -783,7 +783,7 @@ impl<'a> TableBindGenerator<'a> {
         }
 
         write_str!(self, "        )");
-        write_str!(self, "    }");
+        write_str!(self, "    }\n");
     }
 
     fn generate_pack_method(&mut self) {

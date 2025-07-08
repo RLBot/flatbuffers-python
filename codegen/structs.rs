@@ -402,7 +402,7 @@ impl<'a> StructBindGenerator<'a> {
         }
 
         write_str!(self, "        ]).unwrap()");
-        write_str!(self, "    }\n");
+        write_str!(self, "    }");
     }
 
     fn generate_args(&mut self) {
