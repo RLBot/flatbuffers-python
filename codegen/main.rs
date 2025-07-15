@@ -6,6 +6,8 @@ use std::{
     io::Write,
     path::Path,
     process::{Command, Stdio},
+    sync::mpsc,
+    thread,
 };
 
 use crate::{
@@ -164,52 +166,82 @@ fn main() -> eyre::Result<()> {
     let mut python_files = Vec::with_capacity(declarations.declarations.len() + 1);
     python_files.push(String::from("mod.rs"));
 
+    let items: Vec<_> = declarations.declarations.keys().collect();
+
     // generate custom code
-    for (path, item) in &declarations.declarations {
-        let item_name = path.0.last().unwrap().as_str();
-        if item_name == "Float" {
-            // Special case for Float (we always inline Float into Py<PyFloat>)
-            continue;
+    thread::scope(|s| {
+        let (tx, rx) = mpsc::channel();
+
+        let num_codegen_threads = thread::available_parallelism().unwrap().get();
+        let num_items_per_thread = items.len().div_ceil(num_codegen_threads).max(8);
+        let num_threads = items.len().div_ceil(num_items_per_thread);
+
+        for i in 0..num_threads {
+            let start_num = num_items_per_thread * i;
+            let end_num = (start_num + num_items_per_thread).min(items.len());
+
+            let declarations = &declarations.declarations;
+            let items = &items[start_num..end_num];
+            let tx = tx.clone();
+
+            s.spawn(move || {
+                for &path in items {
+                    let item = &declarations[path];
+                    let item_name = path.0.last().unwrap().as_str();
+                    if item_name == "Float" {
+                        // Special case for Float (we always inline Float into Py<PyFloat>)
+                        continue;
+                    }
+
+                    let mut file_name = camel_to_snake(item_name);
+
+                    let file_contents = match &item.kind {
+                        DeclarationKind::Table(info) => {
+                            let bind_gen =
+                                TableBindGenerator::new(item_name, &info.fields, declarations);
+                            bind_gen.generate_binds()
+                        }
+                        DeclarationKind::Struct(info) => {
+                            let bind_gen =
+                                StructBindGenerator::new(item_name, &info.fields, declarations);
+                            bind_gen.generate_binds()
+                        }
+                        DeclarationKind::Enum(info) => {
+                            let bind_gen = EnumBindGenerator::new(item_name, &info.variants);
+                            bind_gen.generate_binds()
+                        }
+                        DeclarationKind::Union(info) => {
+                            let bind_gen = UnionBindGenerator::new(item_name, &info.variants);
+                            bind_gen.generate_binds()
+                        }
+                        DeclarationKind::RpcService(_) => unimplemented!(),
+                    };
+
+                    let mod_lines: String =
+                        ["mod ", &file_name, ";\n", "pub use ", &file_name, "::*;\n"]
+                            .into_iter()
+                            .collect();
+                    file_name.push_str(".rs");
+
+                    fs::write(
+                        python_folder.join(&file_name),
+                        format_string(&file_contents.join("\n")).unwrap(),
+                    )
+                    .unwrap();
+
+                    tx.send((item_name, mod_lines, file_name)).unwrap();
+                }
+            });
         }
 
-        let mut file_name = camel_to_snake(item_name);
+        drop(tx);
 
-        let file_contents = match &item.kind {
-            DeclarationKind::Table(info) => {
-                let bind_gen =
-                    TableBindGenerator::new(item_name, &info.fields, &declarations.declarations);
-                bind_gen.generate_binds()
-            }
-            DeclarationKind::Struct(info) => {
-                let bind_gen =
-                    StructBindGenerator::new(item_name, &info.fields, &declarations.declarations);
-                bind_gen.generate_binds()
-            }
-            DeclarationKind::Enum(info) => {
-                let bind_gen = EnumBindGenerator::new(item_name, &info.variants);
-                bind_gen.generate_binds()
-            }
-            DeclarationKind::Union(info) => {
-                let bind_gen = UnionBindGenerator::new(item_name, &info.variants);
-                bind_gen.generate_binds()
-            }
-            DeclarationKind::RpcService(_) => unimplemented!(),
-        };
-
-        class_names.push(item_name);
-        python_mod.push(
-            ["mod ", &file_name, ";\n", "pub use ", &file_name, "::*;\n"]
-                .into_iter()
-                .collect(),
-        );
-        file_name.push_str(".rs");
-
-        fs::write(
-            python_folder.join(&file_name),
-            format_string(&file_contents.join("\n"))?,
-        )?;
-        python_files.push(file_name);
-    }
+        for (class_name, mod_lines, file_name) in rx.iter() {
+            class_names.push(class_name);
+            python_mod.push(mod_lines);
+            python_files.push(file_name);
+        }
+    });
 
     // remove old files for types that don't exist anymore
     for item in fs::read_dir(python_folder)?.flatten() {
