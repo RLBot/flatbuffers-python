@@ -61,11 +61,8 @@ if __name__ == "__main__":
 
     dgs = DesiredGameState(match_info=DesiredMatchInfo(game_speed=2))
 
-    match dgs.match_info:
-        case DesiredMatchInfo():
-            dgs.match_info.world_gravity_z = -650
-        case _:
-            assert False
+    assert dgs.match_info is not None
+    dgs.match_info.world_gravity_z = -650
 
     assert dgs.match_info.game_speed is not None
     dgs.match_info.game_speed += 1

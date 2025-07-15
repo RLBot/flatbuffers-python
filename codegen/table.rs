@@ -627,7 +627,6 @@ impl<'a> TableBindGenerator<'a> {
             .fields
             .iter()
             .map(|(field_name, field_info)| match &field_info.type_.kind {
-                TypeKind::String => format!("{field_name}={{:?}}"),
                 TypeKind::Vector(inner_type) => match inner_type.kind {
                     TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
                         format!("{field_name}=bytes([{{}}])")
@@ -694,7 +693,7 @@ impl<'a> TableBindGenerator<'a> {
                     _ => {
                         write_fmt!(
                             self,
-                            "            self.{field_name}.bind(py).to_cow().unwrap(),"
+                            "            format!(\"{{:?}}\", self.{field_name}.bind(py).to_cow().unwrap()),"
                         );
                     }
                 },
