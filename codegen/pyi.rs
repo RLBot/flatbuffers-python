@@ -32,16 +32,6 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
         Cow::Borrowed(""),
     ];
 
-    // let primitive_map = [
-    //     ("bool", "bool"),
-    //     ("i32", "int"),
-    //     ("u32", "int"),
-    //     ("f32", "float"),
-    //     ("String", "str"),
-    //     ("u8", "int"),
-    //     ("Vec<u8>", "bytes"),
-    // ];
-
     let mut sorted_types: Vec<_> = type_data.iter().collect();
     sorted_types.sort_by(|(a, _), (b, _)| a.0.last().unwrap().cmp(b.0.last().unwrap()));
 
@@ -133,7 +123,8 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                 }
 
                 if info.fields.is_empty() {
-                    write_str!(file, "    def __init__(self): ...");
+                    write_str!(file, "    def __new__(cls): ...");
+                    write_str!(file, "    def __init__(self): ...\n");
                     continue;
                 }
 
@@ -174,11 +165,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                             }
                             SimpleType::Struct(idx) => {
                                 let (path, _) = type_data.get_index(idx.0).unwrap();
-                                match path.0.last().unwrap().as_str() {
-                                    "Float" => "Float | float",
-                                    "Bool" => "Bool | bool",
-                                    name => name,
-                                }
+                                path.0.last().unwrap()
                             }
                         });
 
@@ -223,7 +210,10 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                             }
                             SimpleType::Struct(idx) => {
                                 let (path, _) = type_data.get_index(idx.0).unwrap();
-                                path.0.last().unwrap()
+                                match path.0.last().unwrap().as_str() {
+                                    "Float" => "float",
+                                    name => name,
+                                }
                             }
                         }),
                         TypeKind::Union(idx) | TypeKind::Table(idx) => {
@@ -274,7 +264,8 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                 }
 
                 if info.fields.is_empty() {
-                    write_str!(file, "    def __init__(self): ...");
+                    write_str!(file, "    def __new__(cls): ...");
+                    write_str!(file, "    def __init__(self): ...\n");
                     continue;
                 }
 
@@ -306,8 +297,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                                 SimpleType::Struct(idx) => {
                                     let (path, _) = type_data.get_index(idx.0).unwrap();
                                     match path.0.last().unwrap().as_str() {
-                                        "Float" => "Float | float",
-                                        "Bool" => "Bool | bool",
+                                        "Float" => "float",
                                         name => name,
                                     }
                                 }
@@ -352,48 +342,51 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                             _ => unimplemented!(),
                         };
 
-                        if matches!(field_info.assign_mode, AssignMode::Optional) {
-                            let mut new_type = python_type.to_string();
-                            new_type.push_str(" | None");
-                            python_type = Cow::Owned(new_type);
-                        }
+                        let default_value =
+                            if matches!(field_info.assign_mode, AssignMode::Optional) {
+                                let mut new_type = python_type.to_string();
+                                new_type.push_str(" | None");
+                                python_type = Cow::Owned(new_type);
 
-                        let default_value = match &field_info.type_.kind {
-                            TypeKind::SimpleType(simple_type) => match simple_type {
-                                SimpleType::Bool => Cow::Borrowed("False"),
-                                SimpleType::Float(_) => Cow::Borrowed("0.0"),
-                                SimpleType::Integer(_) => Cow::Borrowed("0"),
-                                SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
-                                    let (path, _) = type_data.get_index(idx.0).unwrap();
-                                    let name = path.0.last().unwrap();
-                                    Cow::Owned(format!("{name}()"))
+                                Cow::Borrowed("None")
+                            } else {
+                                match &field_info.type_.kind {
+                                    TypeKind::SimpleType(simple_type) => match simple_type {
+                                        SimpleType::Bool => Cow::Borrowed("False"),
+                                        SimpleType::Float(_) => Cow::Borrowed("0.0"),
+                                        SimpleType::Integer(_) => Cow::Borrowed("0"),
+                                        SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
+                                            let (path, _) = type_data.get_index(idx.0).unwrap();
+                                            let name = path.0.last().unwrap();
+                                            Cow::Owned(format!("{name}()"))
+                                        }
+                                    },
+                                    TypeKind::String => Cow::Borrowed("\"\""),
+                                    TypeKind::Vector(inner_type) => match &inner_type.kind {
+                                        TypeKind::SimpleType(SimpleType::Integer(
+                                            IntegerType::U8,
+                                        )) => Cow::Borrowed("bytes()"),
+                                        _ => Cow::Borrowed("[]"),
+                                    },
+                                    TypeKind::Table(idx) => {
+                                        let (path, _) = type_data.get_index(idx.0).unwrap();
+                                        let name = path.0.last().unwrap();
+                                        Cow::Owned(format!("{name}()"))
+                                    }
+                                    TypeKind::Union(idx) => {
+                                        let (_, info) = type_data.get_index(idx.0).unwrap();
+                                        let DeclarationKind::Union(union_info) = &info.kind else {
+                                            unreachable!()
+                                        };
+
+                                        let mut keys: Vec<_> = union_info.variants.keys().collect();
+                                        keys.sort_unstable();
+
+                                        Cow::Owned(format!("{}()", keys[0]))
+                                    }
+                                    _ => unimplemented!(),
                                 }
-                            },
-                            TypeKind::String => Cow::Borrowed("\"\""),
-                            TypeKind::Vector(inner_type) => match &inner_type.kind {
-                                TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
-                                    Cow::Borrowed("bytes()")
-                                }
-                                _ => Cow::Borrowed("[]"),
-                            },
-                            TypeKind::Table(idx) => {
-                                let (path, _) = type_data.get_index(idx.0).unwrap();
-                                let name = path.0.last().unwrap();
-                                Cow::Owned(format!("{name}()"))
-                            }
-                            TypeKind::Union(idx) => {
-                                let (_, info) = type_data.get_index(idx.0).unwrap();
-                                let DeclarationKind::Union(union_info) = &info.kind else {
-                                    unreachable!()
-                                };
-
-                                let mut keys: Vec<_> = union_info.variants.keys().collect();
-                                keys.sort_unstable();
-
-                                Cow::Owned(format!("{}()", keys[0]))
-                            }
-                            _ => unimplemented!(),
-                        };
+                            };
 
                         write_fmt!(
                             file,

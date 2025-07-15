@@ -1,6 +1,12 @@
-use eyre::ContextCompat;
+use eyre::{Context, ContextCompat};
 use planus_types::{ast::IntegerType, intermediate::DeclarationKind};
-use std::{env::set_current_dir, fs, path::Path};
+use std::{
+    env::set_current_dir,
+    fs,
+    io::Write,
+    path::Path,
+    process::{Command, Stdio},
+};
 
 use crate::{
     enums::EnumBindGenerator, structs::StructBindGenerator, table::TableBindGenerator,
@@ -80,6 +86,46 @@ fn camel_to_snake(input: &str) -> String {
     snake_case
 }
 
+/// Taken from <https://github.com/planus-org/planus/blob/main/crates/planus-codegen/src/rust/mod.rs#L1014>
+///
+/// This formats a string using `rustfmt` (using Rust 2024 and not 2021)
+fn format_string(s: &str) -> eyre::Result<String> {
+    let mut child = Command::new("rustfmt");
+
+    child
+        .arg("--edition=2024")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+
+    let mut child = child
+        .spawn()
+        .wrap_err("Unable to spawn rustfmt. Perhaps it is not installed?")?;
+
+    {
+        let child_stdin = child.stdin.as_mut().unwrap();
+        child_stdin
+            .write_all(s.as_bytes())
+            .wrap_err("Unable to write the file to rustfmt")?;
+    }
+
+    let output = child
+        .wait_with_output()
+        .wrap_err("Unable to get the formatted file back from rustfmt")?;
+
+    if output.status.success() && output.stderr.is_empty() {
+        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
+    } else if output.stderr.is_empty() {
+        eyre::bail!("rustfmt failed with exit code {}", output.status);
+    } else {
+        eyre::bail!(
+            "rustfmt failed with exit code {} and message:\n{}",
+            output.status,
+            String::from_utf8_lossy(&output.stderr).into_owned(),
+        )
+    }
+}
+
 fn main() -> eyre::Result<()> {
     set_current_dir(env!("CARGO_MANIFEST_DIR")).unwrap();
 
@@ -121,6 +167,11 @@ fn main() -> eyre::Result<()> {
     // generate custom code
     for (path, item) in &declarations.declarations {
         let item_name = path.0.last().unwrap().as_str();
+        if item_name == "Float" {
+            // Special case for Float (we always inline Float into Py<PyFloat>)
+            continue;
+        }
+
         let mut file_name = camel_to_snake(item_name);
 
         let file_contents = match &item.kind {
@@ -153,7 +204,10 @@ fn main() -> eyre::Result<()> {
         );
         file_name.push_str(".rs");
 
-        fs::write(python_folder.join(&file_name), file_contents.join("\n"))?;
+        fs::write(
+            python_folder.join(&file_name),
+            format_string(&file_contents.join("\n"))?,
+        )?;
         python_files.push(file_name);
     }
 
@@ -185,7 +239,7 @@ fn main() -> eyre::Result<()> {
         .replace("::serde::Serialize,", "")
         .replace("::serde::Deserialize,", "");
 
-    fs::write(OUT_FILE, generated_planus.as_bytes())?;
+    fs::write(OUT_FILE, format_string(&generated_planus)?.as_bytes())?;
 
     class_inject::classes_to_lib_rs(class_names)?;
     pyi::generator(&declarations.declarations)?;

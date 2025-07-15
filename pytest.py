@@ -63,15 +63,13 @@ if __name__ == "__main__":
 
     match dgs.match_info:
         case DesiredMatchInfo():
-            dgs.match_info.world_gravity_z = Float(-650)
+            dgs.match_info.world_gravity_z = -650
         case _:
             assert False
 
-    match dgs.match_info.game_speed:
-        case Float(val):
-            dgs.match_info.game_speed.val = val + 1
-        case _:
-            assert False
+    assert dgs.match_info.game_speed is not None
+    dgs.match_info.game_speed += 1
+    assert dgs.match_info.game_speed == 3
 
     dgs.console_commands = [ConsoleCommand("dump_items")]
     dgs.ball_states = [DesiredBallState()]

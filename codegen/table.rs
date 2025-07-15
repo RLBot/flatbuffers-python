@@ -72,8 +72,13 @@ impl<'a> TableBindGenerator<'a> {
                     SimpleType::Integer(int_type) => Cow::Borrowed(get_int_name(int_type)),
                     SimpleType::Struct(idx) => {
                         let (path, _) = self.all_items.get_index(idx.0).unwrap();
-                        let name = path.0.last().unwrap();
-                        Cow::Owned(format!("Py<super::{name}>"))
+                        match path.0.last().unwrap().as_str() {
+                            "Float" => {
+                                add_set = false;
+                                Cow::Borrowed("Py<PyFloat>")
+                            }
+                            name => Cow::Owned(format!("Py<super::{name}>")),
+                        }
                     }
                     SimpleType::Enum(idx) => {
                         let (path, _) = self.all_items.get_index(idx.0).unwrap();
@@ -178,7 +183,6 @@ impl<'a> TableBindGenerator<'a> {
         }
 
         write_fmt!(self, "impl FromGil<{impl_type}> for {} {{", self.name);
-
         write_str!(self, "    #[allow(unused_variables)]");
         write_fmt!(
             self,
@@ -195,9 +199,17 @@ impl<'a> TableBindGenerator<'a> {
                     SimpleType::Bool | SimpleType::Integer(_) => {
                         format!("flat_t.{field_name}")
                     }
-                    SimpleType::Struct(_) => match field_info.assign_mode {
+                    SimpleType::Struct(idx) => match field_info.assign_mode {
                         AssignMode::Optional => {
-                            format!("flat_t.{field_name}.map(|x| crate::into_py_from(py, x))")
+                            let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                            match path.0.last().unwrap().as_str() {
+                                "Float" => format!(
+                                    "flat_t.{field_name}.map(|x| crate::float_to_py(py, x.val))"
+                                ),
+                                _ => format!(
+                                    "flat_t.{field_name}.map(|x| crate::into_py_from(py, x))"
+                                ),
+                            }
                         }
                         _ => {
                             format!("crate::into_py_from(py, flat_t.{field_name})")
@@ -290,11 +302,17 @@ impl<'a> TableBindGenerator<'a> {
                     SimpleType::Bool | SimpleType::Integer(_) => {
                         format!("py_type.{field_name}")
                     }
-                    SimpleType::Struct(_) => match field_info.assign_mode {
+                    SimpleType::Struct(idx) => match field_info.assign_mode {
                         AssignMode::Optional => {
-                            format!(
-                                "py_type.{field_name}.as_ref().map(|x| crate::from_py_into(py, x))"
-                            )
+                            let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                            match path.0.last().unwrap().as_str() {
+                                "Float" => format!(
+                                    "py_type.{field_name}.as_ref().map(|x| flat::Float {{ val: crate::float_from_py(py, x) }})"
+                                ),
+                                _ => format!(
+                                    "py_type.{field_name}.as_ref().map(|x| crate::from_py_into(py, x))"
+                                ),
+                            }
                         }
                         _ => {
                             format!("crate::from_py_into(py, &py_type.{field_name})",)
@@ -376,12 +394,7 @@ impl<'a> TableBindGenerator<'a> {
                 if let TypeKind::SimpleType(SimpleType::Struct(idx)) = &field_info.type_.kind {
                     let (path, _) = self.all_items.get_index(idx.0).unwrap();
                     let name = path.0.last().unwrap();
-                    match name.as_str() {
-                        "Bool" | "Float" => {
-                            needs_python = true;
-                        }
-                        _ => {}
-                    }
+                    needs_python |= name.as_str() == "Float";
                 }
 
                 signature_parts.push(format!("{field_name}=None"));
@@ -440,8 +453,7 @@ impl<'a> TableBindGenerator<'a> {
                         let (path, _) = self.all_items.get_index(idx.0).unwrap();
                         let name = path.0.last().unwrap();
                         match name.as_str() {
-                            "Float" => Cow::Borrowed("Option<crate::PartFloats>"),
-                            "Bool" => Cow::Borrowed("Option<crate::PartBools>"),
+                            "Float" => Cow::Borrowed("Option<f64>"),
                             _ => Cow::Owned(format!("Option<Py<super::{name}>>")),
                         }
                     }
@@ -479,10 +491,10 @@ impl<'a> TableBindGenerator<'a> {
                         let (path, _) = self.all_items.get_index(idx.0).unwrap();
                         let name = path.0.last().unwrap();
                         match name.as_str() {
-                            "Bool" | "Float" => {
+                            "Float" => {
                                 write_fmt!(
                                     self,
-                                    "            {field_name}: {field_name}.map(|x| x.into_gil(py)),"
+                                    "            {field_name}: {field_name}.map(|x| PyFloat::new(py, x).unbind()),"
                                 );
                             }
                             _ => {
@@ -559,20 +571,37 @@ impl<'a> TableBindGenerator<'a> {
 
         for (field_name, field_info) in self.fields {
             match &field_info.type_.kind {
-                TypeKind::SimpleType(SimpleType::Float(_)) => {
-                    write_str!(self, "\n    #[setter]");
-                    write_fmt!(
-                        self,
-                        "    pub fn {field_name}(&mut self, py: Python, value: f64) {{",
-                    );
-                    write_fmt!(
-                        self,
-                        "        self.{field_name} = PyFloat::new(py, value).unbind();"
-                    );
-                    write_str!(self, "    }");
-                }
+                TypeKind::SimpleType(simple_type) => match simple_type {
+                    SimpleType::Float(_) => {}
+                    SimpleType::Struct(idx) => {
+                        let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                        if path.0.last().unwrap().as_str() != "Float" {
+                            continue;
+                        }
+                    }
+                    _ => continue,
+                },
                 _ => continue,
-            }
+            };
+
+            write_str!(self, "\n    #[setter]");
+
+            let is_optional = matches!(field_info.assign_mode, AssignMode::Optional);
+            let value = if is_optional { "Option<f64>" } else { "f64" };
+
+            write_fmt!(
+                self,
+                "    pub fn {field_name}(&mut self, py: Python, value: {value}) {{",
+            );
+
+            let end = if matches!(field_info.assign_mode, AssignMode::Optional) {
+                "value.map(|x| PyFloat::new(py, x).unbind())"
+            } else {
+                "PyFloat::new(py, value).unbind()"
+            };
+
+            write_fmt!(self, "        self.{field_name} = {end};");
+            write_str!(self, "    }");
         }
     }
 
@@ -614,12 +643,24 @@ impl<'a> TableBindGenerator<'a> {
         for (field_name, field_info) in self.fields {
             match &field_info.type_.kind {
                 TypeKind::SimpleType(simple_type) => match simple_type {
-                    SimpleType::Struct(_) => match field_info.assign_mode {
+                    SimpleType::Struct(idx) => match field_info.assign_mode {
                         AssignMode::Optional => {
                             write_fmt!(self, "            self.{field_name}");
                             write_str!(self, "                .as_ref()");
                             write_str!(self, "                .map_or_else(crate::none_str, |x| {");
-                            write_str!(self, "                    x.borrow(py).__repr__(py)");
+
+                            let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                            match path.0.last().unwrap().as_str() {
+                                "Float" => {
+                                    write_fmt!(self, "                    x.to_string()");
+                                }
+                                _ => {
+                                    write_fmt!(
+                                        self,
+                                        "                    x.borrow(py).__repr__(py)"
+                                    );
+                                }
+                            };
                             write_str!(self, "                }),");
                         }
                         _ => {

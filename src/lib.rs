@@ -133,36 +133,6 @@ pub fn pydefault_string(py: Python) -> Py<PyString> {
     PyString::intern(py, "").unbind()
 }
 
-#[derive(FromPyObject)]
-pub enum PartFloats {
-    Float(f64),
-    Flat(Py<Float>),
-}
-
-impl FromGil<PartFloats> for Py<Float> {
-    fn from_gil(py: Python, floats: PartFloats) -> Self {
-        match floats {
-            PartFloats::Flat(float) => float,
-            PartFloats::Float(num) => Py::new(py, Float::new(py, num)).unwrap(),
-        }
-    }
-}
-
-#[derive(FromPyObject)]
-pub enum PartBools {
-    Num(bool),
-    Flat(Py<Bool>),
-}
-
-impl FromGil<PartBools> for Py<Bool> {
-    fn from_gil(py: Python, bools: PartBools) -> Self {
-        match bools {
-            PartBools::Flat(float) => float,
-            PartBools::Num(num) => Py::new(py, Bool::new(num)).unwrap(),
-        }
-    }
-}
-
 macro_rules! pynamedmodule {
     (doc: $doc:literal, name: $name:tt, classes: [$($class_name:ident),*], vars: [$(($var_name:literal, $value:expr)),*], exceptions: [$($except:expr),*]) => {
         #[doc = $doc]
@@ -194,7 +164,6 @@ pynamedmodule! {
         BallSizeMutator,
         BallTypeMutator,
         BallWeightMutator,
-        Bool,
         BoostAmountMutator,
         BoostPad,
         BoostPadState,
@@ -224,7 +193,6 @@ pynamedmodule! {
         DodgeTimerMutator,
         ExistingMatchBehavior,
         FieldInfo,
-        Float,
         GameEventMutator,
         GameMode,
         GamePacket,
@@ -276,7 +244,7 @@ pynamedmodule! {
         RotatorPartial,
         RumbleMutator,
         ScoreInfo,
-        ScoringRule,
+        ScoringRuleMutator,
         ScriptConfiguration,
         SeriesLengthMutator,
         SetLoadout,
