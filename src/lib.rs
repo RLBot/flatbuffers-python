@@ -90,6 +90,14 @@ fn from_pystring_into(obj: Bound<PyAny>) -> String {
         .to_string()
 }
 
+#[inline(never)]
+fn format_string(mut string: String) -> String {
+    const PYTHON_STRING_CHAR: char = '\"';
+    string.insert(0, PYTHON_STRING_CHAR);
+    string.push(PYTHON_STRING_CHAR);
+    string
+}
+
 pub trait PyDefault: Sized + PyClass {
     fn py_default(py: Python) -> Py<Self>;
 }

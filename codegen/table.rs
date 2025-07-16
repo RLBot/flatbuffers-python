@@ -627,6 +627,13 @@ impl<'a> TableBindGenerator<'a> {
             .fields
             .iter()
             .map(|(field_name, field_info)| match &field_info.type_.kind {
+                TypeKind::String => {
+                    if matches!(field_info.assign_mode, AssignMode::Optional) {
+                        format!("{field_name}={{}}")
+                    } else {
+                        format!("{field_name}={{:?}}")
+                    }
+                }
                 TypeKind::Vector(inner_type) => match inner_type.kind {
                     TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
                         format!("{field_name}=bytes([{{}}])")
@@ -679,24 +686,23 @@ impl<'a> TableBindGenerator<'a> {
                         write_fmt!(self, "            self.{field_name}.__repr__(),")
                     }
                 },
-                TypeKind::String => match field_info.assign_mode {
-                    AssignMode::Optional => {
+                TypeKind::String => {
+                    if matches!(field_info.assign_mode, AssignMode::Optional) {
                         write_fmt!(self, "            self.{field_name}");
                         write_str!(self, "                .as_ref()");
                         write_str!(self, "                .map_or_else(crate::none_str, |i| {");
                         write_str!(
                             self,
-                            "                    format!(\"{:?}\", i.to_str(py).unwrap().to_string())"
+                            "                    crate::format_string(i.to_str(py).unwrap().to_string())"
                         );
                         write_str!(self, "                }),");
-                    }
-                    _ => {
+                    } else {
                         write_fmt!(
                             self,
-                            "            format!(\"{{:?}}\", self.{field_name}.bind(py).to_cow().unwrap()),"
+                            "            self.{field_name}.bind(py).to_cow().unwrap(),"
                         );
                     }
-                },
+                }
                 TypeKind::Table(_) => match field_info.assign_mode {
                     AssignMode::Optional => {
                         write_fmt!(self, "            self.{field_name}");
@@ -758,7 +764,7 @@ impl<'a> TableBindGenerator<'a> {
                             write_str!(self, "                .iter()");
                             write_str!(
                                 self,
-                                "                .map(|s| format!(\"{:?}\", crate::from_pystring_into(s)))"
+                                "                .map(|s| crate::format_string(crate::from_pystring_into(s)))"
                             );
                         }
                         TypeKind::Table(idx) => {
