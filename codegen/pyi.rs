@@ -5,7 +5,7 @@ use planus_types::{
 };
 use std::{borrow::Cow, fs, io};
 
-use crate::structs::DEFAULT_OVERRIDES;
+use crate::{enums::normalize_caps, structs::DEFAULT_OVERRIDES};
 
 macro_rules! write_str {
     ($self:ident, $s:expr) => {
@@ -67,7 +67,11 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
             }
             DeclarationKind::Enum(info) => {
                 for (var_val, var_info) in &info.variants {
-                    write_fmt!(file, "    {} = {type_name}({var_val})", var_info.name);
+                    write_fmt!(
+                        file,
+                        "    {} = {type_name}({var_val})",
+                        normalize_caps(&var_info.name)
+                    );
 
                     if !var_info.docstrings.docstrings.is_empty() {
                         write_str!(file, "    \"\"\"");

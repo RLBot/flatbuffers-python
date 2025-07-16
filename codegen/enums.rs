@@ -21,7 +21,7 @@ macro_rules! write_fmt {
 /// ContactFFSilent => ContactFfSilent
 ///
 /// If a string doesn't need to be updated, the original is returned
-fn normalize_caps<'a>(input: &'a str) -> Cow<'a, str> {
+pub fn normalize_caps(input: &str) -> Cow<'_, str> {
     let bytes = input.as_bytes();
     let mut i = 0;
 
@@ -108,7 +108,7 @@ impl<'a> EnumBindGenerator<'a> {
         write_str!(self, "    #[default]");
 
         for (var_num, var_info) in self.variants {
-            write_fmt!(self, "    {} = {var_num},", var_info.name);
+            write_fmt!(self, "    {} = {var_num},", normalize_caps(&var_info.name));
         }
 
         write_str!(self, "}");
@@ -121,12 +121,11 @@ impl<'a> EnumBindGenerator<'a> {
         write_str!(self, "        match flat_t {");
 
         for var_info in self.variants.values() {
+            let var_name = normalize_caps(&var_info.name);
             write_fmt!(
                 self,
-                "            flat::{}::{} => Self::{},",
-                self.name,
-                normalize_caps(&var_info.name),
-                var_info.name,
+                "            flat::{}::{var_name} => Self::{var_name},",
+                self.name
             );
         }
 
@@ -142,12 +141,11 @@ impl<'a> EnumBindGenerator<'a> {
         write_str!(self, "        match py_type {");
 
         for var_info in self.variants.values() {
+            let var_name = normalize_caps(&var_info.name);
             write_fmt!(
                 self,
-                "            {}::{} => Self::{},",
+                "            {}::{var_name} => Self::{var_name},",
                 self.name,
-                var_info.name,
-                normalize_caps(&var_info.name),
             );
         }
 
@@ -171,7 +169,7 @@ impl<'a> EnumBindGenerator<'a> {
                 self,
                 "            {} => Ok(Self::{}),",
                 var_num.to_u64(),
-                var_info.name
+                normalize_caps(&var_info.name)
             );
         }
 
