@@ -1,11 +1,10 @@
+use crate::{enums::normalize_caps, structs::DEFAULT_OVERRIDES};
 use indexmap::IndexMap;
 use planus_types::{
     ast::IntegerType,
     intermediate::{AbsolutePath, AssignMode, Declaration, DeclarationKind, SimpleType, TypeKind},
 };
 use std::{borrow::Cow, fs, io};
-
-use crate::{enums::normalize_caps, structs::DEFAULT_OVERRIDES};
 
 macro_rules! write_str {
     ($self:ident, $s:expr) => {
@@ -36,6 +35,10 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
     sorted_types.sort_by(|(a, _), (b, _)| a.0.last().unwrap().cmp(b.0.last().unwrap()));
 
     for (full_type_name, item) in sorted_types {
+        if matches!(item.kind, DeclarationKind::Union(_)) {
+            continue;
+        }
+
         let type_name = full_type_name.0.last().unwrap();
 
         write_fmt!(file, "class {type_name}:");
@@ -51,20 +54,6 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
         }
 
         match &item.kind {
-            DeclarationKind::Union(info) => {
-                let types: Vec<_> = info.variants.keys().cloned().collect();
-                let default_value = types.first().unwrap();
-                let union_str = types.join(" | ");
-
-                write_fmt!(file, "    item: {union_str}");
-                write_str!(file, "");
-                write_str!(file, "    def __new__(");
-                write_fmt!(file, "        cls, item: {union_str} = {default_value}()");
-                write_str!(file, "    ): ...");
-                write_str!(file, "    def __init__(");
-                write_fmt!(file, "        self, item: {union_str} = {default_value}()");
-                write_str!(file, "    ): ...\n");
-            }
             DeclarationKind::Enum(info) => {
                 for (var_val, var_info) in &info.variants {
                     write_fmt!(
@@ -220,7 +209,18 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                                 }
                             }
                         }),
-                        TypeKind::Union(idx) | TypeKind::Table(idx) => {
+                        TypeKind::Union(idx) => {
+                            let (_, info) = type_data.get_index(idx.0).unwrap();
+                            let DeclarationKind::Union(union_info) = &info.kind else {
+                                unreachable!()
+                            };
+
+                            let mut keys: Vec<_> = union_info.variants.keys().cloned().collect();
+                            keys.sort_unstable();
+
+                            Cow::Owned(keys.join(" | "))
+                        }
+                        TypeKind::Table(idx) => {
                             let (path, _) = type_data.get_index(idx.0).unwrap();
                             Cow::Borrowed(path.0.last().unwrap().as_str())
                         }

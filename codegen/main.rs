@@ -195,24 +195,24 @@ fn main() -> eyre::Result<()> {
 
                     let mut file_name = camel_to_snake(item_name);
 
-                    let file_contents = match &item.kind {
+                    let (class_name, file_contents) = match &item.kind {
                         DeclarationKind::Table(info) => {
                             let bind_gen =
                                 TableBindGenerator::new(item_name, &info.fields, declarations);
-                            bind_gen.generate_binds()
+                            (Some(item_name), bind_gen.generate_binds())
                         }
                         DeclarationKind::Struct(info) => {
                             let bind_gen =
                                 StructBindGenerator::new(item_name, &info.fields, declarations);
-                            bind_gen.generate_binds()
+                            (Some(item_name), bind_gen.generate_binds())
                         }
                         DeclarationKind::Enum(info) => {
                             let bind_gen = EnumBindGenerator::new(item_name, &info.variants);
-                            bind_gen.generate_binds()
+                            (Some(item_name), bind_gen.generate_binds())
                         }
                         DeclarationKind::Union(info) => {
                             let bind_gen = UnionBindGenerator::new(item_name, &info.variants);
-                            bind_gen.generate_binds()
+                            (None, bind_gen.generate_binds())
                         }
                         DeclarationKind::RpcService(_) => unimplemented!(),
                     };
@@ -229,7 +229,7 @@ fn main() -> eyre::Result<()> {
                     )
                     .unwrap();
 
-                    tx.send((item_name, mod_lines, file_name)).unwrap();
+                    tx.send((class_name, mod_lines, file_name)).unwrap();
                 }
             });
         }
@@ -237,7 +237,10 @@ fn main() -> eyre::Result<()> {
         drop(tx);
 
         for (class_name, mod_lines, file_name) in rx.iter() {
-            class_names.push(class_name);
+            if let Some(class_name) = class_name {
+                class_names.push(class_name);
+            }
+
             python_mod.push(mod_lines);
             python_files.push(file_name);
         }

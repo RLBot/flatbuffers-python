@@ -86,11 +86,11 @@ if __name__ == "__main__":
         )
     )
 
-    if isinstance(render_type.variety.item, Line3D):
-        assert render_type.variety.item.color.r == 255
-        assert render_type.variety.item.color.a == 255
-        render_type.variety.item.color.a = 150
-        assert render_type.variety.item.color.a == 150
+    if isinstance(render_type.variety, Line3D):
+        assert render_type.variety.color.r == 255
+        assert render_type.variety.color.a == 255
+        render_type.variety.color.a = 150
+        assert render_type.variety.color.a == 150
     else:
         raise ValueError("Expected Line3D")
 
@@ -146,7 +146,7 @@ if __name__ == "__main__":
         ),
     )
 
-    match renderPolyLine.variety.item:
+    match renderPolyLine.variety:
         case PolyLine3D(points, clr):
             assert len(points) == 2048
             assert clr.a == 255

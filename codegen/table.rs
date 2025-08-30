@@ -98,12 +98,7 @@ impl<'a> TableBindGenerator<'a> {
                     }
                     _ => Cow::Borrowed("Py<PyList>"),
                 },
-                TypeKind::Union(idx) => {
-                    let (path, _) = self.all_items.get_index(idx.0).unwrap();
-                    let name = path.0.last().unwrap();
-
-                    Cow::Owned(format!("Py<super::{name}>"))
-                }
+                TypeKind::Union(_) => Cow::Borrowed("Py<PyAny>"),
                 _ => todo!("Unknown field type for {field_name} in {}", self.name),
             };
 
@@ -251,14 +246,19 @@ impl<'a> TableBindGenerator<'a> {
                     }
                     _ => todo!("Unknown field type for {field_name} in {}", self.name),
                 },
-                TypeKind::Union(_) => match field_info.assign_mode {
-                    AssignMode::Optional => {
-                        format!("flat_t.{field_name}.map(|x| crate::into_py_from(py, x))")
+                TypeKind::Union(idx) => {
+                    let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                    let type_name = path.0.last().unwrap();
+
+                    match field_info.assign_mode {
+                        AssignMode::Optional => format!(
+                            "flat_t.{field_name}.map(|x| IntoGil::<super::{type_name}>::into_gil(x, py).into_any())"
+                        ),
+                        _ => format!(
+                            "IntoGil::<super::{type_name}>::into_gil(flat_t.{field_name}, py).into_any()"
+                        ),
                     }
-                    _ => {
-                        format!("crate::into_py_from(py, flat_t.{field_name})")
-                    }
-                },
+                }
                 _ => todo!("Unknown field type for {field_name} in {}", self.name),
             };
 
@@ -356,14 +356,23 @@ impl<'a> TableBindGenerator<'a> {
                     }
                     _ => todo!("Unknown field type for {field_name} in {}", self.name),
                 },
-                TypeKind::Union(_) => match field_info.assign_mode {
-                    AssignMode::Optional => {
-                        format!("py_type.{field_name}.as_ref().map(|x| crate::from_py_into(py, x))")
+                TypeKind::Union(idx) => {
+                    let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                    let name = path.0.last().unwrap();
+
+                    match field_info.assign_mode {
+                        AssignMode::Optional => {
+                            format!(
+                                "py_type.{field_name}.as_ref().map(|x| super::{name}::from_py_object_bound(x.bind_borrowed(py)).as_ref().unwrap().into_gil(py))"
+                            )
+                        }
+                        _ => {
+                            format!(
+                                "super::{name}::from_py_object_bound(py_type.{field_name}.bind_borrowed(py)).as_ref().unwrap().into_gil(py)"
+                            )
+                        }
                     }
-                    _ => {
-                        format!("crate::from_py_into(py, &py_type.{field_name})")
-                    }
-                },
+                }
                 _ => todo!("Unknown field type for {field_name} in {}", self.name),
             };
 
@@ -470,11 +479,7 @@ impl<'a> TableBindGenerator<'a> {
                     }
                     _ => Cow::Borrowed("Option<Py<PyList>>"),
                 },
-                TypeKind::Union(idx) => {
-                    let (path, _) = self.all_items.get_index(idx.0).unwrap();
-                    let name = path.0.last().unwrap();
-                    Cow::Owned(format!("Option<super::{name}Union>"))
-                }
+                TypeKind::Union(_) => Cow::Borrowed("Option<Py<PyAny>>"),
                 _ => todo!("Unknown field type for {field_name} in {}", self.name),
             };
 
@@ -501,14 +506,6 @@ impl<'a> TableBindGenerator<'a> {
                                 write_fmt!(self, "            {field_name},");
                             }
                         }
-                    }
-                    TypeKind::Union(idx) => {
-                        let (path, _) = self.all_items.get_index(idx.0).unwrap();
-                        let name = path.0.last().unwrap();
-                        write_fmt!(
-                            self,
-                            "            {field_name}: {field_name}.map(|u| Py::new(py, super::{name}::new(u)).unwrap()),"
-                        )
                     }
                     _ => {
                         write_fmt!(self, "            {field_name},");
@@ -553,7 +550,7 @@ impl<'a> TableBindGenerator<'a> {
                     let (path, _) = self.all_items.get_index(idx.0).unwrap();
                     let name = path.0.last().unwrap();
                     Cow::Owned(format!(
-                        ": {field_name}.map(|u| Py::new(py, super::{name}::new(u)).unwrap()).unwrap_or_else(|| super::{name}::py_default(py))"
+                        ": {field_name}.unwrap_or_else(|| super::{name}::py_default(py))"
                     ))
                 }
                 _ => Cow::Borrowed(""),
@@ -718,22 +715,32 @@ impl<'a> TableBindGenerator<'a> {
                         );
                     }
                 },
-                TypeKind::Union(_) => match field_info.assign_mode {
-                    AssignMode::Optional => {
-                        write_fmt!(self, "            self.{field_name}");
-                        write_str!(self, "                .as_ref()");
-                        write_str!(
-                            self,
-                            "                .map_or_else(crate::none_str, |i| i.borrow(py).inner_repr(py)),"
-                        );
+                TypeKind::Union(idx) => {
+                    let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                    let name = path.0.last().unwrap();
+
+                    match field_info.assign_mode {
+                        AssignMode::Optional => {
+                            write_fmt!(
+                                self,
+                                "            self.{field_name}.as_ref().map_or_else(crate::none_str, |i| {{"
+                            );
+                            write_fmt!(
+                                self,
+                                "                super::{name}::from_py_object_bound(i.bind_borrowed(py))"
+                            );
+                            write_str!(self, "                .unwrap().__repr__(py)");
+                            write_str!(self, "            }),");
+                        }
+                        _ => {
+                            write_fmt!(
+                                self,
+                                "            super::{name}::from_py_object_bound(self.{field_name}.bind_borrowed(py))"
+                            );
+                            write_str!(self, "                .unwrap().__repr__(py),");
+                        }
                     }
-                    _ => {
-                        write_fmt!(
-                            self,
-                            "            self.{field_name}.borrow(py).inner_repr(py),"
-                        );
-                    }
-                },
+                }
                 TypeKind::Vector(inner_type) => {
                     write_fmt!(self, "            self.{field_name}");
 
@@ -905,7 +912,10 @@ impl<'a> TableBindGenerator<'a> {
             }));
 
         write_str!(self, "use planus::{Builder, ReadAsRoot};");
-        write_str!(self, "use pyo3::{prelude::*, types::*};");
+        write_str!(
+            self,
+            "use pyo3::{conversion::FromPyObjectBound, prelude::*, types::*};"
+        );
         write_str!(self, "");
 
         self.generate_definition();

@@ -18,7 +18,7 @@ all = "warn"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.25.0"
+pyo3 = "0.26.0"
 planus = { git = "https://github.com/swz-git/planus", rev = "a0b1fbf" }
 
 [build-dependencies]
