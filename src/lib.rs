@@ -1,29 +1,23 @@
-#[allow(
-    clippy::extra_unused_lifetimes,
-    clippy::missing_safety_doc,
-    clippy::derivable_impls,
-    clippy::unnecessary_cast,
-    clippy::size_of_in_element_count,
-    clippy::needless_lifetimes,
-    clippy::too_long_first_doc_paragraph,
-    unsafe_op_in_unsafe_fn,
-    non_snake_case,
-    unused_imports
-)]
-pub mod generated;
+mod planus_flat;
+pub use planus_flat::rlbot::flat;
 
-#[allow(clippy::enum_variant_names, clippy::useless_conversion, unused_imports)]
+#[allow(clippy::enum_variant_names, unused_imports)]
 mod python;
 
 use pyo3::{PyClass, create_exception, exceptions::PyValueError, prelude::*, types::*};
 use python::*;
 use std::{panic::Location, path::MAIN_SEPARATOR};
 
-create_exception!(rlbot_flatbuffers, InvalidFlatbuffer, PyValueError, "Invalid FlatBuffer");
+create_exception!(
+    rlbot_flatbuffers,
+    InvalidFlatbuffer,
+    PyValueError,
+    "Invalid FlatBuffer"
+);
 
 #[inline(never)]
 #[track_caller]
-pub fn flat_err_to_py(err: flatbuffers::InvalidFlatbuffer) -> PyErr {
+pub fn flat_err_to_py(err: planus::Error) -> PyErr {
     let caller = Location::caller();
     let err_msg = format!(
         "Can't make flatbuffer @ \"rlbot_flatbuffers{MAIN_SEPARATOR}{}\":\n  {err}",
@@ -82,6 +76,28 @@ where
     (&*obj.downcast_into::<T>().unwrap().borrow()).into_gil(py)
 }
 
+fn into_pystringlist_from(py: Python, obj: Vec<String>) -> Py<PyList> {
+    PyList::new(py, obj.into_iter().map(|x| PyString::new(py, &x).unbind()))
+        .unwrap()
+        .unbind()
+}
+
+fn from_pystring_into(obj: Bound<PyAny>) -> String {
+    obj.downcast_into::<PyString>()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_string()
+}
+
+#[inline(never)]
+fn format_string(mut string: String) -> String {
+    const PYTHON_STRING_CHAR: char = '\"';
+    string.insert(0, PYTHON_STRING_CHAR);
+    string.push(PYTHON_STRING_CHAR);
+    string
+}
+
 pub trait PyDefault: Sized + PyClass {
     fn py_default(py: Python) -> Py<Self>;
 }
@@ -125,42 +141,6 @@ pub fn pydefault_string(py: Python) -> Py<PyString> {
     PyString::intern(py, "").unbind()
 }
 
-#[derive(FromPyObject)]
-pub enum PartFloats {
-    Float(f64),
-    Flat(Py<Float>),
-}
-
-impl FromGil<PartFloats> for Py<Float> {
-    fn from_gil(py: Python, floats: PartFloats) -> Self {
-        match floats {
-            PartFloats::Float(num) => Py::new(
-                py,
-                Float {
-                    val: PyFloat::new(py, num).unbind(),
-                },
-            )
-            .unwrap(),
-            PartFloats::Flat(float) => float,
-        }
-    }
-}
-
-#[derive(FromPyObject)]
-pub enum PartBools {
-    Num(bool),
-    Flat(Py<Bool>),
-}
-
-impl FromGil<PartBools> for Py<Bool> {
-    fn from_gil(py: Python, bools: PartBools) -> Self {
-        match bools {
-            PartBools::Flat(float) => float,
-            PartBools::Num(num) => Py::new(py, Bool::new(num)).unwrap(),
-        }
-    }
-}
-
 macro_rules! pynamedmodule {
     (doc: $doc:literal, name: $name:tt, classes: [$($class_name:ident),*], vars: [$(($var_name:literal, $value:expr)),*], exceptions: [$($except:expr),*]) => {
         #[doc = $doc]
@@ -192,21 +172,18 @@ pynamedmodule! {
         BallSizeMutator,
         BallTypeMutator,
         BallWeightMutator,
-        Bool,
         BoostAmountMutator,
         BoostPad,
         BoostPadState,
         BoostStrengthMutator,
         BoxShape,
         CarAnchor,
-        CollisionShape,
         Color,
         ConnectionSettings,
         ConsoleCommand,
         ControllableInfo,
         ControllableTeamInfo,
         ControllerState,
-        CoreMessage,
         CorePacket,
         CustomBot,
         CylinderShape,
@@ -222,7 +199,6 @@ pynamedmodule! {
         DodgeTimerMutator,
         ExistingMatchBehavior,
         FieldInfo,
-        Float,
         GameEventMutator,
         GameMode,
         GamePacket,
@@ -232,7 +208,6 @@ pynamedmodule! {
         Human,
         InitComplete,
         InputRestrictionMutator,
-        InterfaceMessage,
         InterfacePacket,
         JumpMutator,
         Launcher,
@@ -250,7 +225,6 @@ pynamedmodule! {
         NormalGoalScoreMutator,
         OvertimeMutator,
         Physics,
-        PlayerClass,
         PlayerConfiguration,
         PlayerInfo,
         PlayerInput,
@@ -262,19 +236,17 @@ pynamedmodule! {
         PsyonixSkill,
         Rect2D,
         Rect3D,
-        RelativeAnchor,
         RemoveRenderGroup,
         RenderAnchor,
         RenderGroup,
         RenderMessage,
-        RenderType,
         RenderingStatus,
         RespawnTimeMutator,
         Rotator,
         RotatorPartial,
         RumbleMutator,
         ScoreInfo,
-        ScoringRule,
+        ScoringRuleMutator,
         ScriptConfiguration,
         SeriesLengthMutator,
         SetLoadout,

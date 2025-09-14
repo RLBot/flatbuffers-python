@@ -61,17 +61,12 @@ if __name__ == "__main__":
 
     dgs = DesiredGameState(match_info=DesiredMatchInfo(game_speed=2))
 
-    match dgs.match_info:
-        case DesiredMatchInfo():
-            dgs.match_info.world_gravity_z = Float(-650)
-        case _:
-            assert False
+    assert dgs.match_info is not None
+    dgs.match_info.world_gravity_z = -650
 
-    match dgs.match_info.game_speed:
-        case Float(val):
-            dgs.match_info.game_speed.val = val + 1
-        case _:
-            assert False
+    assert dgs.match_info.game_speed is not None
+    dgs.match_info.game_speed += 1
+    assert dgs.match_info.game_speed == 3
 
     dgs.console_commands = [ConsoleCommand("dump_items")]
     dgs.ball_states = [DesiredBallState()]
@@ -91,11 +86,11 @@ if __name__ == "__main__":
         )
     )
 
-    if isinstance(render_type.variety.item, Line3D):
-        assert render_type.variety.item.color.r == 255
-        assert render_type.variety.item.color.a == 255
-        render_type.variety.item.color.a = 150
-        assert render_type.variety.item.color.a == 150
+    if isinstance(render_type.variety, Line3D):
+        assert render_type.variety.color.r == 255
+        assert render_type.variety.color.a == 255
+        render_type.variety.color.a = 150
+        assert render_type.variety.color.a == 150
     else:
         raise ValueError("Expected Line3D")
 
@@ -151,7 +146,7 @@ if __name__ == "__main__":
         ),
     )
 
-    match renderPolyLine.variety.item:
+    match renderPolyLine.variety:
         case PolyLine3D(points, clr):
             assert len(points) == 2048
             assert clr.a == 255

@@ -72,7 +72,6 @@ docs/_build/
 .python-version
 
 # flatbuffers
-src/generated
+src/planus_flat.rs
 src/python
 *.pyi
-classes.txt

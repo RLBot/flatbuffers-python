@@ -9,7 +9,6 @@ def test_gtp():
 
     pack_times = []
     unpack_times = []
-    unpack_with_times = []
 
     gtp = flat.GamePacket(
         balls=[flat.BallInfo(shape=flat.SphereShape()) for _ in range(128)],
@@ -44,7 +43,6 @@ def test_gtp():
 
     pack_times = []
     unpack_times = []
-    unpack_with_times = []
 
     gtp = flat.GamePacket(
         balls=[flat.BallInfo(shape=flat.SphereShape()) for _ in range(1)],
@@ -109,7 +107,6 @@ def test_ballpred():
 
     pack_times = []
     unpack_times = []
-    unpack_with_times = []
 
     ballPred = flat.BallPrediction([flat.PredictionSlice(1) for _ in range(120 * 6)])
 

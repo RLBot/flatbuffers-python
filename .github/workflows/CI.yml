@@ -38,7 +38,9 @@ jobs:
           args: --release --out dist --find-interpreter -Z build-std=std,panic_abort
           sccache: 'true'
           manylinux: auto
-          before-script-linux: rustup component add rust-src --toolchain nightly
+          before-script-linux: |
+            rustup component add rustfmt
+            rustup component add rust-src --toolchain nightly
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -61,6 +63,7 @@ jobs:
         run: |
           rustup toolchain install nightly
           rustup component add rust-src --toolchain nightly
+          rustup component add rustfmt --toolchain nightly
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
