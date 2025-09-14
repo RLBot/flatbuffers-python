@@ -86,7 +86,6 @@ jobs:
       - name: Build sdist
         uses: PyO3/maturin-action@v1
         with:
-          rust-toolchain: beta
           command: sdist
           args: --out dist
       - name: Upload sdist
@@ -104,13 +103,11 @@ jobs:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          path: artifacts/
           merge-multiple: "true"
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         with:
           command: upload
-          args: --non-interactive --skip-existing artifacts/*
+          args: --non-interactive --skip-existing *
