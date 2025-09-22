@@ -14,3 +14,6 @@ dynamic = ["version", "description", "urls", "readme"]
 
 [tool.maturin]
 features = ["pyo3/extension-module", "pyo3/abi3-py310"]
+
+[tool.ruff.lint]
+ignore = ["F403", "F405"]

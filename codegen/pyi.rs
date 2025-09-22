@@ -1,8 +1,8 @@
 use crate::{enums::normalize_caps, structs::DEFAULT_OVERRIDES};
-use indexmap::IndexMap;
+use indexmap::IndexSet;
 use planus_types::{
     ast::IntegerType,
-    intermediate::{AbsolutePath, AssignMode, Declaration, DeclarationKind, SimpleType, TypeKind},
+    intermediate::{AssignMode, DeclarationKind, Declarations, SimpleType, TypeKind},
 };
 use std::{borrow::Cow, fs, io};
 
@@ -18,7 +18,7 @@ macro_rules! write_fmt {
     };
 }
 
-pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<()> {
+pub fn generator(type_data: &Declarations) -> io::Result<()> {
     let mut file = vec![
         Cow::Borrowed("from __future__ import annotations"),
         Cow::Borrowed(""),
@@ -31,10 +31,15 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
         Cow::Borrowed(""),
     ];
 
-    let mut sorted_types: Vec<_> = type_data.iter().collect();
-    sorted_types.sort_by(|(a, _), (b, _)| a.0.last().unwrap().cmp(b.0.last().unwrap()));
+    let sorted_types: IndexSet<usize> = type_data
+        .children
+        .iter()
+        .chain(&type_data.parents)
+        .flat_map(|v| v.iter().map(|ty| ty.0))
+        .collect();
 
-    for (full_type_name, item) in sorted_types {
+    for idx in sorted_types {
+        let (full_type_name, item) = type_data.declarations.get_index(idx).unwrap();
         if matches!(item.kind, DeclarationKind::Union(_)) {
             continue;
         }
@@ -56,26 +61,28 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
         match &item.kind {
             DeclarationKind::Enum(info) => {
                 for (var_val, var_info) in &info.variants {
-                    write_fmt!(
-                        file,
-                        "    {} = {type_name}({var_val})",
-                        normalize_caps(&var_info.name)
-                    );
+                    write_fmt!(file, "    {}: {type_name}", normalize_caps(&var_info.name));
+
+                    write_str!(file, "    \"\"\"");
+                    write_fmt!(file, "    self.value = {var_val}");
 
                     if !var_info.docstrings.docstrings.is_empty() {
-                        write_str!(file, "    \"\"\"");
+                        write_str!(file, "");
 
                         for line in &var_info.docstrings.docstrings {
                             write_fmt!(file, "    {}", line.value.trim());
                         }
-
-                        write_str!(file, "    \"\"\"");
                     }
+
+                    write_str!(file, "    \"\"\"");
                 }
 
                 write_str!(file, "");
-                write_str!(file, "    def __new__(cls, value: int = 0): ...");
-                write_str!(file, "    def __init__(self, value: int = 0):");
+                write_fmt!(
+                    file,
+                    "    def __new__(cls, value: int = 0) -> {type_name}: ..."
+                );
+                write_str!(file, "    def __init__(self, value: int = 0) -> None:");
                 write_str!(file, "        \"\"\"");
                 write_str!(
                     file,
@@ -93,11 +100,11 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                         SimpleType::Float(_) => "float",
                         SimpleType::Integer(_) => "int",
                         SimpleType::Enum(idx) => {
-                            let (path, _) = type_data.get_index(idx.0).unwrap();
+                            let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                             path.0.last().unwrap()
                         }
                         SimpleType::Struct(idx) => {
-                            let (path, _) = type_data.get_index(idx.0).unwrap();
+                            let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                             path.0.last().unwrap()
                         }
                     });
@@ -116,8 +123,8 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                 }
 
                 if info.fields.is_empty() {
-                    write_str!(file, "    def __new__(cls): ...");
-                    write_str!(file, "    def __init__(self): ...\n");
+                    write_fmt!(file, "    def __new__(cls) -> {type_name}: ...");
+                    write_str!(file, "    def __init__(self) -> None: ...\n");
                     continue;
                 }
 
@@ -130,7 +137,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                 write_str!(file, "    )");
                 write_str!(file, "");
 
-                let inits = [("new", "cls"), ("init", "self")];
+                let inits = [("new", "cls", type_name.as_str()), ("init", "self", "None")];
 
                 let default_overrides: Vec<_> = DEFAULT_OVERRIDES
                     .into_iter()
@@ -143,7 +150,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                     })
                     .collect();
 
-                for (func, first_arg) in inits {
+                for (func, first_arg, ret_type) in inits {
                     write_fmt!(file, "    def __{func}__(");
                     write_fmt!(file, "        {first_arg},");
 
@@ -153,11 +160,11 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                             SimpleType::Float(_) => "float",
                             SimpleType::Integer(_) => "int",
                             SimpleType::Enum(idx) => {
-                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                                 path.0.last().unwrap()
                             }
                             SimpleType::Struct(idx) => {
-                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                                 path.0.last().unwrap()
                             }
                         });
@@ -175,7 +182,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                             SimpleType::Float(_) => Cow::Borrowed("0.0"),
                             SimpleType::Integer(_) => Cow::Borrowed("0"),
                             SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
-                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                                 let name = path.0.last().unwrap();
                                 Cow::Owned(format!("{name}()"))
                             }
@@ -187,7 +194,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                         );
                     }
 
-                    write_str!(file, "    ): ...");
+                    write_fmt!(file, "    ) -> {ret_type}: ...");
                 }
             }
             DeclarationKind::Table(info) => {
@@ -198,11 +205,11 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                             SimpleType::Float(_) => "float",
                             SimpleType::Integer(_) => "int",
                             SimpleType::Enum(idx) => {
-                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                                 path.0.last().unwrap()
                             }
                             SimpleType::Struct(idx) => {
-                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                                 match path.0.last().unwrap().as_str() {
                                     "Float" => "float",
                                     name => name,
@@ -210,7 +217,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                             }
                         }),
                         TypeKind::Union(idx) => {
-                            let (_, info) = type_data.get_index(idx.0).unwrap();
+                            let (_, info) = type_data.declarations.get_index(idx.0).unwrap();
                             let DeclarationKind::Union(union_info) = &info.kind else {
                                 unreachable!()
                             };
@@ -221,7 +228,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                             Cow::Owned(keys.join(" | "))
                         }
                         TypeKind::Table(idx) => {
-                            let (path, _) = type_data.get_index(idx.0).unwrap();
+                            let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                             Cow::Borrowed(path.0.last().unwrap().as_str())
                         }
                         TypeKind::String => Cow::Borrowed("str"),
@@ -232,14 +239,15 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                                 SimpleType::Integer(IntegerType::U8) => Cow::Borrowed("bytes"),
                                 SimpleType::Integer(_) => Cow::Borrowed("Sequence[int]"),
                                 SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
-                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    let (path, _) =
+                                        type_data.declarations.get_index(idx.0).unwrap();
                                     let name = path.0.last().unwrap().as_str();
                                     Cow::Owned(format!("Sequence[{name}]"))
                                 }
                             },
                             TypeKind::String => Cow::Borrowed("Sequence[str]"),
                             TypeKind::Table(idx) => {
-                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                                 let name = path.0.last().unwrap().as_str();
                                 Cow::Owned(format!("Sequence[{name}]"))
                             }
@@ -268,8 +276,8 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                 }
 
                 if info.fields.is_empty() {
-                    write_str!(file, "    def __new__(cls): ...");
-                    write_str!(file, "    def __init__(self): ...\n");
+                    write_fmt!(file, "    def __new__(cls) -> {type_name}: ...");
+                    write_str!(file, "    def __init__(self) -> None: ...\n");
                     continue;
                 }
 
@@ -282,9 +290,9 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                 write_str!(file, "    )");
                 write_str!(file, "");
 
-                let inits = [("new", "cls"), ("init", "self")];
+                let inits = [("new", "cls", type_name.as_str()), ("init", "self", "None")];
 
-                for (func, first_arg) in inits {
+                for (func, first_arg, ret_type) in inits {
                     write_fmt!(file, "    def __{func}__(");
                     write_fmt!(file, "        {first_arg},");
 
@@ -295,11 +303,13 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                                 SimpleType::Float(_) => "float",
                                 SimpleType::Integer(_) => "int",
                                 SimpleType::Enum(idx) => {
-                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    let (path, _) =
+                                        type_data.declarations.get_index(idx.0).unwrap();
                                     path.0.last().unwrap()
                                 }
                                 SimpleType::Struct(idx) => {
-                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    let (path, _) =
+                                        type_data.declarations.get_index(idx.0).unwrap();
                                     match path.0.last().unwrap().as_str() {
                                         "Float" => "float",
                                         name => name,
@@ -307,11 +317,11 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                                 }
                             }),
                             TypeKind::Table(idx) => {
-                                let (path, _) = type_data.get_index(idx.0).unwrap();
+                                let (path, _) = type_data.declarations.get_index(idx.0).unwrap();
                                 Cow::Borrowed(path.0.last().unwrap().as_str())
                             }
                             TypeKind::Union(idx) => {
-                                let (_, info) = type_data.get_index(idx.0).unwrap();
+                                let (_, info) = type_data.declarations.get_index(idx.0).unwrap();
                                 let DeclarationKind::Union(union_info) = &info.kind else {
                                     unreachable!()
                                 };
@@ -330,14 +340,16 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                                     SimpleType::Integer(IntegerType::U8) => Cow::Borrowed("bytes"),
                                     SimpleType::Integer(_) => Cow::Borrowed("Sequence[int]"),
                                     SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
-                                        let (path, _) = type_data.get_index(idx.0).unwrap();
+                                        let (path, _) =
+                                            type_data.declarations.get_index(idx.0).unwrap();
                                         let name = path.0.last().unwrap().as_str();
                                         Cow::Owned(format!("Sequence[{name}]"))
                                     }
                                 },
                                 TypeKind::String => Cow::Borrowed("Sequence[str]"),
                                 TypeKind::Table(idx) => {
-                                    let (path, _) = type_data.get_index(idx.0).unwrap();
+                                    let (path, _) =
+                                        type_data.declarations.get_index(idx.0).unwrap();
                                     let name = path.0.last().unwrap().as_str();
                                     Cow::Owned(format!("Sequence[{name}]"))
                                 }
@@ -360,7 +372,8 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                                         SimpleType::Float(_) => Cow::Borrowed("0.0"),
                                         SimpleType::Integer(_) => Cow::Borrowed("0"),
                                         SimpleType::Enum(idx) | SimpleType::Struct(idx) => {
-                                            let (path, _) = type_data.get_index(idx.0).unwrap();
+                                            let (path, _) =
+                                                type_data.declarations.get_index(idx.0).unwrap();
                                             let name = path.0.last().unwrap();
                                             Cow::Owned(format!("{name}()"))
                                         }
@@ -373,12 +386,14 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                                         _ => Cow::Borrowed("[]"),
                                     },
                                     TypeKind::Table(idx) => {
-                                        let (path, _) = type_data.get_index(idx.0).unwrap();
+                                        let (path, _) =
+                                            type_data.declarations.get_index(idx.0).unwrap();
                                         let name = path.0.last().unwrap();
                                         Cow::Owned(format!("{name}()"))
                                     }
                                     TypeKind::Union(idx) => {
-                                        let (_, info) = type_data.get_index(idx.0).unwrap();
+                                        let (_, info) =
+                                            type_data.declarations.get_index(idx.0).unwrap();
                                         let DeclarationKind::Union(union_info) = &info.kind else {
                                             unreachable!()
                                         };
@@ -398,7 +413,7 @@ pub fn generator(type_data: &IndexMap<AbsolutePath, Declaration>) -> io::Result<
                         );
                     }
 
-                    write_str!(file, "    ): ...");
+                    write_fmt!(file, "    ) -> {ret_type}: ...");
                 }
 
                 write_str!(file, "    def pack(self) -> bytes:");

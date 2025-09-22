@@ -277,7 +277,7 @@ fn main() -> eyre::Result<()> {
     fs::write(OUT_FILE, format_string(&generated_planus)?.as_bytes())?;
 
     class_inject::classes_to_lib_rs(class_names)?;
-    pyi::generator(&declarations.declarations)?;
+    pyi::generator(&declarations)?;
 
     Ok(())
 }
