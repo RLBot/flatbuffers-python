@@ -74,10 +74,11 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
         match &item.kind {
             DeclarationKind::Enum(info) => {
                 for (var_val, var_info) in &info.variants {
-                    write_fmt!(file, "    {}: {type_name}", normalize_caps(&var_info.name));
+                    let field_name = normalize_caps(&var_info.name);
+                    write_fmt!(file, "    {field_name}: {type_name}");
 
                     write_str!(file, "    \"\"\"");
-                    write_fmt!(file, "    self.value = {var_val}");
+                    write_fmt!(file, "    `assert int({type_name}.{field_name}) == {var_val}`");
 
                     if !var_info.docstrings.docstrings.is_empty() {
                         write_str!(file, "");
