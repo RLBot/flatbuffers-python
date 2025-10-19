@@ -1,5 +1,4 @@
 use crate::{enums::normalize_caps, structs::DEFAULT_OVERRIDES};
-use indexmap::IndexSet;
 use planus_types::{
     ast::IntegerType,
     intermediate::{AssignMode, DeclarationKind, Declarations, SimpleType, TypeKind},
@@ -31,15 +30,29 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
         Cow::Borrowed(""),
     ];
 
-    let sorted_types: IndexSet<usize> = type_data
-        .children
-        .iter()
-        .chain(&type_data.parents)
-        .flat_map(|v| v.iter().map(|ty| ty.0))
-        .collect();
+    let mut sorted_types: Vec<_> = type_data.iter_declarations().collect();
+    sorted_types.sort_by_cached_key(|(idx, full_type_name, item)| match &item.kind {
+        DeclarationKind::Enum(_) => (0, 0, 0, 0, full_type_name.0.last().unwrap().as_str()),
+        DeclarationKind::Struct(item) => (
+            1,
+            item.fields
+                .iter()
+                .any(|(_, item)| matches!(item.type_, SimpleType::Struct(_))) as usize,
+            0,
+            0,
+            full_type_name.0.last().unwrap().as_str(),
+        ),
+        DeclarationKind::Table(_) | DeclarationKind::Union(_) => (
+            2,
+            0,
+            usize::MAX - type_data.parents[idx.0].len(),
+            type_data.children[idx.0].len(),
+            full_type_name.0.last().unwrap().as_str(),
+        ),
+        _ => unreachable!(),
+    });
 
-    for idx in sorted_types {
-        let (full_type_name, item) = type_data.declarations.get_index(idx).unwrap();
+    for (_, full_type_name, item) in sorted_types {
         if matches!(item.kind, DeclarationKind::Union(_)) {
             continue;
         }

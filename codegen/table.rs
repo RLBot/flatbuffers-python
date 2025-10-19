@@ -363,12 +363,12 @@ impl<'a> TableBindGenerator<'a> {
                     match field_info.assign_mode {
                         AssignMode::Optional => {
                             format!(
-                                "py_type.{field_name}.as_ref().map(|x| super::{name}::from_py_object_bound(x.bind_borrowed(py)).as_ref().unwrap().into_gil(py))"
+                                "py_type.{field_name}.as_ref().map(|x| super::{name}::extract(x.bind_borrowed(py)).as_ref().unwrap().into_gil(py))"
                             )
                         }
                         _ => {
                             format!(
-                                "super::{name}::from_py_object_bound(py_type.{field_name}.bind_borrowed(py)).as_ref().unwrap().into_gil(py)"
+                                "super::{name}::extract(py_type.{field_name}.bind_borrowed(py)).as_ref().unwrap().into_gil(py)"
                             )
                         }
                     }
@@ -727,7 +727,7 @@ impl<'a> TableBindGenerator<'a> {
                             );
                             write_fmt!(
                                 self,
-                                "                super::{name}::from_py_object_bound(i.bind_borrowed(py))"
+                                "                super::{name}::extract(i.bind_borrowed(py))"
                             );
                             write_str!(self, "                .unwrap().__repr__(py)");
                             write_str!(self, "            }),");
@@ -735,7 +735,7 @@ impl<'a> TableBindGenerator<'a> {
                         _ => {
                             write_fmt!(
                                 self,
-                                "            super::{name}::from_py_object_bound(self.{field_name}.bind_borrowed(py))"
+                                "            super::{name}::extract(self.{field_name}.bind_borrowed(py))"
                             );
                             write_str!(self, "                .unwrap().__repr__(py),");
                         }
@@ -758,7 +758,7 @@ impl<'a> TableBindGenerator<'a> {
                                 write_str!(self, "                .iter()");
                                 write_fmt!(
                                     self,
-                                    "                .map(|x| x.downcast_into::<super::{name}>().unwrap().borrow().__repr__(py))"
+                                    "                .map(|x| x.cast_into::<super::{name}>().unwrap().borrow().__repr__(py))"
                                 );
                             }
                             _ => {
@@ -781,7 +781,7 @@ impl<'a> TableBindGenerator<'a> {
                             write_str!(self, "                .iter()");
                             write_fmt!(
                                 self,
-                                "                .map(|x| x.downcast_into::<super::{name}>().unwrap().borrow().__repr__(py))"
+                                "                .map(|x| x.cast_into::<super::{name}>().unwrap().borrow().__repr__(py))"
                             );
                         }
                         _ => continue,
@@ -912,10 +912,7 @@ impl<'a> TableBindGenerator<'a> {
             }));
 
         write_str!(self, "use planus::{Builder, ReadAsRoot};");
-        write_str!(
-            self,
-            "use pyo3::{conversion::FromPyObjectBound, prelude::*, types::*};"
-        );
+        write_str!(self, "use pyo3::{prelude::*, types::*};");
         write_str!(self, "");
 
         self.generate_definition();

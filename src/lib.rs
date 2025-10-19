@@ -73,7 +73,7 @@ where
     T: PyClass,
     U: for<'a> FromGil<&'a T>,
 {
-    (&*obj.downcast_into::<T>().unwrap().borrow()).into_gil(py)
+    (&*obj.cast_into::<T>().unwrap().borrow()).into_gil(py)
 }
 
 fn into_pystringlist_from(py: Python, obj: Vec<String>) -> Py<PyList> {
@@ -83,7 +83,7 @@ fn into_pystringlist_from(py: Python, obj: Vec<String>) -> Py<PyList> {
 }
 
 fn from_pystring_into(obj: Bound<PyAny>) -> String {
-    obj.downcast_into::<PyString>()
+    obj.cast_into::<PyString>()
         .unwrap()
         .to_str()
         .unwrap()
