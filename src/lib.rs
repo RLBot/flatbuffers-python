@@ -225,6 +225,8 @@ pynamedmodule! {
         NormalGoalScoreMutator,
         OvertimeMutator,
         Physics,
+        PingRequest,
+        PingResponse,
         PlayerConfiguration,
         PlayerInfo,
         PlayerInput,

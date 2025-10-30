@@ -131,7 +131,7 @@ impl<'a> StructBindGenerator<'a> {
         if self.fields.is_empty() {
             write_fmt!(self, "impl From<{impl_type}> for {} {{", self.name);
             write_fmt!(self, "    fn from(_: {impl_type}) -> Self {{");
-            write_fmt!(self, "        {} {{}}", self.name);
+            write_str!(self, "        Self {}");
             write_str!(self, "    }");
             write_str!(self, "}");
             write_str!(self, "");
@@ -145,7 +145,7 @@ impl<'a> StructBindGenerator<'a> {
             self,
             "    fn from_gil(py: Python, flat_t: {impl_type}) -> Self {{"
         );
-        write_fmt!(self, "        {} {{", self.name);
+        write_str!(self, "        Self {");
 
         for (field_name, field_info) in self.fields {
             match &field_info.type_ {

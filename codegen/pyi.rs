@@ -78,7 +78,10 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                     write_fmt!(file, "    {field_name}: {type_name}");
 
                     write_str!(file, "    \"\"\"");
-                    write_fmt!(file, "    `assert int({type_name}.{field_name}) == {var_val}`");
+                    write_fmt!(
+                        file,
+                        "    `assert int({type_name}.{field_name}) == {var_val}`"
+                    );
 
                     if !var_info.docstrings.docstrings.is_empty() {
                         write_str!(file, "");
