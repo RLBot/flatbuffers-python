@@ -102,7 +102,7 @@ impl<'a> EnumBindGenerator<'a> {
         );
         write_str!(
             self,
-            "#[pyclass(module = \"rlbot_flatbuffers\", frozen, hash, eq, eq_int)]"
+            "#[pyclass(module = \"rlbot_flatbuffers\", from_py_object, frozen, hash, eq, eq_int)]"
         );
         write_fmt!(self, "pub enum {} {{", self.name);
         write_str!(self, "    #[default]");

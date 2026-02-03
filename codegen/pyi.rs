@@ -154,7 +154,10 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                 write_str!(file, "    )");
                 write_str!(file, "");
 
-                let inits = [("new", "cls", type_name.as_str()), ("init", "self", "None")];
+                let inits = [
+                    ("new", "cls", type_name.as_str(), " ..."),
+                    ("init", "self", "None", ""),
+                ];
 
                 let default_overrides: Vec<_> = DEFAULT_OVERRIDES
                     .into_iter()
@@ -167,7 +170,7 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                     })
                     .collect();
 
-                for (func, first_arg, ret_type) in inits {
+                for (func, first_arg, ret_type, end_str) in inits {
                     write_fmt!(file, "    def __{func}__(");
                     write_fmt!(file, "        {first_arg},");
 
@@ -211,8 +214,15 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                         );
                     }
 
-                    write_fmt!(file, "    ) -> {ret_type}: ...");
+                    write_fmt!(file, "    ) -> {ret_type}:{end_str}");
                 }
+
+                write_str!(file, "        \"\"\"");
+                write_str!(
+                    file,
+                    "        NOTE: All field initialization before `__init__`, inside of `__new__`."
+                );
+                write_str!(file, "        \"\"\"");
             }
             DeclarationKind::Table(info) => {
                 for (field_name, field_info) in &info.fields {
@@ -307,9 +317,12 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                 write_str!(file, "    )");
                 write_str!(file, "");
 
-                let inits = [("new", "cls", type_name.as_str()), ("init", "self", "None")];
+                let inits = [
+                    ("new", "cls", type_name.as_str(), " ..."),
+                    ("init", "self", "None", ""),
+                ];
 
-                for (func, first_arg, ret_type) in inits {
+                for (func, first_arg, ret_type, end_str) in inits {
                     write_fmt!(file, "    def __{func}__(");
                     write_fmt!(file, "        {first_arg},");
 
@@ -430,8 +443,15 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                         );
                     }
 
-                    write_fmt!(file, "    ) -> {ret_type}: ...");
+                    write_fmt!(file, "    ) -> {ret_type}:{end_str}");
                 }
+
+                write_str!(file, "        \"\"\"");
+                write_str!(
+                    file,
+                    "        NOTE: All field initialization before `__init__`, inside of `__new__`."
+                );
+                write_str!(file, "        \"\"\"");
 
                 write_str!(file, "    def pack(self) -> bytes:");
                 write_str!(file, "        \"\"\"");

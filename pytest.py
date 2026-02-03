@@ -2,6 +2,7 @@ from random import randrange
 from time import time_ns
 
 import numpy as np
+
 from rlbot_flatbuffers import *
 
 
@@ -45,7 +46,11 @@ if __name__ == "__main__":
 
     vec1 = MyVector(1, 2, 3)
     vec2 = Vector3(4, 5, 6)
-    print(vec1 + vec2)
+    vec3 = vec1 + vec2
+    print(vec3)
+    assert vec3.x == 5
+    assert vec3.y == 7
+    assert vec3.z == 9
 
     player_info = PlayerInfo(name="HELLO", accolades=["MVP", "Hat Trick"])
     eval(repr(player_info))
