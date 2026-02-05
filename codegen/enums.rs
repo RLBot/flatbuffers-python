@@ -98,7 +98,7 @@ impl<'a> EnumBindGenerator<'a> {
     fn generate_definition(&mut self) {
         write_str!(
             self,
-            "#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]"
+            "#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]"
         );
         write_str!(
             self,
@@ -136,8 +136,8 @@ impl<'a> EnumBindGenerator<'a> {
     }
 
     fn generate_to_flat_impls(&mut self) {
-        write_fmt!(self, "impl From<{}> for flat::{} {{", self.name, self.name);
-        write_fmt!(self, "    fn from(py_type: {}) -> Self {{", self.name);
+        write_fmt!(self, "impl From<&{}> for flat::{} {{", self.name, self.name);
+        write_fmt!(self, "    fn from(py_type: &{}) -> Self {{", self.name);
         write_str!(self, "        match py_type {");
 
         for var_info in self.variants.values() {
