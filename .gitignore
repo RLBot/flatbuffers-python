@@ -71,7 +71,5 @@ docs/_build/
 # Pyenv
 .python-version
 
-# flatbuffers
-src/planus_flat.rs
-src/python
-*.pyi
+# uv
+uv.lock
