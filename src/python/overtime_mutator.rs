@@ -1,34 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum OvertimeMutator {
-    #[default]
-    Unlimited = 0,
-    FiveMaxFirstScore = 1,
-    FiveMaxRandomTeam = 2,
-}
-
-impl From<flat::OvertimeMutator> for OvertimeMutator {
-    fn from(flat_t: flat::OvertimeMutator) -> Self {
-        match flat_t {
-            flat::OvertimeMutator::Unlimited => Self::Unlimited,
-            flat::OvertimeMutator::FiveMaxFirstScore => Self::FiveMaxFirstScore,
-            flat::OvertimeMutator::FiveMaxRandomTeam => Self::FiveMaxRandomTeam,
-        }
-    }
-}
-
-impl From<&OvertimeMutator> for flat::OvertimeMutator {
-    fn from(py_type: &OvertimeMutator) -> Self {
-        match py_type {
-            OvertimeMutator::Unlimited => Self::Unlimited,
-            OvertimeMutator::FiveMaxFirstScore => Self::FiveMaxFirstScore,
-            OvertimeMutator::FiveMaxRandomTeam => Self::FiveMaxRandomTeam,
-        }
-    }
-}
+pub use flat::OvertimeMutator;
 
 #[pymethods]
 impl OvertimeMutator {

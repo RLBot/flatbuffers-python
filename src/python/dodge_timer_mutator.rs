@@ -1,37 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum DodgeTimerMutator {
-    #[default]
-    OnePointTwentyFiveSeconds = 0,
-    TwoSeconds = 1,
-    ThreeSeconds = 2,
-    Unlimited = 3,
-}
-
-impl From<flat::DodgeTimerMutator> for DodgeTimerMutator {
-    fn from(flat_t: flat::DodgeTimerMutator) -> Self {
-        match flat_t {
-            flat::DodgeTimerMutator::OnePointTwentyFiveSeconds => Self::OnePointTwentyFiveSeconds,
-            flat::DodgeTimerMutator::TwoSeconds => Self::TwoSeconds,
-            flat::DodgeTimerMutator::ThreeSeconds => Self::ThreeSeconds,
-            flat::DodgeTimerMutator::Unlimited => Self::Unlimited,
-        }
-    }
-}
-
-impl From<&DodgeTimerMutator> for flat::DodgeTimerMutator {
-    fn from(py_type: &DodgeTimerMutator) -> Self {
-        match py_type {
-            DodgeTimerMutator::OnePointTwentyFiveSeconds => Self::OnePointTwentyFiveSeconds,
-            DodgeTimerMutator::TwoSeconds => Self::TwoSeconds,
-            DodgeTimerMutator::ThreeSeconds => Self::ThreeSeconds,
-            DodgeTimerMutator::Unlimited => Self::Unlimited,
-        }
-    }
-}
+pub use flat::DodgeTimerMutator;
 
 #[pymethods]
 impl DodgeTimerMutator {

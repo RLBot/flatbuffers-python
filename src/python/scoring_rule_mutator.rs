@@ -1,31 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum ScoringRuleMutator {
-    #[default]
-    Default = 0,
-    Disabled = 1,
-}
-
-impl From<flat::ScoringRuleMutator> for ScoringRuleMutator {
-    fn from(flat_t: flat::ScoringRuleMutator) -> Self {
-        match flat_t {
-            flat::ScoringRuleMutator::Default => Self::Default,
-            flat::ScoringRuleMutator::Disabled => Self::Disabled,
-        }
-    }
-}
-
-impl From<&ScoringRuleMutator> for flat::ScoringRuleMutator {
-    fn from(py_type: &ScoringRuleMutator) -> Self {
-        match py_type {
-            ScoringRuleMutator::Default => Self::Default,
-            ScoringRuleMutator::Disabled => Self::Disabled,
-        }
-    }
-}
+pub use flat::ScoringRuleMutator;
 
 #[pymethods]
 impl ScoringRuleMutator {

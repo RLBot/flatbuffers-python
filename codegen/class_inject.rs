@@ -22,3 +22,16 @@ pub fn classes_to_lib_rs(mut class_names: Vec<&str>) -> io::Result<()> {
 
     Ok(())
 }
+
+pub fn add_pyclass_to_planus_enum(file: &mut String, name: &str) {
+    let find_str = format!("pub enum {name} {{");
+    let file_pos = file.find(&find_str).unwrap();
+    let end_pos = file_pos + find_str.len();
+    let start_pos = file[..file_pos].rfind("#[derive").unwrap();
+    file.replace_range(
+        start_pos..end_pos,
+        &format!(
+            "#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]\n#[repr(u8)]\n#[::pyo3::pyclass(module = \"rlbot_flatbuffers\", from_py_object, frozen, hash, eq, eq_int)]\n{find_str}#[default]"
+        )
+    );
+}

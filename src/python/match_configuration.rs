@@ -69,7 +69,7 @@ impl FromGil<&flat::MatchConfiguration> for MatchConfiguration {
     #[allow(unused_variables)]
     fn from_gil(py: Python, flat_t: &flat::MatchConfiguration) -> Self {
         MatchConfiguration {
-            launcher: flat_t.launcher.into(),
+            launcher: flat_t.launcher,
             launcher_arg: PyString::new(py, &flat_t.launcher_arg).unbind(),
             auto_start_agents: flat_t.auto_start_agents,
             wait_for_agents: flat_t.wait_for_agents,
@@ -92,15 +92,15 @@ impl FromGil<&flat::MatchConfiguration> for MatchConfiguration {
             )
             .unwrap()
             .unbind(),
-            game_mode: flat_t.game_mode.into(),
+            game_mode: flat_t.game_mode,
             skip_replays: flat_t.skip_replays,
             instant_start: flat_t.instant_start,
             mutators: flat_t
                 .mutators
                 .as_ref()
                 .map(|x| crate::into_py_from(py, &**x)),
-            existing_match_behavior: flat_t.existing_match_behavior.into(),
-            enable_rendering: flat_t.enable_rendering.into(),
+            existing_match_behavior: flat_t.existing_match_behavior,
+            enable_rendering: flat_t.enable_rendering,
             enable_state_setting: flat_t.enable_state_setting,
             auto_save_replay: flat_t.auto_save_replay,
             freeplay: flat_t.freeplay,
@@ -112,7 +112,7 @@ impl FromGil<&MatchConfiguration> for flat::MatchConfiguration {
     #[allow(unused_variables)]
     fn from_gil(py: Python, py_type: &MatchConfiguration) -> Self {
         Self {
-            launcher: (&py_type.launcher).into(),
+            launcher: py_type.launcher,
             launcher_arg: py_type.launcher_arg.to_str(py).unwrap().to_string(),
             auto_start_agents: py_type.auto_start_agents,
             wait_for_agents: py_type.wait_for_agents,
@@ -129,15 +129,15 @@ impl FromGil<&MatchConfiguration> for flat::MatchConfiguration {
                 .iter()
                 .map(|x| crate::from_pyany_into(py, x))
                 .collect(),
-            game_mode: (&py_type.game_mode).into(),
+            game_mode: py_type.game_mode,
             skip_replays: py_type.skip_replays,
             instant_start: py_type.instant_start,
             mutators: py_type
                 .mutators
                 .as_ref()
                 .map(|x| Box::new(crate::from_py_into(py, x))),
-            existing_match_behavior: (&py_type.existing_match_behavior).into(),
-            enable_rendering: (&py_type.enable_rendering).into(),
+            existing_match_behavior: py_type.existing_match_behavior,
+            enable_rendering: py_type.enable_rendering,
             enable_state_setting: py_type.enable_state_setting,
             auto_save_replay: py_type.auto_save_replay,
             freeplay: py_type.freeplay,

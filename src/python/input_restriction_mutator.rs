@@ -1,31 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum InputRestrictionMutator {
-    #[default]
-    Default = 0,
-    Backwards = 1,
-}
-
-impl From<flat::InputRestrictionMutator> for InputRestrictionMutator {
-    fn from(flat_t: flat::InputRestrictionMutator) -> Self {
-        match flat_t {
-            flat::InputRestrictionMutator::Default => Self::Default,
-            flat::InputRestrictionMutator::Backwards => Self::Backwards,
-        }
-    }
-}
-
-impl From<&InputRestrictionMutator> for flat::InputRestrictionMutator {
-    fn from(py_type: &InputRestrictionMutator) -> Self {
-        match py_type {
-            InputRestrictionMutator::Default => Self::Default,
-            InputRestrictionMutator::Backwards => Self::Backwards,
-        }
-    }
-}
+pub use flat::InputRestrictionMutator;
 
 #[pymethods]
 impl InputRestrictionMutator {

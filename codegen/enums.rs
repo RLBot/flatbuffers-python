@@ -95,67 +95,6 @@ impl<'a> EnumBindGenerator<'a> {
         }
     }
 
-    fn generate_definition(&mut self) {
-        write_str!(
-            self,
-            "#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]"
-        );
-        write_str!(
-            self,
-            "#[pyclass(module = \"rlbot_flatbuffers\", from_py_object, frozen, hash, eq, eq_int)]"
-        );
-        write_fmt!(self, "pub enum {} {{", self.name);
-        write_str!(self, "    #[default]");
-
-        for (var_num, var_info) in self.variants {
-            write_fmt!(self, "    {} = {var_num},", normalize_caps(&var_info.name));
-        }
-
-        write_str!(self, "}");
-        write_str!(self, "");
-    }
-
-    fn generate_from_flat_impls(&mut self) {
-        write_fmt!(self, "impl From<flat::{}> for {} {{", self.name, self.name);
-        write_fmt!(self, "    fn from(flat_t: flat::{}) -> Self {{", self.name);
-        write_str!(self, "        match flat_t {");
-
-        for var_info in self.variants.values() {
-            let var_name = normalize_caps(&var_info.name);
-            write_fmt!(
-                self,
-                "            flat::{}::{var_name} => Self::{var_name},",
-                self.name
-            );
-        }
-
-        write_str!(self, "        }");
-        write_str!(self, "    }");
-        write_str!(self, "}");
-        write_str!(self, "");
-    }
-
-    fn generate_to_flat_impls(&mut self) {
-        write_fmt!(self, "impl From<&{}> for flat::{} {{", self.name, self.name);
-        write_fmt!(self, "    fn from(py_type: &{}) -> Self {{", self.name);
-        write_str!(self, "        match py_type {");
-
-        for var_info in self.variants.values() {
-            let var_name = normalize_caps(&var_info.name);
-            write_fmt!(
-                self,
-                "            {}::{var_name} => Self::{var_name},",
-                self.name,
-            );
-        }
-
-        write_str!(self, "        }");
-        write_str!(self, "    }");
-        write_str!(self, "}");
-
-        write_str!(self, "");
-    }
-
     fn generate_new_method(&mut self) {
         write_str!(self, "    #[new]");
         assert!(u8::try_from(self.variants.len()).is_ok());
@@ -216,10 +155,9 @@ impl<'a> EnumBindGenerator<'a> {
             "use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};"
         );
         write_str!(self, "");
+        write_fmt!(self, "pub use flat::{};", self.name);
+        write_str!(self, "");
 
-        self.generate_definition();
-        self.generate_from_flat_impls();
-        self.generate_to_flat_impls();
         self.generate_py_methods();
 
         self.file_contents

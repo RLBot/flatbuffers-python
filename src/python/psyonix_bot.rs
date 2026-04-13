@@ -35,7 +35,7 @@ impl FromGil<&flat::PsyonixBot> for PsyonixBot {
                 .loadout
                 .as_ref()
                 .map(|x| crate::into_py_from(py, &**x)),
-            bot_skill: flat_t.bot_skill.into(),
+            bot_skill: flat_t.bot_skill,
         }
     }
 }
@@ -49,7 +49,7 @@ impl FromGil<&PsyonixBot> for flat::PsyonixBot {
                 .loadout
                 .as_ref()
                 .map(|x| Box::new(crate::from_py_into(py, x))),
-            bot_skill: (&py_type.bot_skill).into(),
+            bot_skill: py_type.bot_skill,
         }
     }
 }

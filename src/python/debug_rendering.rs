@@ -1,34 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum DebugRendering {
-    #[default]
-    OffByDefault = 0,
-    OnByDefault = 1,
-    AlwaysOff = 2,
-}
-
-impl From<flat::DebugRendering> for DebugRendering {
-    fn from(flat_t: flat::DebugRendering) -> Self {
-        match flat_t {
-            flat::DebugRendering::OffByDefault => Self::OffByDefault,
-            flat::DebugRendering::OnByDefault => Self::OnByDefault,
-            flat::DebugRendering::AlwaysOff => Self::AlwaysOff,
-        }
-    }
-}
-
-impl From<&DebugRendering> for flat::DebugRendering {
-    fn from(py_type: &DebugRendering) -> Self {
-        match py_type {
-            DebugRendering::OffByDefault => Self::OffByDefault,
-            DebugRendering::OnByDefault => Self::OnByDefault,
-            DebugRendering::AlwaysOff => Self::AlwaysOff,
-        }
-    }
-}
+pub use flat::DebugRendering;
 
 #[pymethods]
 impl DebugRendering {

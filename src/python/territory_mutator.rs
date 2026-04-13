@@ -1,31 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum TerritoryMutator {
-    #[default]
-    Off = 0,
-    Territory = 1,
-}
-
-impl From<flat::TerritoryMutator> for TerritoryMutator {
-    fn from(flat_t: flat::TerritoryMutator) -> Self {
-        match flat_t {
-            flat::TerritoryMutator::Off => Self::Off,
-            flat::TerritoryMutator::Territory => Self::Territory,
-        }
-    }
-}
-
-impl From<&TerritoryMutator> for flat::TerritoryMutator {
-    fn from(py_type: &TerritoryMutator) -> Self {
-        match py_type {
-            TerritoryMutator::Off => Self::Off,
-            TerritoryMutator::Territory => Self::Territory,
-        }
-    }
-}
+pub use flat::TerritoryMutator;
 
 #[pymethods]
 impl TerritoryMutator {

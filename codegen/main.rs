@@ -11,8 +11,8 @@ use std::{
 };
 
 use crate::{
-    enums::EnumBindGenerator, structs::StructBindGenerator, table::TableBindGenerator,
-    unions::UnionBindGenerator,
+    class_inject::add_pyclass_to_planus_enum, enums::EnumBindGenerator,
+    structs::StructBindGenerator, table::TableBindGenerator, unions::UnionBindGenerator,
 };
 
 mod class_inject;
@@ -273,6 +273,13 @@ fn main() -> eyre::Result<()> {
     generated_planus = generated_planus
         .replace("::serde::Serialize,", "")
         .replace("::serde::Deserialize,", "");
+
+    for (_, full_type_name, item) in declarations.iter_declarations() {
+        if let DeclarationKind::Enum(_) = &item.kind {
+            let type_name = full_type_name.0.last().unwrap();
+            add_pyclass_to_planus_enum(&mut generated_planus, type_name);
+        }
+    }
 
     fs::write(OUT_FILE, format_string(&generated_planus)?.as_bytes())?;
 

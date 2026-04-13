@@ -43,8 +43,8 @@ impl FromGil<&flat::Rect2D> for Rect2D {
             width: crate::float_to_py(py, flat_t.width),
             height: crate::float_to_py(py, flat_t.height),
             color: crate::into_py_from(py, &flat_t.color),
-            h_align: flat_t.h_align.into(),
-            v_align: flat_t.v_align.into(),
+            h_align: flat_t.h_align,
+            v_align: flat_t.v_align,
         }
     }
 }
@@ -58,8 +58,8 @@ impl FromGil<&Rect2D> for flat::Rect2D {
             width: crate::float_from_py(py, &py_type.width),
             height: crate::float_from_py(py, &py_type.height),
             color: crate::from_py_into(py, &py_type.color),
-            h_align: (&py_type.h_align).into(),
-            v_align: (&py_type.v_align).into(),
+            h_align: py_type.h_align,
+            v_align: py_type.v_align,
         }
     }
 }

@@ -1,40 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum BoostStrengthMutator {
-    #[default]
-    One = 0,
-    OneAndAHalf = 1,
-    Two = 2,
-    Five = 3,
-    Ten = 4,
-}
-
-impl From<flat::BoostStrengthMutator> for BoostStrengthMutator {
-    fn from(flat_t: flat::BoostStrengthMutator) -> Self {
-        match flat_t {
-            flat::BoostStrengthMutator::One => Self::One,
-            flat::BoostStrengthMutator::OneAndAHalf => Self::OneAndAHalf,
-            flat::BoostStrengthMutator::Two => Self::Two,
-            flat::BoostStrengthMutator::Five => Self::Five,
-            flat::BoostStrengthMutator::Ten => Self::Ten,
-        }
-    }
-}
-
-impl From<&BoostStrengthMutator> for flat::BoostStrengthMutator {
-    fn from(py_type: &BoostStrengthMutator) -> Self {
-        match py_type {
-            BoostStrengthMutator::One => Self::One,
-            BoostStrengthMutator::OneAndAHalf => Self::OneAndAHalf,
-            BoostStrengthMutator::Two => Self::Two,
-            BoostStrengthMutator::Five => Self::Five,
-            BoostStrengthMutator::Ten => Self::Ten,
-        }
-    }
-}
+pub use flat::BoostStrengthMutator;
 
 #[pymethods]
 impl BoostStrengthMutator {

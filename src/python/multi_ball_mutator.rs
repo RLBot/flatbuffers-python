@@ -1,37 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum MultiBallMutator {
-    #[default]
-    One = 0,
-    Two = 1,
-    Four = 2,
-    Six = 3,
-}
-
-impl From<flat::MultiBallMutator> for MultiBallMutator {
-    fn from(flat_t: flat::MultiBallMutator) -> Self {
-        match flat_t {
-            flat::MultiBallMutator::One => Self::One,
-            flat::MultiBallMutator::Two => Self::Two,
-            flat::MultiBallMutator::Four => Self::Four,
-            flat::MultiBallMutator::Six => Self::Six,
-        }
-    }
-}
-
-impl From<&MultiBallMutator> for flat::MultiBallMutator {
-    fn from(py_type: &MultiBallMutator) -> Self {
-        match py_type {
-            MultiBallMutator::One => Self::One,
-            MultiBallMutator::Two => Self::Two,
-            MultiBallMutator::Four => Self::Four,
-            MultiBallMutator::Six => Self::Six,
-        }
-    }
-}
+pub use flat::MultiBallMutator;
 
 #[pymethods]
 impl MultiBallMutator {

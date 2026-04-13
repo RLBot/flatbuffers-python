@@ -46,8 +46,8 @@ impl FromGil<&flat::String3D> for String3D {
             scale: crate::float_to_py(py, flat_t.scale),
             foreground: crate::into_py_from(py, &flat_t.foreground),
             background: crate::into_py_from(py, &flat_t.background),
-            h_align: flat_t.h_align.into(),
-            v_align: flat_t.v_align.into(),
+            h_align: flat_t.h_align,
+            v_align: flat_t.v_align,
         }
     }
 }
@@ -61,8 +61,8 @@ impl FromGil<&String3D> for flat::String3D {
             scale: crate::float_from_py(py, &py_type.scale),
             foreground: crate::from_py_into(py, &py_type.foreground),
             background: crate::from_py_into(py, &py_type.background),
-            h_align: (&py_type.h_align).into(),
-            v_align: (&py_type.v_align).into(),
+            h_align: py_type.h_align,
+            v_align: py_type.v_align,
         }
     }
 }

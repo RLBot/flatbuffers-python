@@ -1,34 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum TextHAlign {
-    #[default]
-    Left = 0,
-    Center = 1,
-    Right = 2,
-}
-
-impl From<flat::TextHAlign> for TextHAlign {
-    fn from(flat_t: flat::TextHAlign) -> Self {
-        match flat_t {
-            flat::TextHAlign::Left => Self::Left,
-            flat::TextHAlign::Center => Self::Center,
-            flat::TextHAlign::Right => Self::Right,
-        }
-    }
-}
-
-impl From<&TextHAlign> for flat::TextHAlign {
-    fn from(py_type: &TextHAlign) -> Self {
-        match py_type {
-            TextHAlign::Left => Self::Left,
-            TextHAlign::Center => Self::Center,
-            TextHAlign::Right => Self::Right,
-        }
-    }
-}
+pub use flat::TextHAlign;
 
 #[pymethods]
 impl TextHAlign {

@@ -71,7 +71,7 @@ impl FromGil<&flat::PlayerInfo> for PlayerInfo {
                 .latest_touch
                 .as_ref()
                 .map(|x| crate::into_py_from(py, &**x)),
-            air_state: flat_t.air_state.into(),
+            air_state: flat_t.air_state,
             dodge_timeout: crate::float_to_py(py, flat_t.dodge_timeout),
             demolished_timeout: crate::float_to_py(py, flat_t.demolished_timeout),
             is_supersonic: flat_t.is_supersonic,
@@ -103,7 +103,7 @@ impl FromGil<&PlayerInfo> for flat::PlayerInfo {
                 .latest_touch
                 .as_ref()
                 .map(|x| Box::new(crate::from_py_into(py, x))),
-            air_state: (&py_type.air_state).into(),
+            air_state: py_type.air_state,
             dodge_timeout: crate::float_from_py(py, &py_type.dodge_timeout),
             demolished_timeout: crate::float_from_py(py, &py_type.demolished_timeout),
             is_supersonic: py_type.is_supersonic,

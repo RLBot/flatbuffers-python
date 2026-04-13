@@ -211,7 +211,7 @@ impl<'a> TableBindGenerator<'a> {
                         }
                     },
                     SimpleType::Enum(_) => {
-                        format!("flat_t.{field_name}.into()")
+                        format!("flat_t.{field_name}")
                     }
                 },
                 TypeKind::String => match field_info.assign_mode {
@@ -323,7 +323,7 @@ impl<'a> TableBindGenerator<'a> {
                         }
                     },
                     SimpleType::Enum(_) => {
-                        format!("(&py_type.{field_name}).into()")
+                        format!("py_type.{field_name}")
                     }
                 },
                 TypeKind::String => match field_info.assign_mode {

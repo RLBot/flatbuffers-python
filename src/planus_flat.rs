@@ -8967,9 +8967,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `AirState` in the file `flatbuffers-schema/schema/gamedata.fbs:133`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum AirState {
+                #[default]
                 ///  All wheels are on the ground and the car is affected by wall-stickiness forces.
                 OnGround = 0,
 
@@ -11496,9 +11505,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `MatchPhase` in the file `flatbuffers-schema/schema/gamedata.fbs:274`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum MatchPhase {
+                #[default]
                 ///  Match has not been created yet.
                 Inactive = 0,
 
@@ -18173,9 +18191,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `PsyonixSkill` in the file `flatbuffers-schema/schema/matchconfig.fbs:35`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum PsyonixSkill {
+                #[default]
                 /// The variant `Beginner` in the enum `PsyonixSkill`
                 Beginner = 0,
 
@@ -21354,9 +21381,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `GameMode` in the file `flatbuffers-schema/schema/matchconfig.fbs:118`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum GameMode {
+                #[default]
                 /// The variant `Soccar` in the enum `GameMode`
                 Soccar = 0,
 
@@ -21551,9 +21587,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `MatchLengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:130`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum MatchLengthMutator {
+                #[default]
                 /// The variant `FiveMinutes` in the enum `MatchLengthMutator`
                 FiveMinutes = 0,
 
@@ -21728,9 +21773,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `MaxScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:138`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum MaxScoreMutator {
+                #[default]
                 /// The variant `Unlimited` in the enum `MaxScoreMutator`
                 Unlimited = 0,
 
@@ -21960,9 +22014,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `MultiBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:157`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum MultiBallMutator {
+                #[default]
                 /// The variant `One` in the enum `MultiBallMutator`
                 One = 0,
 
@@ -22132,9 +22195,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `OvertimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:165`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum OvertimeMutator {
+                #[default]
                 /// The variant `Unlimited` in the enum `OvertimeMutator`
                 Unlimited = 0,
 
@@ -22304,9 +22376,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `SeriesLengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:172`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum SeriesLengthMutator {
+                #[default]
                 /// The variant `Unlimited` in the enum `SeriesLengthMutator`
                 Unlimited = 0,
 
@@ -22481,9 +22562,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `GameSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:180`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum GameSpeedMutator {
+                #[default]
                 /// The variant `Default` in the enum `GameSpeedMutator`
                 Default = 0,
 
@@ -22649,9 +22739,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `BallMaxSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:187`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum BallMaxSpeedMutator {
+                #[default]
                 /// The variant `Default` in the enum `BallMaxSpeedMutator`
                 Default = 0,
 
@@ -22822,9 +22921,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `BallTypeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:195`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum BallTypeMutator {
+                #[default]
                 /// The variant `Default` in the enum `BallTypeMutator`
                 Default = 0,
 
@@ -23054,9 +23162,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `BallWeightMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:214`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum BallWeightMutator {
+                #[default]
                 /// The variant `Default` in the enum `BallWeightMutator`
                 Default = 0,
 
@@ -23251,9 +23368,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `BallSizeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:226`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum BallSizeMutator {
+                #[default]
                 /// The variant `Default` in the enum `BallSizeMutator`
                 Default = 0,
 
@@ -23433,9 +23559,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `BallBouncinessMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:235`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum BallBouncinessMutator {
+                #[default]
                 /// The variant `Default` in the enum `BallBouncinessMutator`
                 Default = 0,
 
@@ -23617,9 +23752,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `BallGravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:244`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum BallGravityMutator {
+                #[default]
                 /// The variant `Default` in the enum `BallGravityMutator`
                 Default = 0,
 
@@ -23790,9 +23934,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `BoostAmountMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:252`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum BoostAmountMutator {
+                #[default]
                 /// The variant `NormalBoost` in the enum `BoostAmountMutator`
                 NormalBoost = 0,
 
@@ -23972,9 +24125,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `RumbleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:261`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum RumbleMutator {
+                #[default]
                 /// The variant `Off` in the enum `RumbleMutator`
                 Off = 0,
 
@@ -24204,9 +24366,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `BoostStrengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:280`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum BoostStrengthMutator {
+                #[default]
                 /// The variant `One` in the enum `BoostStrengthMutator`
                 One = 0,
 
@@ -24386,9 +24557,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `GravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:289`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum GravityMutator {
+                #[default]
                 /// The variant `Default` in the enum `GravityMutator`
                 Default = 0,
 
@@ -24568,9 +24748,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `DemolishMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:298`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum DemolishMutator {
+                #[default]
                 /// The variant `Default` in the enum `DemolishMutator`
                 Default = 0,
 
@@ -24770,9 +24959,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `RespawnTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:311`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum RespawnTimeMutator {
+                #[default]
                 /// The variant `ThreeSeconds` in the enum `RespawnTimeMutator`
                 ThreeSeconds = 0,
 
@@ -24947,9 +25145,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `MaxTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:319`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum MaxTimeMutator {
+                #[default]
                 /// The variant `Unlimited` in the enum `MaxTimeMutator`
                 Unlimited = 0,
 
@@ -25111,9 +25318,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `GameEventMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:325`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum GameEventMutator {
+                #[default]
                 /// The variant `Default` in the enum `GameEventMutator`
                 Default = 0,
 
@@ -25279,9 +25495,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `AudioMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:332`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum AudioMutator {
+                #[default]
                 /// The variant `Default` in the enum `AudioMutator`
                 Default = 0,
 
@@ -25443,9 +25668,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `TerritoryMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:337`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum TerritoryMutator {
+                #[default]
                 /// The variant `Off` in the enum `TerritoryMutator`
                 Off = 0,
 
@@ -25607,9 +25841,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `StaleBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:342`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum StaleBallMutator {
+                #[default]
                 /// The variant `Unlimited` in the enum `StaleBallMutator`
                 Unlimited = 0,
 
@@ -25771,9 +26014,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `JumpMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:347`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum JumpMutator {
+                #[default]
                 /// The variant `Default` in the enum `JumpMutator`
                 Default = 0,
 
@@ -25963,9 +26215,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `DodgeTimerMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:357`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum DodgeTimerMutator {
+                #[default]
                 /// The variant `OnePointTwentyFiveSeconds` in the enum `DodgeTimerMutator`
                 OnePointTwentyFiveSeconds = 0,
 
@@ -26142,9 +26403,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `PossessionScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:364`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum PossessionScoreMutator {
+                #[default]
                 /// The variant `Off` in the enum `PossessionScoreMutator`
                 Off = 0,
 
@@ -26321,9 +26591,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `DemolishScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:371`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum DemolishScoreMutator {
+                #[default]
                 /// The variant `Zero` in the enum `DemolishScoreMutator`
                 Zero = 0,
 
@@ -26493,9 +26772,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `NormalGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:378`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum NormalGoalScoreMutator {
+                #[default]
                 /// The variant `One` in the enum `NormalGoalScoreMutator`
                 One = 0,
 
@@ -26682,9 +26970,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `AerialGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:387`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum AerialGoalScoreMutator {
+                #[default]
                 /// The variant `One` in the enum `AerialGoalScoreMutator`
                 One = 0,
 
@@ -26871,9 +27168,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `AssistGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:396`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum AssistGoalScoreMutator {
+                #[default]
                 /// The variant `Zero` in the enum `AssistGoalScoreMutator`
                 Zero = 0,
 
@@ -27045,9 +27351,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `InputRestrictionMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:403`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum InputRestrictionMutator {
+                #[default]
                 /// The variant `Default` in the enum `InputRestrictionMutator`
                 Default = 0,
 
@@ -27211,9 +27526,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `ScoringRuleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:408`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum ScoringRuleMutator {
+                #[default]
                 /// The variant `Default` in the enum `ScoringRuleMutator`
                 Default = 0,
 
@@ -31910,9 +32234,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `DebugRendering` in the file `flatbuffers-schema/schema/matchconfig.fbs:513`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum DebugRendering {
+                #[default]
                 ///  Renders are ignored unless explicitly enabled per-agent
                 OffByDefault = 0,
 
@@ -32079,9 +32412,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `ExistingMatchBehavior` in the file `flatbuffers-schema/schema/matchconfig.fbs:525`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum ExistingMatchBehavior {
+                #[default]
                 ///  Always restart the match, even if config is identical.
                 Restart = 0,
 
@@ -32255,9 +32597,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `Launcher` in the file `flatbuffers-schema/schema/matchconfig.fbs:539`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum Launcher {
+                #[default]
                 /// The variant `Steam` in the enum `Launcher`
                 Steam = 0,
 
@@ -34239,9 +34590,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `TextHAlign` in the file `flatbuffers-schema/schema/rendering.fbs:7`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum TextHAlign {
+                #[default]
                 /// The variant `Left` in the enum `TextHAlign`
                 Left = 0,
 
@@ -34407,9 +34767,18 @@ mod root {
             ///
             /// Generated from these locations:
             /// * Enum `TextVAlign` in the file `flatbuffers-schema/schema/rendering.fbs:14`
-            #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
             pub enum TextVAlign {
+                #[default]
                 /// The variant `Top` in the enum `TextVAlign`
                 Top = 0,
 

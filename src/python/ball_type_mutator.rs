@@ -1,70 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum BallTypeMutator {
-    #[default]
-    Default = 0,
-    Cube = 1,
-    Puck = 2,
-    Basketball = 3,
-    Beachball = 4,
-    Anniversary = 5,
-    Haunted = 6,
-    Ekin = 7,
-    SpookyCube = 8,
-    Egg = 9,
-    PlayerSeeking = 10,
-    Dropshot = 11,
-    ScoreAbsorb = 12,
-    Shoe = 13,
-    PizzaPuck = 14,
-}
-
-impl From<flat::BallTypeMutator> for BallTypeMutator {
-    fn from(flat_t: flat::BallTypeMutator) -> Self {
-        match flat_t {
-            flat::BallTypeMutator::Default => Self::Default,
-            flat::BallTypeMutator::Cube => Self::Cube,
-            flat::BallTypeMutator::Puck => Self::Puck,
-            flat::BallTypeMutator::Basketball => Self::Basketball,
-            flat::BallTypeMutator::Beachball => Self::Beachball,
-            flat::BallTypeMutator::Anniversary => Self::Anniversary,
-            flat::BallTypeMutator::Haunted => Self::Haunted,
-            flat::BallTypeMutator::Ekin => Self::Ekin,
-            flat::BallTypeMutator::SpookyCube => Self::SpookyCube,
-            flat::BallTypeMutator::Egg => Self::Egg,
-            flat::BallTypeMutator::PlayerSeeking => Self::PlayerSeeking,
-            flat::BallTypeMutator::Dropshot => Self::Dropshot,
-            flat::BallTypeMutator::ScoreAbsorb => Self::ScoreAbsorb,
-            flat::BallTypeMutator::Shoe => Self::Shoe,
-            flat::BallTypeMutator::PizzaPuck => Self::PizzaPuck,
-        }
-    }
-}
-
-impl From<&BallTypeMutator> for flat::BallTypeMutator {
-    fn from(py_type: &BallTypeMutator) -> Self {
-        match py_type {
-            BallTypeMutator::Default => Self::Default,
-            BallTypeMutator::Cube => Self::Cube,
-            BallTypeMutator::Puck => Self::Puck,
-            BallTypeMutator::Basketball => Self::Basketball,
-            BallTypeMutator::Beachball => Self::Beachball,
-            BallTypeMutator::Anniversary => Self::Anniversary,
-            BallTypeMutator::Haunted => Self::Haunted,
-            BallTypeMutator::Ekin => Self::Ekin,
-            BallTypeMutator::SpookyCube => Self::SpookyCube,
-            BallTypeMutator::Egg => Self::Egg,
-            BallTypeMutator::PlayerSeeking => Self::PlayerSeeking,
-            BallTypeMutator::Dropshot => Self::Dropshot,
-            BallTypeMutator::ScoreAbsorb => Self::ScoreAbsorb,
-            BallTypeMutator::Shoe => Self::Shoe,
-            BallTypeMutator::PizzaPuck => Self::PizzaPuck,
-        }
-    }
-}
+pub use flat::BallTypeMutator;
 
 #[pymethods]
 impl BallTypeMutator {

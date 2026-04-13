@@ -1,37 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum DemolishScoreMutator {
-    #[default]
-    Zero = 0,
-    One = 1,
-    Two = 2,
-    Three = 3,
-}
-
-impl From<flat::DemolishScoreMutator> for DemolishScoreMutator {
-    fn from(flat_t: flat::DemolishScoreMutator) -> Self {
-        match flat_t {
-            flat::DemolishScoreMutator::Zero => Self::Zero,
-            flat::DemolishScoreMutator::One => Self::One,
-            flat::DemolishScoreMutator::Two => Self::Two,
-            flat::DemolishScoreMutator::Three => Self::Three,
-        }
-    }
-}
-
-impl From<&DemolishScoreMutator> for flat::DemolishScoreMutator {
-    fn from(py_type: &DemolishScoreMutator) -> Self {
-        match py_type {
-            DemolishScoreMutator::Zero => Self::Zero,
-            DemolishScoreMutator::One => Self::One,
-            DemolishScoreMutator::Two => Self::Two,
-            DemolishScoreMutator::Three => Self::Three,
-        }
-    }
-}
+pub use flat::DemolishScoreMutator;
 
 #[pymethods]
 impl DemolishScoreMutator {

@@ -1,31 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum MaxTimeMutator {
-    #[default]
-    Unlimited = 0,
-    ElevenMinutes = 1,
-}
-
-impl From<flat::MaxTimeMutator> for MaxTimeMutator {
-    fn from(flat_t: flat::MaxTimeMutator) -> Self {
-        match flat_t {
-            flat::MaxTimeMutator::Unlimited => Self::Unlimited,
-            flat::MaxTimeMutator::ElevenMinutes => Self::ElevenMinutes,
-        }
-    }
-}
-
-impl From<&MaxTimeMutator> for flat::MaxTimeMutator {
-    fn from(py_type: &MaxTimeMutator) -> Self {
-        match py_type {
-            MaxTimeMutator::Unlimited => Self::Unlimited,
-            MaxTimeMutator::ElevenMinutes => Self::ElevenMinutes,
-        }
-    }
-}
+pub use flat::MaxTimeMutator;
 
 #[pymethods]
 impl MaxTimeMutator {

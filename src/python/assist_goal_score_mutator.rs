@@ -1,37 +1,7 @@
 use crate::flat;
 use pyo3::{PyResult, exceptions::PyValueError, pyclass, pymethods};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-#[pyclass(module = "rlbot_flatbuffers", from_py_object, frozen, hash, eq, eq_int)]
-pub enum AssistGoalScoreMutator {
-    #[default]
-    Zero = 0,
-    One = 1,
-    Two = 2,
-    Three = 3,
-}
-
-impl From<flat::AssistGoalScoreMutator> for AssistGoalScoreMutator {
-    fn from(flat_t: flat::AssistGoalScoreMutator) -> Self {
-        match flat_t {
-            flat::AssistGoalScoreMutator::Zero => Self::Zero,
-            flat::AssistGoalScoreMutator::One => Self::One,
-            flat::AssistGoalScoreMutator::Two => Self::Two,
-            flat::AssistGoalScoreMutator::Three => Self::Three,
-        }
-    }
-}
-
-impl From<&AssistGoalScoreMutator> for flat::AssistGoalScoreMutator {
-    fn from(py_type: &AssistGoalScoreMutator) -> Self {
-        match py_type {
-            AssistGoalScoreMutator::Zero => Self::Zero,
-            AssistGoalScoreMutator::One => Self::One,
-            AssistGoalScoreMutator::Two => Self::Two,
-            AssistGoalScoreMutator::Three => Self::Three,
-        }
-    }
-}
+pub use flat::AssistGoalScoreMutator;
 
 #[pymethods]
 impl AssistGoalScoreMutator {
