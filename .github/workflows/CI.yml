@@ -39,7 +39,7 @@ jobs:
           sccache: 'true'
           manylinux: auto
           before-script-linux: |
-            rustup component add rustfmt
+            rustup component add rustfmt --toolchain nightly
             rustup component add rust-src --toolchain nightly
       - name: Upload wheels
         uses: actions/upload-artifact@v5
@@ -106,8 +106,7 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           merge-multiple: "true"
-      - name: Publish to PyPI
-        uses: PyO3/maturin-action@v1
-        with:
-          command: upload
-          args: --non-interactive --skip-existing *
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v8
+      - name: Publish to PyPi
+        run: uv publish *
