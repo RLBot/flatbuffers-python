@@ -129,8 +129,8 @@ impl<'a> StructBindGenerator<'a> {
         let impl_type = format!("flat::{}", self.name);
 
         if self.fields.is_empty() {
-            write_fmt!(self, "impl From<{impl_type}> for {} {{", self.name);
-            write_fmt!(self, "    fn from(_: {impl_type}) -> Self {{");
+            write_fmt!(self, "impl From<&{impl_type}> for {} {{", self.name);
+            write_fmt!(self, "    fn from(_: &{impl_type}) -> Self {{");
             write_str!(self, "        Self {}");
             write_str!(self, "    }");
             write_str!(self, "}");
@@ -138,12 +138,12 @@ impl<'a> StructBindGenerator<'a> {
             return;
         }
 
-        write_fmt!(self, "impl FromGil<{impl_type}> for {} {{", self.name);
+        write_fmt!(self, "impl FromGil<&{impl_type}> for {} {{", self.name);
 
         write_str!(self, "    #[allow(unused_variables)]");
         write_fmt!(
             self,
-            "    fn from_gil(py: Python, flat_t: {impl_type}) -> Self {{"
+            "    fn from_gil(py: Python, flat_t: &{impl_type}) -> Self {{"
         );
         write_str!(self, "        Self {");
 
@@ -161,7 +161,7 @@ impl<'a> StructBindGenerator<'a> {
                 SimpleType::Struct(_) => {
                     write_fmt!(
                         self,
-                        "            {field_name}: crate::into_py_from(py, flat_t.{field_name}),",
+                        "            {field_name}: crate::into_py_from(py, &flat_t.{field_name}),",
                     );
                 }
                 _ => todo!("Unknown field type for {field_name} in {}", self.name),

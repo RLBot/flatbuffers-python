@@ -76,8 +76,8 @@ where
     (&*obj.cast_into::<T>().unwrap().borrow()).into_gil(py)
 }
 
-fn into_pystringlist_from(py: Python, obj: Vec<String>) -> Py<PyList> {
-    PyList::new(py, obj.into_iter().map(|x| PyString::new(py, &x).unbind()))
+fn into_pystringlist_from(py: Python, obj: &[String]) -> Py<PyList> {
+    PyList::new(py, obj.iter().map(|x| PyString::new(py, x).unbind()))
         .unwrap()
         .unbind()
 }

@@ -56,13 +56,13 @@ impl<'a> UnionBindGenerator<'a> {
     fn generate_from_flat_impls(&mut self) {
         write_fmt!(
             self,
-            "impl FromGil<flat::{}> for {} {{",
+            "impl FromGil<&flat::{}> for {} {{",
             self.name,
             self.name
         );
         write_fmt!(
             self,
-            "    fn from_gil(py: Python, flat_t: flat::{}) -> Self {{",
+            "    fn from_gil(py: Python, flat_t: &flat::{}) -> Self {{",
             self.name
         );
 
@@ -78,7 +78,7 @@ impl<'a> UnionBindGenerator<'a> {
 
             write_fmt!(
                 self,
-                "                    Py::new(py, super::{var_name}::from_gil(py, *item)).unwrap(),"
+                "                    Py::new(py, super::{var_name}::from_gil(py, &**item)).unwrap(),"
             );
 
             write_str!(self, "                ),");

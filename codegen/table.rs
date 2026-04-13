@@ -168,8 +168,8 @@ impl<'a> TableBindGenerator<'a> {
         let impl_type = format!("flat::{}", self.name);
 
         if self.fields.is_empty() {
-            write_fmt!(self, "impl From<{impl_type}> for {} {{", self.name);
-            write_fmt!(self, "    fn from(_: {impl_type}) -> Self {{");
+            write_fmt!(self, "impl From<&{impl_type}> for {} {{", self.name);
+            write_fmt!(self, "    fn from(_: &{impl_type}) -> Self {{");
             write_fmt!(self, "        {} {{}}", self.name);
             write_str!(self, "    }");
             write_str!(self, "}");
@@ -177,11 +177,11 @@ impl<'a> TableBindGenerator<'a> {
             return;
         }
 
-        write_fmt!(self, "impl FromGil<{impl_type}> for {} {{", self.name);
+        write_fmt!(self, "impl FromGil<&{impl_type}> for {} {{", self.name);
         write_str!(self, "    #[allow(unused_variables)]");
         write_fmt!(
             self,
-            "    fn from_gil(py: Python, flat_t: {impl_type}) -> Self {{"
+            "    fn from_gil(py: Python, flat_t: &{impl_type}) -> Self {{"
         );
         write_fmt!(self, "        {} {{", self.name);
 
@@ -202,12 +202,12 @@ impl<'a> TableBindGenerator<'a> {
                                     "flat_t.{field_name}.map(|x| crate::float_to_py(py, x.val))"
                                 ),
                                 _ => format!(
-                                    "flat_t.{field_name}.map(|x| crate::into_py_from(py, x))"
+                                    "flat_t.{field_name}.map(|x| crate::into_py_from(py, &x))"
                                 ),
                             }
                         }
                         _ => {
-                            format!("crate::into_py_from(py, flat_t.{field_name})")
+                            format!("crate::into_py_from(py, &flat_t.{field_name})")
                         }
                     },
                     SimpleType::Enum(_) => {
@@ -216,7 +216,9 @@ impl<'a> TableBindGenerator<'a> {
                 },
                 TypeKind::String => match field_info.assign_mode {
                     AssignMode::Optional => {
-                        format!("flat_t.{field_name}.map(|s| PyString::new(py, &s).unbind())")
+                        format!(
+                            "flat_t.{field_name}.as_ref().map(|s| PyString::new(py, s).unbind())"
+                        )
                     }
                     _ => {
                         format!("PyString::new(py, &flat_t.{field_name}).unbind()")
@@ -224,15 +226,17 @@ impl<'a> TableBindGenerator<'a> {
                 },
                 TypeKind::Table(_) => match field_info.assign_mode {
                     AssignMode::Optional => {
-                        format!("flat_t.{field_name}.map(|x| crate::into_py_from(py, *x))")
+                        format!(
+                            "flat_t.{field_name}.as_ref().map(|x| crate::into_py_from(py, &**x))"
+                        )
                     }
                     _ => {
-                        format!("crate::into_py_from(py, *flat_t.{field_name})")
+                        format!("crate::into_py_from(py, &*flat_t.{field_name})")
                     }
                 },
                 TypeKind::Vector(inner_type) => match &inner_type.kind {
                     TypeKind::String => {
-                        format!("crate::into_pystringlist_from(py, flat_t.{field_name})")
+                        format!("crate::into_pystringlist_from(py, &flat_t.{field_name})")
                     }
                     TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
                         format!("PyBytes::new(py, &flat_t.{field_name}).unbind()")
@@ -241,7 +245,7 @@ impl<'a> TableBindGenerator<'a> {
                         let (path, _) = self.all_items.get_index(idx.0).unwrap();
                         let type_name = path.0.last().unwrap();
                         format!(
-                            "PyList::new(py, flat_t.{field_name}.into_iter().map(|x| crate::into_py_from::<_, super::{type_name}>(py, x))).unwrap().unbind()"
+                            "PyList::new(py, flat_t.{field_name}.iter().map(|x| crate::into_py_from::<_, super::{type_name}>(py, x))).unwrap().unbind()"
                         )
                     }
                     _ => todo!("Unknown field type for {field_name} in {}", self.name),
@@ -252,10 +256,10 @@ impl<'a> TableBindGenerator<'a> {
 
                     match field_info.assign_mode {
                         AssignMode::Optional => format!(
-                            "flat_t.{field_name}.map(|x| IntoGil::<super::{type_name}>::into_gil(x, py).into_any())"
+                            "flat_t.{field_name}.as_ref().map(|x| IntoGil::<super::{type_name}>::into_gil(x, py).into_any())"
                         ),
                         _ => format!(
-                            "IntoGil::<super::{type_name}>::into_gil(flat_t.{field_name}, py).into_any()"
+                            "IntoGil::<super::{type_name}>::into_gil(&flat_t.{field_name}, py).into_any()"
                         ),
                     }
                 }
@@ -876,7 +880,7 @@ impl<'a> TableBindGenerator<'a> {
             "        let flat_t = flat::{}::try_from(flat_t_ref).map_err(flat_err_to_py)?;\n",
             self.name
         );
-        write_str!(self, "        Ok(crate::into_py_from(py, flat_t))");
+        write_str!(self, "        Ok(crate::into_py_from(py, &flat_t))");
         write_str!(self, "    }");
     }
 
