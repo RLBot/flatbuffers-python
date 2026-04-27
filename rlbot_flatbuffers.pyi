@@ -1574,6 +1574,19 @@ class BoostPadState:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> BoostPadState:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1611,6 +1624,19 @@ class Color:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> Color:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1698,6 +1724,19 @@ class ControllerState:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> ControllerState:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1723,6 +1762,19 @@ class Float:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> Float:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1765,6 +1817,19 @@ class Rotator:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> Rotator:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1835,6 +1900,19 @@ class ScoreInfo:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> ScoreInfo:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1872,6 +1950,19 @@ class TeamInfo:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> TeamInfo:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1901,6 +1992,19 @@ class Vector2:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> Vector2:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1935,6 +2039,19 @@ class Vector3:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> Vector3:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -1972,6 +2089,19 @@ class Physics:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> Physics:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
@@ -2008,6 +2138,19 @@ class PredictionSlice:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
         """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> PredictionSlice:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 

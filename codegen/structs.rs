@@ -427,7 +427,7 @@ impl<'a> StructBindGenerator<'a> {
         }
 
         write_str!(self, "        )");
-        write_str!(self, "    }");
+        write_str!(self, "    }\n");
     }
 
     fn generate_py_methods(&mut self) {
@@ -445,24 +445,91 @@ impl<'a> StructBindGenerator<'a> {
 
         self.generate_args();
 
+        self.generate_pack_method();
+        write_str!(self, "");
+
+        self.generate_unpack_method();
+
         write_str!(self, "}");
         write_str!(self, "");
+    }
+
+    fn generate_read_as_root(&mut self) {
+        write_fmt!(
+            self,
+            "fn read_as_root<'a>(slice: &'a [u8]) -> ::planus::Result<flat::{}Ref<'a>> {{",
+            self.name
+        );
+        write_str!(
+            self,
+            "planus::TableRead::from_buffer(planus::SliceWithStartOffset {"
+        );
+        write_str!(self, "buffer: slice, offset_from_start: 0 }, 0,");
+        write_str!(self, ").map_err(|error_kind|");
+        write_fmt!(
+            self,
+            "error_kind.with_error_location(\"[{}Ref]\", \"read_as_root\", 0)",
+            self.name
+        );
+        write_str!(self, ")}\n");
+    }
+
+    fn generate_pack_method(&mut self) {
+        write_str!(
+            self,
+            "    fn pack<'py>(&self, py: Python<'py>) -> Bound<'py, PyBytes> {"
+        );
+        write_str!(
+            self,
+            "        let mut builder = Builder::with_capacity(u16::MAX as usize);\n"
+        );
+        write_fmt!(
+            self,
+            "        let flat_t = flat::{}::from_gil(py, self);",
+            self.name
+        );
+        write_str!(
+            self,
+            "        PyBytes::new(py, builder.finish(flat_t, None))"
+        );
+        write_str!(self, "    }");
+    }
+
+    fn generate_unpack_method(&mut self) {
+        write_str!(self, "    #[staticmethod]");
+        write_str!(
+            self,
+            "    fn unpack(py: Python, data: &[u8]) -> PyResult<Py<Self>> {"
+        );
+        write_str!(
+            self,
+            "        let flat_t_ref = read_as_root(data).map_err(flat_err_to_py)?;"
+        );
+        write_fmt!(
+            self,
+            "        let flat_t = flat::{}::from(flat_t_ref);\n",
+            self.name
+        );
+        write_str!(self, "        Ok(crate::into_py_from(py, &flat_t))");
+        write_str!(self, "    }");
     }
 
     pub fn generate_binds(mut self) -> Vec<Cow<'static, str>> {
         self.file_contents
             .push(Cow::Borrowed(if self.fields.is_empty() {
-                "use crate::{FromGil, flat};"
+                "use crate::{FromGil, flat_err_to_py, flat};"
             } else {
-                "use crate::{FromGil, PyDefault, flat};"
+                "use crate::{FromGil, PyDefault, flat, flat_err_to_py};"
             }));
 
+        write_str!(self, "use planus::{Builder, ReadAsRoot};");
         write_str!(self, "use pyo3::{prelude::*, types::*};");
         write_str!(self, "");
 
         self.generate_definition();
         self.generate_from_flat_impls();
         self.generate_to_flat_impls();
+        self.generate_read_as_root();
         self.generate_py_methods();
 
         self.file_contents

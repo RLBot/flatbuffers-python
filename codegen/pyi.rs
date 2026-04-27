@@ -223,6 +223,21 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                     "        NOTE: All field initialization before `__init__`, inside of `__new__`."
                 );
                 write_str!(file, "        \"\"\"");
+
+                write_str!(file, "    def pack(self) -> bytes:");
+                write_str!(file, "        \"\"\"");
+                write_str!(file, "        Serializes this instance into a byte array");
+                write_str!(file, "        \"\"\"\n");
+
+                write_str!(file, "    @staticmethod");
+                write_fmt!(file, "    def unpack(data: bytes) -> {type_name}:");
+                write_str!(file, "        \"\"\"");
+                write_str!(file, "        Deserializes the data into a new instance\n");
+                write_str!(
+                    file,
+                    "        :raises InvalidFlatbuffer: If the `data` is invalid for this type"
+                );
+                write_str!(file, "        \"\"\"\n");
             }
             DeclarationKind::Table(info) => {
                 for (field_name, field_info) in &info.fields {

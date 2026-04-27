@@ -43,6 +43,7 @@ if __name__ == "__main__":
     controller.throttle = 1
     controller.steer = 0.5
     controller.pitch = np.array([0.1], dtype=np.float32)[0]
+    controller.pack()
 
     vec1 = MyVector(1, 2, 3)
     vec2 = Vector3(4, 5, 6)

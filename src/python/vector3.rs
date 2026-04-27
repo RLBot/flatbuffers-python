@@ -1,4 +1,5 @@
-use crate::{FromGil, PyDefault, flat};
+use crate::{FromGil, PyDefault, flat, flat_err_to_py};
+use planus::{Builder, ReadAsRoot};
 use pyo3::{prelude::*, types::*};
 
 #[pyclass(module = "rlbot_flatbuffers", subclass, get_all)]
@@ -44,6 +45,17 @@ impl FromGil<&Vector3> for flat::Vector3 {
     }
 }
 
+fn read_as_root<'a>(slice: &'a [u8]) -> ::planus::Result<flat::Vector3Ref<'a>> {
+    planus::TableRead::from_buffer(
+        planus::SliceWithStartOffset {
+            buffer: slice,
+            offset_from_start: 0,
+        },
+        0,
+    )
+    .map_err(|error_kind| error_kind.with_error_location("[Vector3Ref]", "read_as_root", 0))
+}
+
 #[pymethods]
 impl Vector3 {
     #[new]
@@ -83,5 +95,20 @@ impl Vector3 {
     #[classattr]
     fn __match_args__() -> (&'static str, &'static str, &'static str) {
         ("x", "y", "z")
+    }
+
+    fn pack<'py>(&self, py: Python<'py>) -> Bound<'py, PyBytes> {
+        let mut builder = Builder::with_capacity(u16::MAX as usize);
+
+        let flat_t = flat::Vector3::from_gil(py, self);
+        PyBytes::new(py, builder.finish(flat_t, None))
+    }
+
+    #[staticmethod]
+    fn unpack(py: Python, data: &[u8]) -> PyResult<Py<Self>> {
+        let flat_t_ref = read_as_root(data).map_err(flat_err_to_py)?;
+        let flat_t = flat::Vector3::from(flat_t_ref);
+
+        Ok(crate::into_py_from(py, &flat_t))
     }
 }
