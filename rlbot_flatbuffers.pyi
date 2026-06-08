@@ -357,6 +357,14 @@ class BallTypeMutator:
     """
     `assert int(BallTypeMutator.PizzaPuck) == 14`
     """
+    Strike: BallTypeMutator
+    """
+    `assert int(BallTypeMutator.Strike) == 15`
+    """
+    SpookyBalloon: BallTypeMutator
+    """
+    `assert int(BallTypeMutator.SpookyBalloon) == 16`
+    """
 
     def __new__(cls, value: int = 0) -> BallTypeMutator: ...
     def __init__(self, value: int = 0) -> None:
@@ -406,6 +414,10 @@ class BallWeightMutator:
     """
     `assert int(BallWeightMutator.MagnusFutballLess) == 7`
     """
+    Balloon: BallWeightMutator
+    """
+    `assert int(BallWeightMutator.Balloon) == 8`
+    """
 
     def __new__(cls, value: int = 0) -> BallWeightMutator: ...
     def __init__(self, value: int = 0) -> None:
@@ -445,6 +457,27 @@ class BoostAmountMutator:
     """
 
     def __new__(cls, value: int = 0) -> BoostAmountMutator: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
+class BoostRestritionMutator:
+    Default: BoostRestritionMutator
+    """
+    `assert int(BoostRestritionMutator.Default) == 0`
+    """
+    AerialOnly: BoostRestritionMutator
+    """
+    `assert int(BoostRestritionMutator.AerialOnly) == 1`
+    """
+
+    def __new__(cls, value: int = 0) -> BoostRestritionMutator: ...
     def __init__(self, value: int = 0) -> None:
         """
         :raises ValueError: If the `value` is not a valid enum value
@@ -877,6 +910,31 @@ class JumpMutator:
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
+class KeepUpRulesMutator:
+    Off: KeepUpRulesMutator
+    """
+    `assert int(KeepUpRulesMutator.Off) == 0`
+    """
+    EnabledIncrement: KeepUpRulesMutator
+    """
+    `assert int(KeepUpRulesMutator.EnabledIncrement) == 1`
+    """
+    Enabled: KeepUpRulesMutator
+    """
+    `assert int(KeepUpRulesMutator.Enabled) == 2`
+    """
+
+    def __new__(cls, value: int = 0) -> KeepUpRulesMutator: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
 class Launcher:
     """
     Possible to launch Rocket League.
@@ -903,6 +961,48 @@ class Launcher:
     """
 
     def __new__(cls, value: int = 0) -> Launcher: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
+class LockedDamagePhaseMutator:
+    Default: LockedDamagePhaseMutator
+    """
+    `assert int(LockedDamagePhaseMutator.Default) == 0`
+    """
+    High: LockedDamagePhaseMutator
+    """
+    `assert int(LockedDamagePhaseMutator.High) == 1`
+    """
+
+    def __new__(cls, value: int = 0) -> LockedDamagePhaseMutator: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
+class MatchAdminMutator:
+    Off: MatchAdminMutator
+    """
+    `assert int(MatchAdminMutator.Off) == 0`
+    """
+    On: MatchAdminMutator
+    """
+    `assert int(MatchAdminMutator.On) == 1`
+    """
+
+    def __new__(cls, value: int = 0) -> MatchAdminMutator: ...
     def __init__(self, value: int = 0) -> None:
         """
         :raises ValueError: If the `value` is not a valid enum value
@@ -1077,6 +1177,10 @@ class MaxScoreMutator:
     """
     `assert int(MaxScoreMutator.HundredGoals) == 14`
     """
+    OneHundredFiftyOneGoals: MaxScoreMutator
+    """
+    `assert int(MaxScoreMutator.OneHundredFiftyOneGoals) == 15`
+    """
 
     def __new__(cls, value: int = 0) -> MaxScoreMutator: ...
     def __init__(self, value: int = 0) -> None:
@@ -1098,9 +1202,65 @@ class MaxTimeMutator:
     """
     `assert int(MaxTimeMutator.Unlimited) == 0`
     """
+    OneMinute: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.OneMinute) == 1`
+    """
+    TwoMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.TwoMinutes) == 2`
+    """
+    ThreeMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.ThreeMinutes) == 3`
+    """
+    FourMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.FourMinutes) == 4`
+    """
+    FiveMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.FiveMinutes) == 5`
+    """
+    SixMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.SixMinutes) == 6`
+    """
+    SevenMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.SevenMinutes) == 7`
+    """
+    EightMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.EightMinutes) == 8`
+    """
+    NineMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.NineMinutes) == 9`
+    """
+    TenMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.TenMinutes) == 10`
+    """
     ElevenMinutes: MaxTimeMutator
     """
-    `assert int(MaxTimeMutator.ElevenMinutes) == 1`
+    `assert int(MaxTimeMutator.ElevenMinutes) == 11`
+    """
+    TwelveMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.TwelveMinutes) == 12`
+    """
+    ThirteenMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.ThirteenMinutes) == 13`
+    """
+    FourteenMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.FourteenMinutes) == 14`
+    """
+    FifteenMinutes: MaxTimeMutator
+    """
+    `assert int(MaxTimeMutator.FifteenMinutes) == 15`
     """
 
     def __new__(cls, value: int = 0) -> MaxTimeMutator: ...
@@ -1203,6 +1363,35 @@ class OvertimeMutator:
     """
 
     def __new__(cls, value: int = 0) -> OvertimeMutator: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
+class PerformanceMonitor:
+    """
+    Controls when the in-game performance monitor is shown.
+    """
+
+    ShowWhenSuboptimal: PerformanceMonitor
+    """
+    `assert int(PerformanceMonitor.ShowWhenSuboptimal) == 0`
+    """
+    AlwaysShow: PerformanceMonitor
+    """
+    `assert int(PerformanceMonitor.AlwaysShow) == 1`
+    """
+    NeverShow: PerformanceMonitor
+    """
+    `assert int(PerformanceMonitor.NeverShow) == 2`
+    """
+
+    def __new__(cls, value: int = 0) -> PerformanceMonitor: ...
     def __init__(self, value: int = 0) -> None:
         """
         :raises ValueError: If the `value` is not a valid enum value
@@ -1439,6 +1628,27 @@ class SeriesLengthMutator:
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
+class SpawnDemoballMutator:
+    Off: SpawnDemoballMutator
+    """
+    `assert int(SpawnDemoballMutator.Off) == 0`
+    """
+    On: SpawnDemoballMutator
+    """
+    `assert int(SpawnDemoballMutator.On) == 1`
+    """
+
+    def __new__(cls, value: int = 0) -> SpawnDemoballMutator: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
 class StaleBallMutator:
     Unlimited: StaleBallMutator
     """
@@ -1529,6 +1739,27 @@ class TextVAlign:
     """
 
     def __new__(cls, value: int = 0) -> TextVAlign: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
+class TriTipModeMutator:
+    Off: TriTipModeMutator
+    """
+    `assert int(TriTipModeMutator.Off) == 0`
+    """
+    Tritip: TriTipModeMutator
+    """
+    `assert int(TriTipModeMutator.Tritip) == 1`
+    """
+
+    def __new__(cls, value: int = 0) -> TriTipModeMutator: ...
     def __init__(self, value: int = 0) -> None:
         """
         :raises ValueError: If the `value` is not a valid enum value
@@ -2711,6 +2942,10 @@ class MatchConfiguration:
     If set to true, a free play match is launched instead of an exhibition match.
     This allows the players to use training keybinds, Bakkesmod plugins, and other features that are only allowed in free play.
     """
+    performance_monitor: PerformanceMonitor
+    """
+    Controls when the in-game performance monitor will display.
+    """
 
     __match_args__ = (
         "launcher",
@@ -2729,6 +2964,7 @@ class MatchConfiguration:
         "enable_state_setting",
         "auto_save_replay",
         "freeplay",
+        "performance_monitor",
     )
 
     def __new__(
@@ -2749,6 +2985,7 @@ class MatchConfiguration:
         enable_state_setting: bool = False,
         auto_save_replay: bool = False,
         freeplay: bool = False,
+        performance_monitor: PerformanceMonitor = PerformanceMonitor(),
     ) -> MatchConfiguration: ...
     def __init__(
         self,
@@ -2768,6 +3005,7 @@ class MatchConfiguration:
         enable_state_setting: bool = False,
         auto_save_replay: bool = False,
         freeplay: bool = False,
+        performance_monitor: PerformanceMonitor = PerformanceMonitor(),
     ) -> None:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
@@ -4240,6 +4478,44 @@ class Touch:
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
+class UpdatePerformanceMonitor:
+    """
+    Controls when the in-game performance monitor will display.
+    """
+
+    show: PerformanceMonitor
+
+    __match_args__ = (
+        "show",
+    )
+
+    def __new__(
+        cls,
+        show: PerformanceMonitor = PerformanceMonitor(),
+    ) -> UpdatePerformanceMonitor: ...
+    def __init__(
+        self,
+        show: PerformanceMonitor = PerformanceMonitor(),
+    ) -> None:
+        """
+        NOTE: All field initialization before `__init__`, inside of `__new__`.
+        """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> UpdatePerformanceMonitor:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
 class Vector3Partial:
     """
     A 3D vector where x, y, and z can be null.
@@ -5393,6 +5669,30 @@ class MutatorSettings:
     """
     Additional rules about scoring (ball-goal interaction).
     """
+    tri_tip_mode: TriTipModeMutator
+    """
+    Tri tip car mode.
+    """
+    locked_damage_phase: LockedDamagePhaseMutator
+    """
+    Locked damage phase mode.
+    """
+    spawn_demoball: SpawnDemoballMutator
+    """
+    Spawn demoball.
+    """
+    boost_restriction: BoostRestritionMutator
+    """
+    Boost restriction.
+    """
+    keep_up_rules: KeepUpRulesMutator
+    """
+    Keep up rules.
+    """
+    match_admin: MatchAdminMutator
+    """
+    Match admin.
+    """
 
     __match_args__ = (
         "match_length",
@@ -5427,6 +5727,12 @@ class MutatorSettings:
         "assist_goal_score",
         "input_restriction",
         "scoring_rule",
+        "tri_tip_mode",
+        "locked_damage_phase",
+        "spawn_demoball",
+        "boost_restriction",
+        "keep_up_rules",
+        "match_admin",
     )
 
     def __new__(
@@ -5463,6 +5769,12 @@ class MutatorSettings:
         assist_goal_score: AssistGoalScoreMutator = AssistGoalScoreMutator(),
         input_restriction: InputRestrictionMutator = InputRestrictionMutator(),
         scoring_rule: ScoringRuleMutator = ScoringRuleMutator(),
+        tri_tip_mode: TriTipModeMutator = TriTipModeMutator(),
+        locked_damage_phase: LockedDamagePhaseMutator = LockedDamagePhaseMutator(),
+        spawn_demoball: SpawnDemoballMutator = SpawnDemoballMutator(),
+        boost_restriction: BoostRestritionMutator = BoostRestritionMutator(),
+        keep_up_rules: KeepUpRulesMutator = KeepUpRulesMutator(),
+        match_admin: MatchAdminMutator = MatchAdminMutator(),
     ) -> MutatorSettings: ...
     def __init__(
         self,
@@ -5498,6 +5810,12 @@ class MutatorSettings:
         assist_goal_score: AssistGoalScoreMutator = AssistGoalScoreMutator(),
         input_restriction: InputRestrictionMutator = InputRestrictionMutator(),
         scoring_rule: ScoringRuleMutator = ScoringRuleMutator(),
+        tri_tip_mode: TriTipModeMutator = TriTipModeMutator(),
+        locked_damage_phase: LockedDamagePhaseMutator = LockedDamagePhaseMutator(),
+        spawn_demoball: SpawnDemoballMutator = SpawnDemoballMutator(),
+        boost_restriction: BoostRestritionMutator = BoostRestritionMutator(),
+        keep_up_rules: KeepUpRulesMutator = KeepUpRulesMutator(),
+        match_admin: MatchAdminMutator = MatchAdminMutator(),
     ) -> None:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
@@ -5561,7 +5879,7 @@ class InterfacePacket:
     Packet containing a InterfaceMessage
     """
 
-    message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand
+    message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor
 
     __match_args__ = (
         "message",
@@ -5569,11 +5887,11 @@ class InterfacePacket:
 
     def __new__(
         cls,
-        message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand = ConnectionSettings(),
+        message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor = ConnectionSettings(),
     ) -> InterfacePacket: ...
     def __init__(
         self,
-        message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand = ConnectionSettings(),
+        message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor = ConnectionSettings(),
     ) -> None:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.

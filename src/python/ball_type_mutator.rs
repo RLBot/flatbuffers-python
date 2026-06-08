@@ -24,6 +24,8 @@ impl BallTypeMutator {
             12 => Ok(Self::ScoreAbsorb),
             13 => Ok(Self::Shoe),
             14 => Ok(Self::PizzaPuck),
+            15 => Ok(Self::Strike),
+            16 => Ok(Self::SpookyBalloon),
             v => Err(PyValueError::new_err(format!("Unknown value of {v}"))),
         }
     }

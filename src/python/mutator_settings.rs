@@ -68,6 +68,18 @@ pub struct MutatorSettings {
     pub input_restriction: super::InputRestrictionMutator,
     #[pyo3(set)]
     pub scoring_rule: super::ScoringRuleMutator,
+    #[pyo3(set)]
+    pub tri_tip_mode: super::TriTipModeMutator,
+    #[pyo3(set)]
+    pub locked_damage_phase: super::LockedDamagePhaseMutator,
+    #[pyo3(set)]
+    pub spawn_demoball: super::SpawnDemoballMutator,
+    #[pyo3(set)]
+    pub boost_restriction: super::BoostRestritionMutator,
+    #[pyo3(set)]
+    pub keep_up_rules: super::KeepUpRulesMutator,
+    #[pyo3(set)]
+    pub match_admin: super::MatchAdminMutator,
 }
 
 impl crate::PyDefault for MutatorSettings {
@@ -107,6 +119,12 @@ impl crate::PyDefault for MutatorSettings {
                 assist_goal_score: Default::default(),
                 input_restriction: Default::default(),
                 scoring_rule: Default::default(),
+                tri_tip_mode: Default::default(),
+                locked_damage_phase: Default::default(),
+                spawn_demoball: Default::default(),
+                boost_restriction: Default::default(),
+                keep_up_rules: Default::default(),
+                match_admin: Default::default(),
             },
         )
         .unwrap()
@@ -149,6 +167,12 @@ impl FromGil<&flat::MutatorSettings> for MutatorSettings {
             assist_goal_score: flat_t.assist_goal_score,
             input_restriction: flat_t.input_restriction,
             scoring_rule: flat_t.scoring_rule,
+            tri_tip_mode: flat_t.tri_tip_mode,
+            locked_damage_phase: flat_t.locked_damage_phase,
+            spawn_demoball: flat_t.spawn_demoball,
+            boost_restriction: flat_t.boost_restriction,
+            keep_up_rules: flat_t.keep_up_rules,
+            match_admin: flat_t.match_admin,
         }
     }
 }
@@ -189,6 +213,12 @@ impl FromGil<&MutatorSettings> for flat::MutatorSettings {
             assist_goal_score: py_type.assist_goal_score,
             input_restriction: py_type.input_restriction,
             scoring_rule: py_type.scoring_rule,
+            tri_tip_mode: py_type.tri_tip_mode,
+            locked_damage_phase: py_type.locked_damage_phase,
+            spawn_demoball: py_type.spawn_demoball,
+            boost_restriction: py_type.boost_restriction,
+            keep_up_rules: py_type.keep_up_rules,
+            match_admin: py_type.match_admin,
         }
     }
 }
@@ -197,7 +227,7 @@ impl FromGil<&MutatorSettings> for flat::MutatorSettings {
 impl MutatorSettings {
     #[new]
     #[allow(clippy::too_many_arguments)]
-    #[pyo3(signature = (match_length=Default::default(), max_score=Default::default(), multi_ball=Default::default(), overtime=Default::default(), series_length=Default::default(), game_speed=Default::default(), ball_max_speed=Default::default(), ball_type=Default::default(), ball_weight=Default::default(), ball_size=Default::default(), ball_bounciness=Default::default(), boost_amount=Default::default(), rumble=Default::default(), boost_strength=Default::default(), gravity=Default::default(), demolish=Default::default(), respawn_time=Default::default(), max_time=Default::default(), game_event=Default::default(), audio=Default::default(), ball_gravity=Default::default(), territory=Default::default(), stale_ball=Default::default(), jump=Default::default(), dodge_timer=Default::default(), possession_score=Default::default(), demolish_score=Default::default(), normal_goal_score=Default::default(), aerial_goal_score=Default::default(), assist_goal_score=Default::default(), input_restriction=Default::default(), scoring_rule=Default::default()))]
+    #[pyo3(signature = (match_length=Default::default(), max_score=Default::default(), multi_ball=Default::default(), overtime=Default::default(), series_length=Default::default(), game_speed=Default::default(), ball_max_speed=Default::default(), ball_type=Default::default(), ball_weight=Default::default(), ball_size=Default::default(), ball_bounciness=Default::default(), boost_amount=Default::default(), rumble=Default::default(), boost_strength=Default::default(), gravity=Default::default(), demolish=Default::default(), respawn_time=Default::default(), max_time=Default::default(), game_event=Default::default(), audio=Default::default(), ball_gravity=Default::default(), territory=Default::default(), stale_ball=Default::default(), jump=Default::default(), dodge_timer=Default::default(), possession_score=Default::default(), demolish_score=Default::default(), normal_goal_score=Default::default(), aerial_goal_score=Default::default(), assist_goal_score=Default::default(), input_restriction=Default::default(), scoring_rule=Default::default(), tri_tip_mode=Default::default(), locked_damage_phase=Default::default(), spawn_demoball=Default::default(), boost_restriction=Default::default(), keep_up_rules=Default::default(), match_admin=Default::default()))]
     pub fn new(
         match_length: super::MatchLengthMutator,
         max_score: super::MaxScoreMutator,
@@ -231,6 +261,12 @@ impl MutatorSettings {
         assist_goal_score: super::AssistGoalScoreMutator,
         input_restriction: super::InputRestrictionMutator,
         scoring_rule: super::ScoringRuleMutator,
+        tri_tip_mode: super::TriTipModeMutator,
+        locked_damage_phase: super::LockedDamagePhaseMutator,
+        spawn_demoball: super::SpawnDemoballMutator,
+        boost_restriction: super::BoostRestritionMutator,
+        keep_up_rules: super::KeepUpRulesMutator,
+        match_admin: super::MatchAdminMutator,
     ) -> Self {
         Self {
             match_length,
@@ -265,6 +301,12 @@ impl MutatorSettings {
             assist_goal_score,
             input_restriction,
             scoring_rule,
+            tri_tip_mode,
+            locked_damage_phase,
+            spawn_demoball,
+            boost_restriction,
+            keep_up_rules,
+            match_admin,
         }
     }
 
@@ -275,7 +317,7 @@ impl MutatorSettings {
     #[allow(unused_variables)]
     pub fn __repr__(&self, py: Python) -> String {
         format!(
-            "MutatorSettings(match_length={}, max_score={}, multi_ball={}, overtime={}, series_length={}, game_speed={}, ball_max_speed={}, ball_type={}, ball_weight={}, ball_size={}, ball_bounciness={}, boost_amount={}, rumble={}, boost_strength={}, gravity={}, demolish={}, respawn_time={}, max_time={}, game_event={}, audio={}, ball_gravity={}, territory={}, stale_ball={}, jump={}, dodge_timer={}, possession_score={}, demolish_score={}, normal_goal_score={}, aerial_goal_score={}, assist_goal_score={}, input_restriction={}, scoring_rule={})",
+            "MutatorSettings(match_length={}, max_score={}, multi_ball={}, overtime={}, series_length={}, game_speed={}, ball_max_speed={}, ball_type={}, ball_weight={}, ball_size={}, ball_bounciness={}, boost_amount={}, rumble={}, boost_strength={}, gravity={}, demolish={}, respawn_time={}, max_time={}, game_event={}, audio={}, ball_gravity={}, territory={}, stale_ball={}, jump={}, dodge_timer={}, possession_score={}, demolish_score={}, normal_goal_score={}, aerial_goal_score={}, assist_goal_score={}, input_restriction={}, scoring_rule={}, tri_tip_mode={}, locked_damage_phase={}, spawn_demoball={}, boost_restriction={}, keep_up_rules={}, match_admin={})",
             self.match_length.__repr__(),
             self.max_score.__repr__(),
             self.multi_ball.__repr__(),
@@ -308,6 +350,12 @@ impl MutatorSettings {
             self.assist_goal_score.__repr__(),
             self.input_restriction.__repr__(),
             self.scoring_rule.__repr__(),
+            self.tri_tip_mode.__repr__(),
+            self.locked_damage_phase.__repr__(),
+            self.spawn_demoball.__repr__(),
+            self.boost_restriction.__repr__(),
+            self.keep_up_rules.__repr__(),
+            self.match_admin.__repr__(),
         )
     }
 
@@ -348,6 +396,12 @@ impl MutatorSettings {
                 "assist_goal_score",
                 "input_restriction",
                 "scoring_rule",
+                "tri_tip_mode",
+                "locked_damage_phase",
+                "spawn_demoball",
+                "boost_restriction",
+                "keep_up_rules",
+                "match_admin",
             ],
         )
         .unwrap()

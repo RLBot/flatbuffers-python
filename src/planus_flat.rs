@@ -1022,6 +1022,11 @@ mod root {
 
                 ///  Response to PingRequest for measuring latency
                 PingResponse(::planus::alloc::boxed::Box<self::PingResponse>),
+
+                ///  Sent by sessions to control when the in-game performance monitor will display
+                UpdatePerformanceMonitor(
+                    ::planus::alloc::boxed::Box<self::UpdatePerformanceMonitor>,
+                ),
             }
 
             impl InterfaceMessage {
@@ -1150,6 +1155,14 @@ mod root {
                 ) -> ::planus::UnionOffset<Self> {
                     ::planus::UnionOffset::new(15, value.prepare(builder).downcast())
                 }
+
+                #[inline]
+                pub fn create_update_performance_monitor(
+                    builder: &mut ::planus::Builder,
+                    value: impl ::planus::WriteAsOffset<self::UpdatePerformanceMonitor>,
+                ) -> ::planus::UnionOffset<Self> {
+                    ::planus::UnionOffset::new(16, value.prepare(builder).downcast())
+                }
             }
 
             impl ::planus::WriteAsUnion<InterfaceMessage> for InterfaceMessage {
@@ -1183,6 +1196,9 @@ mod root {
                         }
                         Self::PingRequest(value) => Self::create_ping_request(builder, value),
                         Self::PingResponse(value) => Self::create_ping_response(builder, value),
+                        Self::UpdatePerformanceMonitor(value) => {
+                            Self::create_update_performance_monitor(builder, value)
+                        }
                     }
                 }
             }
@@ -1381,6 +1397,18 @@ mod root {
                 ) -> InterfaceMessageBuilder<::planus::Initialized<15, T>>
                 where
                     T: ::planus::WriteAsOffset<self::PingResponse>,
+                {
+                    InterfaceMessageBuilder(::planus::Initialized(value))
+                }
+
+                /// Creates an instance of the [`UpdatePerformanceMonitor` variant](InterfaceMessage#variant.UpdatePerformanceMonitor).
+                #[inline]
+                pub fn update_performance_monitor<T>(
+                    self,
+                    value: T,
+                ) -> InterfaceMessageBuilder<::planus::Initialized<16, T>>
+                where
+                    T: ::planus::WriteAsOffset<self::UpdatePerformanceMonitor>,
                 {
                     InterfaceMessageBuilder(::planus::Initialized(value))
                 }
@@ -1820,6 +1848,34 @@ mod root {
                     ::core::option::Option::Some(::planus::WriteAsUnion::prepare(self, builder))
                 }
             }
+            impl<T> ::planus::WriteAsUnion<InterfaceMessage>
+                for InterfaceMessageBuilder<::planus::Initialized<16, T>>
+            where
+                T: ::planus::WriteAsOffset<self::UpdatePerformanceMonitor>,
+            {
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::UnionOffset<InterfaceMessage> {
+                    ::planus::UnionOffset::new(16, (self.0).0.prepare(builder).downcast())
+                }
+            }
+
+            impl<T> ::planus::WriteAsOptionalUnion<InterfaceMessage>
+                for InterfaceMessageBuilder<::planus::Initialized<16, T>>
+            where
+                T: ::planus::WriteAsOffset<self::UpdatePerformanceMonitor>,
+            {
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<::planus::UnionOffset<InterfaceMessage>>
+                {
+                    ::core::option::Option::Some(::planus::WriteAsUnion::prepare(self, builder))
+                }
+            }
 
             /// Reference to a deserialized [InterfaceMessage].
             #[derive(Copy, Clone, Debug)]
@@ -1839,6 +1895,7 @@ mod root {
                 RenderingStatus(self::RenderingStatusRef<'a>),
                 PingRequest(self::PingRequestRef<'a>),
                 PingResponse(self::PingResponseRef<'a>),
+                UpdatePerformanceMonitor(self::UpdatePerformanceMonitorRef<'a>),
             }
 
             impl<'a> ::core::convert::TryFrom<InterfaceMessageRef<'a>> for InterfaceMessage {
@@ -1935,6 +1992,12 @@ mod root {
                                 ::core::convert::TryFrom::try_from(value)?,
                             ))
                         }
+
+                        InterfaceMessageRef::UpdatePerformanceMonitor(value) => {
+                            Self::UpdatePerformanceMonitor(::planus::alloc::boxed::Box::new(
+                                ::core::convert::TryFrom::try_from(value)?,
+                            ))
+                        }
                     })
                 }
             }
@@ -1991,6 +2054,9 @@ mod root {
                         15 => ::core::result::Result::Ok(Self::PingResponse(
                             ::planus::TableRead::from_buffer(buffer, field_offset)?,
                         )),
+                        16 => ::core::result::Result::Ok(Self::UpdatePerformanceMonitor(
+                            ::planus::TableRead::from_buffer(buffer, field_offset)?,
+                        )),
                         _ => ::core::result::Result::Err(
                             ::planus::errors::ErrorKind::UnknownUnionTag { tag },
                         ),
@@ -2005,7 +2071,7 @@ mod root {
             ///  Packet containing a InterfaceMessage
             ///
             /// Generated from these locations:
-            /// * Table `InterfacePacket` in the file `flatbuffers-schema/schema/interfacepacket.fbs:63`
+            /// * Table `InterfacePacket` in the file `flatbuffers-schema/schema/interfacepacket.fbs:66`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct InterfacePacket {
                 /// The field `message` in the table `InterfacePacket`
@@ -5525,6 +5591,298 @@ mod root {
                     )
                     .map_err(|error_kind| {
                         error_kind.with_error_location("[PingResponseRef]", "read_as_root", 0)
+                    })
+                }
+            }
+
+            ///  Controls when the in-game performance monitor will display.
+            ///
+            /// Generated from these locations:
+            /// * Table `UpdatePerformanceMonitor` in the file `flatbuffers-schema/schema/misc.fbs:106`
+            #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
+            pub struct UpdatePerformanceMonitor {
+                /// The field `show` in the table `UpdatePerformanceMonitor`
+                pub show: self::PerformanceMonitor,
+            }
+
+            #[allow(clippy::derivable_impls)]
+            impl ::core::default::Default for UpdatePerformanceMonitor {
+                fn default() -> Self {
+                    Self {
+                        show: self::PerformanceMonitor::ShowWhenSuboptimal,
+                    }
+                }
+            }
+
+            impl UpdatePerformanceMonitor {
+                /// Creates a [UpdatePerformanceMonitorBuilder] for serializing an instance of this table.
+                #[inline]
+                pub fn builder() -> UpdatePerformanceMonitorBuilder<()> {
+                    UpdatePerformanceMonitorBuilder(())
+                }
+
+                #[allow(clippy::too_many_arguments)]
+                pub fn create(
+                    builder: &mut ::planus::Builder,
+                    field_show: impl ::planus::WriteAsDefault<
+                        self::PerformanceMonitor,
+                        self::PerformanceMonitor,
+                    >,
+                ) -> ::planus::Offset<Self> {
+                    let prepared_show =
+                        field_show.prepare(builder, &self::PerformanceMonitor::ShowWhenSuboptimal);
+
+                    let mut table_writer: ::planus::table_writer::TableWriter<6> =
+                        ::core::default::Default::default();
+                    if prepared_show.is_some() {
+                        table_writer.write_entry::<self::PerformanceMonitor>(0);
+                    }
+
+                    unsafe {
+                        table_writer.finish(builder, |object_writer| {
+                            if let ::core::option::Option::Some(prepared_show) = prepared_show {
+                                object_writer.write::<_, _, 1>(&prepared_show);
+                            }
+                        });
+                    }
+                    builder.current_offset()
+                }
+            }
+
+            impl ::planus::WriteAs<::planus::Offset<UpdatePerformanceMonitor>> for UpdatePerformanceMonitor {
+                type Prepared = ::planus::Offset<Self>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<UpdatePerformanceMonitor> {
+                    ::planus::WriteAsOffset::prepare(self, builder)
+                }
+            }
+
+            impl ::planus::WriteAsOptional<::planus::Offset<UpdatePerformanceMonitor>>
+                for UpdatePerformanceMonitor
+            {
+                type Prepared = ::planus::Offset<Self>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<::planus::Offset<UpdatePerformanceMonitor>>
+                {
+                    ::core::option::Option::Some(::planus::WriteAsOffset::prepare(self, builder))
+                }
+            }
+
+            impl ::planus::WriteAsOffset<UpdatePerformanceMonitor> for UpdatePerformanceMonitor {
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<UpdatePerformanceMonitor> {
+                    UpdatePerformanceMonitor::create(builder, self.show)
+                }
+            }
+
+            /// Builder for serializing an instance of the [UpdatePerformanceMonitor] type.
+            ///
+            /// Can be created using the [UpdatePerformanceMonitor::builder] method.
+            #[derive(Debug)]
+            #[must_use]
+            pub struct UpdatePerformanceMonitorBuilder<State>(State);
+
+            impl UpdatePerformanceMonitorBuilder<()> {
+                /// Setter for the [`show` field](UpdatePerformanceMonitor#structfield.show).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn show<T0>(self, value: T0) -> UpdatePerformanceMonitorBuilder<(T0,)>
+                where
+                    T0: ::planus::WriteAsDefault<self::PerformanceMonitor, self::PerformanceMonitor>,
+                {
+                    UpdatePerformanceMonitorBuilder((value,))
+                }
+
+                /// Sets the [`show` field](UpdatePerformanceMonitor#structfield.show) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn show_as_default(
+                    self,
+                ) -> UpdatePerformanceMonitorBuilder<(::planus::DefaultValue,)> {
+                    self.show(::planus::DefaultValue)
+                }
+            }
+
+            impl<T0> UpdatePerformanceMonitorBuilder<(T0,)> {
+                /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [UpdatePerformanceMonitor].
+                #[inline]
+                pub fn finish(
+                    self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<UpdatePerformanceMonitor>
+                where
+                    Self: ::planus::WriteAsOffset<UpdatePerformanceMonitor>,
+                {
+                    ::planus::WriteAsOffset::prepare(&self, builder)
+                }
+            }
+
+            impl<T0: ::planus::WriteAsDefault<self::PerformanceMonitor, self::PerformanceMonitor>>
+                ::planus::WriteAs<::planus::Offset<UpdatePerformanceMonitor>>
+                for UpdatePerformanceMonitorBuilder<(T0,)>
+            {
+                type Prepared = ::planus::Offset<UpdatePerformanceMonitor>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<UpdatePerformanceMonitor> {
+                    ::planus::WriteAsOffset::prepare(self, builder)
+                }
+            }
+
+            impl<T0: ::planus::WriteAsDefault<self::PerformanceMonitor, self::PerformanceMonitor>>
+                ::planus::WriteAsOptional<::planus::Offset<UpdatePerformanceMonitor>>
+                for UpdatePerformanceMonitorBuilder<(T0,)>
+            {
+                type Prepared = ::planus::Offset<UpdatePerformanceMonitor>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<::planus::Offset<UpdatePerformanceMonitor>>
+                {
+                    ::core::option::Option::Some(::planus::WriteAsOffset::prepare(self, builder))
+                }
+            }
+
+            impl<T0: ::planus::WriteAsDefault<self::PerformanceMonitor, self::PerformanceMonitor>>
+                ::planus::WriteAsOffset<UpdatePerformanceMonitor>
+                for UpdatePerformanceMonitorBuilder<(T0,)>
+            {
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<UpdatePerformanceMonitor> {
+                    let (v0,) = &self.0;
+                    UpdatePerformanceMonitor::create(builder, v0)
+                }
+            }
+
+            /// Reference to a deserialized [UpdatePerformanceMonitor].
+            #[derive(Copy, Clone)]
+            pub struct UpdatePerformanceMonitorRef<'a>(::planus::table_reader::Table<'a>);
+
+            impl<'a> UpdatePerformanceMonitorRef<'a> {
+                /// Getter for the [`show` field](UpdatePerformanceMonitor#structfield.show).
+                #[inline]
+                pub fn show(&self) -> ::planus::Result<self::PerformanceMonitor> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(0, "UpdatePerformanceMonitor", "show")?
+                            .unwrap_or(self::PerformanceMonitor::ShowWhenSuboptimal),
+                    )
+                }
+            }
+
+            impl<'a> ::core::fmt::Debug for UpdatePerformanceMonitorRef<'a> {
+                fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+                    let mut f = f.debug_struct("UpdatePerformanceMonitorRef");
+                    f.field("show", &self.show());
+                    f.finish()
+                }
+            }
+
+            impl<'a> ::core::convert::TryFrom<UpdatePerformanceMonitorRef<'a>> for UpdatePerformanceMonitor {
+                type Error = ::planus::Error;
+
+                #[allow(unreachable_code)]
+                fn try_from(value: UpdatePerformanceMonitorRef<'a>) -> ::planus::Result<Self> {
+                    ::core::result::Result::Ok(Self {
+                        show: ::core::convert::TryInto::try_into(value.show()?)?,
+                    })
+                }
+            }
+
+            impl<'a> ::planus::TableRead<'a> for UpdatePerformanceMonitorRef<'a> {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'a>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    ::core::result::Result::Ok(Self(::planus::table_reader::Table::from_buffer(
+                        buffer, offset,
+                    )?))
+                }
+            }
+
+            impl<'a> ::planus::VectorReadInner<'a> for UpdatePerformanceMonitorRef<'a> {
+                type Error = ::planus::Error;
+                const STRIDE: usize = 4;
+
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'a>,
+                    offset: usize,
+                ) -> ::planus::Result<Self> {
+                    ::planus::TableRead::from_buffer(buffer, offset).map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "[UpdatePerformanceMonitorRef]",
+                            "get",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<::planus::Offset<UpdatePerformanceMonitor>>
+                for UpdatePerformanceMonitor
+            {
+                type Value = ::planus::Offset<UpdatePerformanceMonitor>;
+                const STRIDE: usize = 4;
+                #[inline]
+                fn prepare(&self, builder: &mut ::planus::Builder) -> Self::Value {
+                    ::planus::WriteAs::prepare(self, builder)
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[::planus::Offset<UpdatePerformanceMonitor>],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 4];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - (Self::STRIDE * i) as u32,
+                        );
+                    }
+                }
+            }
+
+            impl<'a> ::planus::ReadAsRoot<'a> for UpdatePerformanceMonitorRef<'a> {
+                fn read_as_root(slice: &'a [u8]) -> ::planus::Result<Self> {
+                    ::planus::TableRead::from_buffer(
+                        ::planus::SliceWithStartOffset {
+                            buffer: slice,
+                            offset_from_start: 0,
+                        },
+                        0,
+                    )
+                    .map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "[UpdatePerformanceMonitorRef]",
+                            "read_as_root",
+                            0,
+                        )
                     })
                 }
             }
@@ -21829,11 +22187,14 @@ mod root {
 
                 /// The variant `HundredGoals` in the enum `MaxScoreMutator`
                 HundredGoals = 14,
+
+                /// The variant `OneHundredFiftyOneGoals` in the enum `MaxScoreMutator`
+                OneHundredFiftyOneGoals = 15,
             }
 
             impl MaxScoreMutator {
                 /// Array containing all valid variants of MaxScoreMutator
-                pub const ENUM_VALUES: [Self; 15] = [
+                pub const ENUM_VALUES: [Self; 16] = [
                     Self::Unlimited,
                     Self::OneGoal,
                     Self::ThreeGoals,
@@ -21849,6 +22210,7 @@ mod root {
                     Self::EightyGoals,
                     Self::NinetyGoals,
                     Self::HundredGoals,
+                    Self::OneHundredFiftyOneGoals,
                 ];
             }
 
@@ -21876,6 +22238,7 @@ mod root {
                         12 => ::core::result::Result::Ok(MaxScoreMutator::EightyGoals),
                         13 => ::core::result::Result::Ok(MaxScoreMutator::NinetyGoals),
                         14 => ::core::result::Result::Ok(MaxScoreMutator::HundredGoals),
+                        15 => ::core::result::Result::Ok(MaxScoreMutator::OneHundredFiftyOneGoals),
 
                         _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
                             tag: value as i128,
@@ -22013,7 +22376,7 @@ mod root {
             ///  Multi ball mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `MultiBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:157`
+            /// * Enum `MultiBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:158`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -22194,7 +22557,7 @@ mod root {
             ///  Overtime mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `OvertimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:165`
+            /// * Enum `OvertimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:166`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -22375,7 +22738,7 @@ mod root {
             ///  Series length mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `SeriesLengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:172`
+            /// * Enum `SeriesLengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:173`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -22561,7 +22924,7 @@ mod root {
             ///  Game speed mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `GameSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:180`
+            /// * Enum `GameSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:181`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -22738,7 +23101,7 @@ mod root {
             ///  Ball max speed mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallMaxSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:187`
+            /// * Enum `BallMaxSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:188`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -22920,7 +23283,7 @@ mod root {
             ///  Ball type mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallTypeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:195`
+            /// * Enum `BallTypeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:196`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -22977,11 +23340,17 @@ mod root {
 
                 /// The variant `PizzaPuck` in the enum `BallTypeMutator`
                 PizzaPuck = 14,
+
+                /// The variant `Strike` in the enum `BallTypeMutator`
+                Strike = 15,
+
+                /// The variant `SpookyBalloon` in the enum `BallTypeMutator`
+                SpookyBalloon = 16,
             }
 
             impl BallTypeMutator {
                 /// Array containing all valid variants of BallTypeMutator
-                pub const ENUM_VALUES: [Self; 15] = [
+                pub const ENUM_VALUES: [Self; 17] = [
                     Self::Default,
                     Self::Cube,
                     Self::Puck,
@@ -22997,6 +23366,8 @@ mod root {
                     Self::ScoreAbsorb,
                     Self::Shoe,
                     Self::PizzaPuck,
+                    Self::Strike,
+                    Self::SpookyBalloon,
                 ];
             }
 
@@ -23024,6 +23395,8 @@ mod root {
                         12 => ::core::result::Result::Ok(BallTypeMutator::ScoreAbsorb),
                         13 => ::core::result::Result::Ok(BallTypeMutator::Shoe),
                         14 => ::core::result::Result::Ok(BallTypeMutator::PizzaPuck),
+                        15 => ::core::result::Result::Ok(BallTypeMutator::Strike),
+                        16 => ::core::result::Result::Ok(BallTypeMutator::SpookyBalloon),
 
                         _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
                             tag: value as i128,
@@ -23161,7 +23534,7 @@ mod root {
             ///  Ball weight mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallWeightMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:214`
+            /// * Enum `BallWeightMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:217`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -23197,11 +23570,14 @@ mod root {
 
                 /// The variant `MagnusFutballLess` in the enum `BallWeightMutator`
                 MagnusFutballLess = 7,
+
+                /// The variant `Balloon` in the enum `BallWeightMutator`
+                Balloon = 8,
             }
 
             impl BallWeightMutator {
                 /// Array containing all valid variants of BallWeightMutator
-                pub const ENUM_VALUES: [Self; 8] = [
+                pub const ENUM_VALUES: [Self; 9] = [
                     Self::Default,
                     Self::Light,
                     Self::Heavy,
@@ -23210,6 +23586,7 @@ mod root {
                     Self::BeachBallCurve,
                     Self::MagnusFutBall,
                     Self::MagnusFutballLess,
+                    Self::Balloon,
                 ];
             }
 
@@ -23230,6 +23607,7 @@ mod root {
                         5 => ::core::result::Result::Ok(BallWeightMutator::BeachBallCurve),
                         6 => ::core::result::Result::Ok(BallWeightMutator::MagnusFutBall),
                         7 => ::core::result::Result::Ok(BallWeightMutator::MagnusFutballLess),
+                        8 => ::core::result::Result::Ok(BallWeightMutator::Balloon),
 
                         _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
                             tag: value as i128,
@@ -23367,7 +23745,7 @@ mod root {
             ///  Ball size mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallSizeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:226`
+            /// * Enum `BallSizeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:230`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -23558,7 +23936,7 @@ mod root {
             ///  Ball bounciness mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallBouncinessMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:235`
+            /// * Enum `BallBouncinessMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:239`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -23751,7 +24129,7 @@ mod root {
             ///  Ball gravity mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallGravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:244`
+            /// * Enum `BallGravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:248`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -23933,7 +24311,7 @@ mod root {
             ///  Boost amount mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BoostAmountMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:252`
+            /// * Enum `BoostAmountMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:256`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24124,7 +24502,7 @@ mod root {
             ///  Rumble mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `RumbleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:261`
+            /// * Enum `RumbleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:265`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24365,7 +24743,7 @@ mod root {
             ///  Boost strength mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BoostStrengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:280`
+            /// * Enum `BoostStrengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:284`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24556,7 +24934,7 @@ mod root {
             ///  Gravity mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `GravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:289`
+            /// * Enum `GravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:293`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24747,7 +25125,7 @@ mod root {
             ///  Demolition mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `DemolishMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:298`
+            /// * Enum `DemolishMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:302`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24958,7 +25336,7 @@ mod root {
             ///  Respawn time mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `RespawnTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:311`
+            /// * Enum `RespawnTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:315`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25144,7 +25522,7 @@ mod root {
             ///  Max time mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `MaxTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:319`
+            /// * Enum `MaxTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:323`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25160,13 +25538,72 @@ mod root {
                 /// The variant `Unlimited` in the enum `MaxTimeMutator`
                 Unlimited = 0,
 
+                /// The variant `OneMinute` in the enum `MaxTimeMutator`
+                OneMinute = 1,
+
+                /// The variant `TwoMinutes` in the enum `MaxTimeMutator`
+                TwoMinutes = 2,
+
+                /// The variant `ThreeMinutes` in the enum `MaxTimeMutator`
+                ThreeMinutes = 3,
+
+                /// The variant `FourMinutes` in the enum `MaxTimeMutator`
+                FourMinutes = 4,
+
+                /// The variant `FiveMinutes` in the enum `MaxTimeMutator`
+                FiveMinutes = 5,
+
+                /// The variant `SixMinutes` in the enum `MaxTimeMutator`
+                SixMinutes = 6,
+
+                /// The variant `SevenMinutes` in the enum `MaxTimeMutator`
+                SevenMinutes = 7,
+
+                /// The variant `EightMinutes` in the enum `MaxTimeMutator`
+                EightMinutes = 8,
+
+                /// The variant `NineMinutes` in the enum `MaxTimeMutator`
+                NineMinutes = 9,
+
+                /// The variant `TenMinutes` in the enum `MaxTimeMutator`
+                TenMinutes = 10,
+
                 /// The variant `ElevenMinutes` in the enum `MaxTimeMutator`
-                ElevenMinutes = 1,
+                ElevenMinutes = 11,
+
+                /// The variant `TwelveMinutes` in the enum `MaxTimeMutator`
+                TwelveMinutes = 12,
+
+                /// The variant `ThirteenMinutes` in the enum `MaxTimeMutator`
+                ThirteenMinutes = 13,
+
+                /// The variant `FourteenMinutes` in the enum `MaxTimeMutator`
+                FourteenMinutes = 14,
+
+                /// The variant `FifteenMinutes` in the enum `MaxTimeMutator`
+                FifteenMinutes = 15,
             }
 
             impl MaxTimeMutator {
                 /// Array containing all valid variants of MaxTimeMutator
-                pub const ENUM_VALUES: [Self; 2] = [Self::Unlimited, Self::ElevenMinutes];
+                pub const ENUM_VALUES: [Self; 16] = [
+                    Self::Unlimited,
+                    Self::OneMinute,
+                    Self::TwoMinutes,
+                    Self::ThreeMinutes,
+                    Self::FourMinutes,
+                    Self::FiveMinutes,
+                    Self::SixMinutes,
+                    Self::SevenMinutes,
+                    Self::EightMinutes,
+                    Self::NineMinutes,
+                    Self::TenMinutes,
+                    Self::ElevenMinutes,
+                    Self::TwelveMinutes,
+                    Self::ThirteenMinutes,
+                    Self::FourteenMinutes,
+                    Self::FifteenMinutes,
+                ];
             }
 
             impl ::core::convert::TryFrom<u8> for MaxTimeMutator {
@@ -25179,7 +25616,21 @@ mod root {
                     #[allow(clippy::match_single_binding)]
                     match value {
                         0 => ::core::result::Result::Ok(MaxTimeMutator::Unlimited),
-                        1 => ::core::result::Result::Ok(MaxTimeMutator::ElevenMinutes),
+                        1 => ::core::result::Result::Ok(MaxTimeMutator::OneMinute),
+                        2 => ::core::result::Result::Ok(MaxTimeMutator::TwoMinutes),
+                        3 => ::core::result::Result::Ok(MaxTimeMutator::ThreeMinutes),
+                        4 => ::core::result::Result::Ok(MaxTimeMutator::FourMinutes),
+                        5 => ::core::result::Result::Ok(MaxTimeMutator::FiveMinutes),
+                        6 => ::core::result::Result::Ok(MaxTimeMutator::SixMinutes),
+                        7 => ::core::result::Result::Ok(MaxTimeMutator::SevenMinutes),
+                        8 => ::core::result::Result::Ok(MaxTimeMutator::EightMinutes),
+                        9 => ::core::result::Result::Ok(MaxTimeMutator::NineMinutes),
+                        10 => ::core::result::Result::Ok(MaxTimeMutator::TenMinutes),
+                        11 => ::core::result::Result::Ok(MaxTimeMutator::ElevenMinutes),
+                        12 => ::core::result::Result::Ok(MaxTimeMutator::TwelveMinutes),
+                        13 => ::core::result::Result::Ok(MaxTimeMutator::ThirteenMinutes),
+                        14 => ::core::result::Result::Ok(MaxTimeMutator::FourteenMinutes),
+                        15 => ::core::result::Result::Ok(MaxTimeMutator::FifteenMinutes),
 
                         _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
                             tag: value as i128,
@@ -25317,7 +25768,7 @@ mod root {
             ///  Game event mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `GameEventMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:325`
+            /// * Enum `GameEventMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:343`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25494,7 +25945,7 @@ mod root {
             ///  Audio mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `AudioMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:332`
+            /// * Enum `AudioMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:350`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25667,7 +26118,7 @@ mod root {
             /// The enum `TerritoryMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `TerritoryMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:337`
+            /// * Enum `TerritoryMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:355`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25840,7 +26291,7 @@ mod root {
             /// The enum `StaleBallMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `StaleBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:342`
+            /// * Enum `StaleBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:360`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26013,7 +26464,7 @@ mod root {
             /// The enum `JumpMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `JumpMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:347`
+            /// * Enum `JumpMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:365`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26214,7 +26665,7 @@ mod root {
             /// The enum `DodgeTimerMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `DodgeTimerMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:357`
+            /// * Enum `DodgeTimerMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:375`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26402,7 +26853,7 @@ mod root {
             /// The enum `PossessionScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `PossessionScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:364`
+            /// * Enum `PossessionScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:382`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26590,7 +27041,7 @@ mod root {
             /// The enum `DemolishScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `DemolishScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:371`
+            /// * Enum `DemolishScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:389`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26771,7 +27222,7 @@ mod root {
             /// The enum `NormalGoalScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `NormalGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:378`
+            /// * Enum `NormalGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:396`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26969,7 +27420,7 @@ mod root {
             /// The enum `AerialGoalScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `AerialGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:387`
+            /// * Enum `AerialGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:405`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27167,7 +27618,7 @@ mod root {
             /// The enum `AssistGoalScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `AssistGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:396`
+            /// * Enum `AssistGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:414`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27350,7 +27801,7 @@ mod root {
             /// The enum `InputRestrictionMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `InputRestrictionMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:403`
+            /// * Enum `InputRestrictionMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:421`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27525,7 +27976,7 @@ mod root {
             /// The enum `ScoringRuleMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `ScoringRuleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:408`
+            /// * Enum `ScoringRuleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:426`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27695,10 +28146,1057 @@ mod root {
                 }
             }
 
+            /// The enum `TriTipModeMutator` in the namespace `rlbot.flat`
+            ///
+            /// Generated from these locations:
+            /// * Enum `TriTipModeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:431`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum TriTipModeMutator {
+                #[default]
+                /// The variant `Off` in the enum `TriTipModeMutator`
+                Off = 0,
+
+                /// The variant `Tritip` in the enum `TriTipModeMutator`
+                Tritip = 1,
+            }
+
+            impl TriTipModeMutator {
+                /// Array containing all valid variants of TriTipModeMutator
+                pub const ENUM_VALUES: [Self; 2] = [Self::Off, Self::Tritip];
+            }
+
+            impl ::core::convert::TryFrom<u8> for TriTipModeMutator {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(TriTipModeMutator::Off),
+                        1 => ::core::result::Result::Ok(TriTipModeMutator::Tritip),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<TriTipModeMutator> for u8 {
+                #[inline]
+                fn from(value: TriTipModeMutator) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for TriTipModeMutator {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<TriTipModeMutator> for TriTipModeMutator {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<TriTipModeMutator> for TriTipModeMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> TriTipModeMutator {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<TriTipModeMutator, TriTipModeMutator> for TriTipModeMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &TriTipModeMutator,
+                ) -> ::core::option::Option<TriTipModeMutator> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<TriTipModeMutator> for TriTipModeMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<TriTipModeMutator> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for TriTipModeMutator {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for TriTipModeMutator {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "TriTipModeMutator",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<TriTipModeMutator> for TriTipModeMutator {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
+            /// The enum `LockedDamagePhaseMutator` in the namespace `rlbot.flat`
+            ///
+            /// Generated from these locations:
+            /// * Enum `LockedDamagePhaseMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:436`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum LockedDamagePhaseMutator {
+                #[default]
+                /// The variant `Default` in the enum `LockedDamagePhaseMutator`
+                Default = 0,
+
+                /// The variant `High` in the enum `LockedDamagePhaseMutator`
+                High = 1,
+            }
+
+            impl LockedDamagePhaseMutator {
+                /// Array containing all valid variants of LockedDamagePhaseMutator
+                pub const ENUM_VALUES: [Self; 2] = [Self::Default, Self::High];
+            }
+
+            impl ::core::convert::TryFrom<u8> for LockedDamagePhaseMutator {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(LockedDamagePhaseMutator::Default),
+                        1 => ::core::result::Result::Ok(LockedDamagePhaseMutator::High),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<LockedDamagePhaseMutator> for u8 {
+                #[inline]
+                fn from(value: LockedDamagePhaseMutator) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for LockedDamagePhaseMutator {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<LockedDamagePhaseMutator> for LockedDamagePhaseMutator {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<LockedDamagePhaseMutator> for LockedDamagePhaseMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> LockedDamagePhaseMutator {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<LockedDamagePhaseMutator, LockedDamagePhaseMutator>
+                for LockedDamagePhaseMutator
+            {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &LockedDamagePhaseMutator,
+                ) -> ::core::option::Option<LockedDamagePhaseMutator> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<LockedDamagePhaseMutator> for LockedDamagePhaseMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<LockedDamagePhaseMutator> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for LockedDamagePhaseMutator {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for LockedDamagePhaseMutator {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "LockedDamagePhaseMutator",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<LockedDamagePhaseMutator> for LockedDamagePhaseMutator {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
+            /// The enum `SpawnDemoballMutator` in the namespace `rlbot.flat`
+            ///
+            /// Generated from these locations:
+            /// * Enum `SpawnDemoballMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:441`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum SpawnDemoballMutator {
+                #[default]
+                /// The variant `Off` in the enum `SpawnDemoballMutator`
+                Off = 0,
+
+                /// The variant `On` in the enum `SpawnDemoballMutator`
+                On = 1,
+            }
+
+            impl SpawnDemoballMutator {
+                /// Array containing all valid variants of SpawnDemoballMutator
+                pub const ENUM_VALUES: [Self; 2] = [Self::Off, Self::On];
+            }
+
+            impl ::core::convert::TryFrom<u8> for SpawnDemoballMutator {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(SpawnDemoballMutator::Off),
+                        1 => ::core::result::Result::Ok(SpawnDemoballMutator::On),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<SpawnDemoballMutator> for u8 {
+                #[inline]
+                fn from(value: SpawnDemoballMutator) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for SpawnDemoballMutator {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<SpawnDemoballMutator> for SpawnDemoballMutator {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<SpawnDemoballMutator> for SpawnDemoballMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> SpawnDemoballMutator {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<SpawnDemoballMutator, SpawnDemoballMutator> for SpawnDemoballMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &SpawnDemoballMutator,
+                ) -> ::core::option::Option<SpawnDemoballMutator> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<SpawnDemoballMutator> for SpawnDemoballMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<SpawnDemoballMutator> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for SpawnDemoballMutator {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for SpawnDemoballMutator {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "SpawnDemoballMutator",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<SpawnDemoballMutator> for SpawnDemoballMutator {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
+            /// The enum `BoostRestritionMutator` in the namespace `rlbot.flat`
+            ///
+            /// Generated from these locations:
+            /// * Enum `BoostRestritionMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:446`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum BoostRestritionMutator {
+                #[default]
+                /// The variant `Default` in the enum `BoostRestritionMutator`
+                Default = 0,
+
+                /// The variant `AerialOnly` in the enum `BoostRestritionMutator`
+                AerialOnly = 1,
+            }
+
+            impl BoostRestritionMutator {
+                /// Array containing all valid variants of BoostRestritionMutator
+                pub const ENUM_VALUES: [Self; 2] = [Self::Default, Self::AerialOnly];
+            }
+
+            impl ::core::convert::TryFrom<u8> for BoostRestritionMutator {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(BoostRestritionMutator::Default),
+                        1 => ::core::result::Result::Ok(BoostRestritionMutator::AerialOnly),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<BoostRestritionMutator> for u8 {
+                #[inline]
+                fn from(value: BoostRestritionMutator) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for BoostRestritionMutator {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<BoostRestritionMutator> for BoostRestritionMutator {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<BoostRestritionMutator> for BoostRestritionMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> BoostRestritionMutator {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<BoostRestritionMutator, BoostRestritionMutator>
+                for BoostRestritionMutator
+            {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &BoostRestritionMutator,
+                ) -> ::core::option::Option<BoostRestritionMutator> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<BoostRestritionMutator> for BoostRestritionMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<BoostRestritionMutator> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for BoostRestritionMutator {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for BoostRestritionMutator {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "BoostRestritionMutator",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<BoostRestritionMutator> for BoostRestritionMutator {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
+            /// The enum `KeepUpRulesMutator` in the namespace `rlbot.flat`
+            ///
+            /// Generated from these locations:
+            /// * Enum `KeepUpRulesMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:451`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum KeepUpRulesMutator {
+                #[default]
+                /// The variant `Off` in the enum `KeepUpRulesMutator`
+                Off = 0,
+
+                /// The variant `EnabledIncrement` in the enum `KeepUpRulesMutator`
+                EnabledIncrement = 1,
+
+                /// The variant `Enabled` in the enum `KeepUpRulesMutator`
+                Enabled = 2,
+            }
+
+            impl KeepUpRulesMutator {
+                /// Array containing all valid variants of KeepUpRulesMutator
+                pub const ENUM_VALUES: [Self; 3] =
+                    [Self::Off, Self::EnabledIncrement, Self::Enabled];
+            }
+
+            impl ::core::convert::TryFrom<u8> for KeepUpRulesMutator {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(KeepUpRulesMutator::Off),
+                        1 => ::core::result::Result::Ok(KeepUpRulesMutator::EnabledIncrement),
+                        2 => ::core::result::Result::Ok(KeepUpRulesMutator::Enabled),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<KeepUpRulesMutator> for u8 {
+                #[inline]
+                fn from(value: KeepUpRulesMutator) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for KeepUpRulesMutator {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<KeepUpRulesMutator> for KeepUpRulesMutator {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<KeepUpRulesMutator> for KeepUpRulesMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> KeepUpRulesMutator {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<KeepUpRulesMutator, KeepUpRulesMutator> for KeepUpRulesMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &KeepUpRulesMutator,
+                ) -> ::core::option::Option<KeepUpRulesMutator> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<KeepUpRulesMutator> for KeepUpRulesMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<KeepUpRulesMutator> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for KeepUpRulesMutator {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for KeepUpRulesMutator {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "KeepUpRulesMutator",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<KeepUpRulesMutator> for KeepUpRulesMutator {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
+            /// The enum `MatchAdminMutator` in the namespace `rlbot.flat`
+            ///
+            /// Generated from these locations:
+            /// * Enum `MatchAdminMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:457`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum MatchAdminMutator {
+                #[default]
+                /// The variant `Off` in the enum `MatchAdminMutator`
+                Off = 0,
+
+                /// The variant `On` in the enum `MatchAdminMutator`
+                On = 1,
+            }
+
+            impl MatchAdminMutator {
+                /// Array containing all valid variants of MatchAdminMutator
+                pub const ENUM_VALUES: [Self; 2] = [Self::Off, Self::On];
+            }
+
+            impl ::core::convert::TryFrom<u8> for MatchAdminMutator {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(MatchAdminMutator::Off),
+                        1 => ::core::result::Result::Ok(MatchAdminMutator::On),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<MatchAdminMutator> for u8 {
+                #[inline]
+                fn from(value: MatchAdminMutator) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for MatchAdminMutator {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<MatchAdminMutator> for MatchAdminMutator {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<MatchAdminMutator> for MatchAdminMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> MatchAdminMutator {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<MatchAdminMutator, MatchAdminMutator> for MatchAdminMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &MatchAdminMutator,
+                ) -> ::core::option::Option<MatchAdminMutator> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<MatchAdminMutator> for MatchAdminMutator {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<MatchAdminMutator> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for MatchAdminMutator {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for MatchAdminMutator {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "MatchAdminMutator",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<MatchAdminMutator> for MatchAdminMutator {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
             ///  All mutators options.
             ///
             /// Generated from these locations:
-            /// * Table `MutatorSettings` in the file `flatbuffers-schema/schema/matchconfig.fbs:414`
+            /// * Table `MutatorSettings` in the file `flatbuffers-schema/schema/matchconfig.fbs:463`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct MutatorSettings {
                 ///  Duration of the match.
@@ -27766,6 +29264,18 @@ mod root {
                 pub input_restriction: self::InputRestrictionMutator,
                 ///  Additional rules about scoring (ball-goal interaction).
                 pub scoring_rule: self::ScoringRuleMutator,
+                ///  Tri tip car mode.
+                pub tri_tip_mode: self::TriTipModeMutator,
+                ///  Locked damage phase mode.
+                pub locked_damage_phase: self::LockedDamagePhaseMutator,
+                ///  Spawn demoball.
+                pub spawn_demoball: self::SpawnDemoballMutator,
+                ///  Boost restriction.
+                pub boost_restriction: self::BoostRestritionMutator,
+                ///  Keep up rules.
+                pub keep_up_rules: self::KeepUpRulesMutator,
+                ///  Match admin.
+                pub match_admin: self::MatchAdminMutator,
             }
 
             #[allow(clippy::derivable_impls)]
@@ -27804,6 +29314,12 @@ mod root {
                         assist_goal_score: self::AssistGoalScoreMutator::Zero,
                         input_restriction: self::InputRestrictionMutator::Default,
                         scoring_rule: self::ScoringRuleMutator::Default,
+                        tri_tip_mode: self::TriTipModeMutator::Off,
+                        locked_damage_phase: self::LockedDamagePhaseMutator::Default,
+                        spawn_demoball: self::SpawnDemoballMutator::Off,
+                        boost_restriction: self::BoostRestritionMutator::Default,
+                        keep_up_rules: self::KeepUpRulesMutator::Off,
+                        match_admin: self::MatchAdminMutator::Off,
                     }
                 }
             }
@@ -27940,6 +29456,30 @@ mod root {
                         self::ScoringRuleMutator,
                         self::ScoringRuleMutator,
                     >,
+                    field_tri_tip_mode: impl ::planus::WriteAsDefault<
+                        self::TriTipModeMutator,
+                        self::TriTipModeMutator,
+                    >,
+                    field_locked_damage_phase: impl ::planus::WriteAsDefault<
+                        self::LockedDamagePhaseMutator,
+                        self::LockedDamagePhaseMutator,
+                    >,
+                    field_spawn_demoball: impl ::planus::WriteAsDefault<
+                        self::SpawnDemoballMutator,
+                        self::SpawnDemoballMutator,
+                    >,
+                    field_boost_restriction: impl ::planus::WriteAsDefault<
+                        self::BoostRestritionMutator,
+                        self::BoostRestritionMutator,
+                    >,
+                    field_keep_up_rules: impl ::planus::WriteAsDefault<
+                        self::KeepUpRulesMutator,
+                        self::KeepUpRulesMutator,
+                    >,
+                    field_match_admin: impl ::planus::WriteAsDefault<
+                        self::MatchAdminMutator,
+                        self::MatchAdminMutator,
+                    >,
                 ) -> ::planus::Offset<Self> {
                     let prepared_match_length =
                         field_match_length.prepare(builder, &self::MatchLengthMutator::FiveMinutes);
@@ -28002,8 +29542,20 @@ mod root {
                         .prepare(builder, &self::InputRestrictionMutator::Default);
                     let prepared_scoring_rule =
                         field_scoring_rule.prepare(builder, &self::ScoringRuleMutator::Default);
+                    let prepared_tri_tip_mode =
+                        field_tri_tip_mode.prepare(builder, &self::TriTipModeMutator::Off);
+                    let prepared_locked_damage_phase = field_locked_damage_phase
+                        .prepare(builder, &self::LockedDamagePhaseMutator::Default);
+                    let prepared_spawn_demoball =
+                        field_spawn_demoball.prepare(builder, &self::SpawnDemoballMutator::Off);
+                    let prepared_boost_restriction = field_boost_restriction
+                        .prepare(builder, &self::BoostRestritionMutator::Default);
+                    let prepared_keep_up_rules =
+                        field_keep_up_rules.prepare(builder, &self::KeepUpRulesMutator::Off);
+                    let prepared_match_admin =
+                        field_match_admin.prepare(builder, &self::MatchAdminMutator::Off);
 
-                    let mut table_writer: ::planus::table_writer::TableWriter<68> =
+                    let mut table_writer: ::planus::table_writer::TableWriter<80> =
                         ::core::default::Default::default();
                     if prepared_match_length.is_some() {
                         table_writer.write_entry::<self::MatchLengthMutator>(0);
@@ -28100,6 +29652,24 @@ mod root {
                     }
                     if prepared_scoring_rule.is_some() {
                         table_writer.write_entry::<self::ScoringRuleMutator>(31);
+                    }
+                    if prepared_tri_tip_mode.is_some() {
+                        table_writer.write_entry::<self::TriTipModeMutator>(32);
+                    }
+                    if prepared_locked_damage_phase.is_some() {
+                        table_writer.write_entry::<self::LockedDamagePhaseMutator>(33);
+                    }
+                    if prepared_spawn_demoball.is_some() {
+                        table_writer.write_entry::<self::SpawnDemoballMutator>(34);
+                    }
+                    if prepared_boost_restriction.is_some() {
+                        table_writer.write_entry::<self::BoostRestritionMutator>(35);
+                    }
+                    if prepared_keep_up_rules.is_some() {
+                        table_writer.write_entry::<self::KeepUpRulesMutator>(36);
+                    }
+                    if prepared_match_admin.is_some() {
+                        table_writer.write_entry::<self::MatchAdminMutator>(37);
                     }
 
                     unsafe {
@@ -28257,6 +29827,36 @@ mod root {
                             {
                                 object_writer.write::<_, _, 1>(&prepared_scoring_rule);
                             }
+                            if let ::core::option::Option::Some(prepared_tri_tip_mode) =
+                                prepared_tri_tip_mode
+                            {
+                                object_writer.write::<_, _, 1>(&prepared_tri_tip_mode);
+                            }
+                            if let ::core::option::Option::Some(prepared_locked_damage_phase) =
+                                prepared_locked_damage_phase
+                            {
+                                object_writer.write::<_, _, 1>(&prepared_locked_damage_phase);
+                            }
+                            if let ::core::option::Option::Some(prepared_spawn_demoball) =
+                                prepared_spawn_demoball
+                            {
+                                object_writer.write::<_, _, 1>(&prepared_spawn_demoball);
+                            }
+                            if let ::core::option::Option::Some(prepared_boost_restriction) =
+                                prepared_boost_restriction
+                            {
+                                object_writer.write::<_, _, 1>(&prepared_boost_restriction);
+                            }
+                            if let ::core::option::Option::Some(prepared_keep_up_rules) =
+                                prepared_keep_up_rules
+                            {
+                                object_writer.write::<_, _, 1>(&prepared_keep_up_rules);
+                            }
+                            if let ::core::option::Option::Some(prepared_match_admin) =
+                                prepared_match_admin
+                            {
+                                object_writer.write::<_, _, 1>(&prepared_match_admin);
+                            }
                         });
                     }
                     builder.current_offset()
@@ -28327,6 +29927,12 @@ mod root {
                         self.assist_goal_score,
                         self.input_restriction,
                         self.scoring_rule,
+                        self.tri_tip_mode,
+                        self.locked_damage_phase,
+                        self.spawn_demoball,
+                        self.boost_restriction,
+                        self.keep_up_rules,
+                        self.match_admin,
                     )
                 }
             }
@@ -31398,6 +33004,1290 @@ mod root {
                     T31,
                 )>
             {
+                /// Setter for the [`tri_tip_mode` field](MutatorSettings#structfield.tri_tip_mode).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn tri_tip_mode<T32>(
+                    self,
+                    value: T32,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                )>
+                where
+                    T32: ::planus::WriteAsDefault<self::TriTipModeMutator, self::TriTipModeMutator>,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                        v21,
+                        v22,
+                        v23,
+                        v24,
+                        v25,
+                        v26,
+                        v27,
+                        v28,
+                        v29,
+                        v30,
+                        v31,
+                    ) = self.0;
+                    MutatorSettingsBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31,
+                        value,
+                    ))
+                }
+
+                /// Sets the [`tri_tip_mode` field](MutatorSettings#structfield.tri_tip_mode) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn tri_tip_mode_as_default(
+                    self,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    ::planus::DefaultValue,
+                )> {
+                    self.tri_tip_mode(::planus::DefaultValue)
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+                T22,
+                T23,
+                T24,
+                T25,
+                T26,
+                T27,
+                T28,
+                T29,
+                T30,
+                T31,
+                T32,
+            >
+                MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                )>
+            {
+                /// Setter for the [`locked_damage_phase` field](MutatorSettings#structfield.locked_damage_phase).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn locked_damage_phase<T33>(
+                    self,
+                    value: T33,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                )>
+                where
+                    T33: ::planus::WriteAsDefault<
+                            self::LockedDamagePhaseMutator,
+                            self::LockedDamagePhaseMutator,
+                        >,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                        v21,
+                        v22,
+                        v23,
+                        v24,
+                        v25,
+                        v26,
+                        v27,
+                        v28,
+                        v29,
+                        v30,
+                        v31,
+                        v32,
+                    ) = self.0;
+                    MutatorSettingsBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31,
+                        v32, value,
+                    ))
+                }
+
+                /// Sets the [`locked_damage_phase` field](MutatorSettings#structfield.locked_damage_phase) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn locked_damage_phase_as_default(
+                    self,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    ::planus::DefaultValue,
+                )> {
+                    self.locked_damage_phase(::planus::DefaultValue)
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+                T22,
+                T23,
+                T24,
+                T25,
+                T26,
+                T27,
+                T28,
+                T29,
+                T30,
+                T31,
+                T32,
+                T33,
+            >
+                MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                )>
+            {
+                /// Setter for the [`spawn_demoball` field](MutatorSettings#structfield.spawn_demoball).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn spawn_demoball<T34>(
+                    self,
+                    value: T34,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                )>
+                where
+                    T34: ::planus::WriteAsDefault<
+                            self::SpawnDemoballMutator,
+                            self::SpawnDemoballMutator,
+                        >,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                        v21,
+                        v22,
+                        v23,
+                        v24,
+                        v25,
+                        v26,
+                        v27,
+                        v28,
+                        v29,
+                        v30,
+                        v31,
+                        v32,
+                        v33,
+                    ) = self.0;
+                    MutatorSettingsBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31,
+                        v32, v33, value,
+                    ))
+                }
+
+                /// Sets the [`spawn_demoball` field](MutatorSettings#structfield.spawn_demoball) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn spawn_demoball_as_default(
+                    self,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    ::planus::DefaultValue,
+                )> {
+                    self.spawn_demoball(::planus::DefaultValue)
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+                T22,
+                T23,
+                T24,
+                T25,
+                T26,
+                T27,
+                T28,
+                T29,
+                T30,
+                T31,
+                T32,
+                T33,
+                T34,
+            >
+                MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                )>
+            {
+                /// Setter for the [`boost_restriction` field](MutatorSettings#structfield.boost_restriction).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn boost_restriction<T35>(
+                    self,
+                    value: T35,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                )>
+                where
+                    T35: ::planus::WriteAsDefault<
+                            self::BoostRestritionMutator,
+                            self::BoostRestritionMutator,
+                        >,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                        v21,
+                        v22,
+                        v23,
+                        v24,
+                        v25,
+                        v26,
+                        v27,
+                        v28,
+                        v29,
+                        v30,
+                        v31,
+                        v32,
+                        v33,
+                        v34,
+                    ) = self.0;
+                    MutatorSettingsBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31,
+                        v32, v33, v34, value,
+                    ))
+                }
+
+                /// Sets the [`boost_restriction` field](MutatorSettings#structfield.boost_restriction) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn boost_restriction_as_default(
+                    self,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    ::planus::DefaultValue,
+                )> {
+                    self.boost_restriction(::planus::DefaultValue)
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+                T22,
+                T23,
+                T24,
+                T25,
+                T26,
+                T27,
+                T28,
+                T29,
+                T30,
+                T31,
+                T32,
+                T33,
+                T34,
+                T35,
+            >
+                MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                )>
+            {
+                /// Setter for the [`keep_up_rules` field](MutatorSettings#structfield.keep_up_rules).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn keep_up_rules<T36>(
+                    self,
+                    value: T36,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    T36,
+                )>
+                where
+                    T36: ::planus::WriteAsDefault<self::KeepUpRulesMutator, self::KeepUpRulesMutator>,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                        v21,
+                        v22,
+                        v23,
+                        v24,
+                        v25,
+                        v26,
+                        v27,
+                        v28,
+                        v29,
+                        v30,
+                        v31,
+                        v32,
+                        v33,
+                        v34,
+                        v35,
+                    ) = self.0;
+                    MutatorSettingsBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31,
+                        v32, v33, v34, v35, value,
+                    ))
+                }
+
+                /// Sets the [`keep_up_rules` field](MutatorSettings#structfield.keep_up_rules) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn keep_up_rules_as_default(
+                    self,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    ::planus::DefaultValue,
+                )> {
+                    self.keep_up_rules(::planus::DefaultValue)
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+                T22,
+                T23,
+                T24,
+                T25,
+                T26,
+                T27,
+                T28,
+                T29,
+                T30,
+                T31,
+                T32,
+                T33,
+                T34,
+                T35,
+                T36,
+            >
+                MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    T36,
+                )>
+            {
+                /// Setter for the [`match_admin` field](MutatorSettings#structfield.match_admin).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn match_admin<T37>(
+                    self,
+                    value: T37,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    T36,
+                    T37,
+                )>
+                where
+                    T37: ::planus::WriteAsDefault<self::MatchAdminMutator, self::MatchAdminMutator>,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                        v21,
+                        v22,
+                        v23,
+                        v24,
+                        v25,
+                        v26,
+                        v27,
+                        v28,
+                        v29,
+                        v30,
+                        v31,
+                        v32,
+                        v33,
+                        v34,
+                        v35,
+                        v36,
+                    ) = self.0;
+                    MutatorSettingsBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31,
+                        v32, v33, v34, v35, v36, value,
+                    ))
+                }
+
+                /// Sets the [`match_admin` field](MutatorSettings#structfield.match_admin) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn match_admin_as_default(
+                    self,
+                ) -> MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    T36,
+                    ::planus::DefaultValue,
+                )> {
+                    self.match_admin(::planus::DefaultValue)
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+                T22,
+                T23,
+                T24,
+                T25,
+                T26,
+                T27,
+                T28,
+                T29,
+                T30,
+                T31,
+                T32,
+                T33,
+                T34,
+                T35,
+                T36,
+                T37,
+            >
+                MutatorSettingsBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                    T24,
+                    T25,
+                    T26,
+                    T27,
+                    T28,
+                    T29,
+                    T30,
+                    T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    T36,
+                    T37,
+                )>
+            {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [MutatorSettings].
                 #[inline]
                 pub fn finish(
@@ -31459,6 +34349,18 @@ mod root {
                         self::InputRestrictionMutator,
                     >,
                 T31: ::planus::WriteAsDefault<self::ScoringRuleMutator, self::ScoringRuleMutator>,
+                T32: ::planus::WriteAsDefault<self::TriTipModeMutator, self::TriTipModeMutator>,
+                T33: ::planus::WriteAsDefault<
+                        self::LockedDamagePhaseMutator,
+                        self::LockedDamagePhaseMutator,
+                    >,
+                T34: ::planus::WriteAsDefault<self::SpawnDemoballMutator, self::SpawnDemoballMutator>,
+                T35: ::planus::WriteAsDefault<
+                        self::BoostRestritionMutator,
+                        self::BoostRestritionMutator,
+                    >,
+                T36: ::planus::WriteAsDefault<self::KeepUpRulesMutator, self::KeepUpRulesMutator>,
+                T37: ::planus::WriteAsDefault<self::MatchAdminMutator, self::MatchAdminMutator>,
             > ::planus::WriteAs<::planus::Offset<MutatorSettings>>
                 for MutatorSettingsBuilder<(
                     T0,
@@ -31493,6 +34395,12 @@ mod root {
                     T29,
                     T30,
                     T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    T36,
+                    T37,
                 )>
             {
                 type Prepared = ::planus::Offset<MutatorSettings>;
@@ -31554,6 +34462,18 @@ mod root {
                         self::InputRestrictionMutator,
                     >,
                 T31: ::planus::WriteAsDefault<self::ScoringRuleMutator, self::ScoringRuleMutator>,
+                T32: ::planus::WriteAsDefault<self::TriTipModeMutator, self::TriTipModeMutator>,
+                T33: ::planus::WriteAsDefault<
+                        self::LockedDamagePhaseMutator,
+                        self::LockedDamagePhaseMutator,
+                    >,
+                T34: ::planus::WriteAsDefault<self::SpawnDemoballMutator, self::SpawnDemoballMutator>,
+                T35: ::planus::WriteAsDefault<
+                        self::BoostRestritionMutator,
+                        self::BoostRestritionMutator,
+                    >,
+                T36: ::planus::WriteAsDefault<self::KeepUpRulesMutator, self::KeepUpRulesMutator>,
+                T37: ::planus::WriteAsDefault<self::MatchAdminMutator, self::MatchAdminMutator>,
             > ::planus::WriteAsOptional<::planus::Offset<MutatorSettings>>
                 for MutatorSettingsBuilder<(
                     T0,
@@ -31588,6 +34508,12 @@ mod root {
                     T29,
                     T30,
                     T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    T36,
+                    T37,
                 )>
             {
                 type Prepared = ::planus::Offset<MutatorSettings>;
@@ -31649,6 +34575,18 @@ mod root {
                         self::InputRestrictionMutator,
                     >,
                 T31: ::planus::WriteAsDefault<self::ScoringRuleMutator, self::ScoringRuleMutator>,
+                T32: ::planus::WriteAsDefault<self::TriTipModeMutator, self::TriTipModeMutator>,
+                T33: ::planus::WriteAsDefault<
+                        self::LockedDamagePhaseMutator,
+                        self::LockedDamagePhaseMutator,
+                    >,
+                T34: ::planus::WriteAsDefault<self::SpawnDemoballMutator, self::SpawnDemoballMutator>,
+                T35: ::planus::WriteAsDefault<
+                        self::BoostRestritionMutator,
+                        self::BoostRestritionMutator,
+                    >,
+                T36: ::planus::WriteAsDefault<self::KeepUpRulesMutator, self::KeepUpRulesMutator>,
+                T37: ::planus::WriteAsDefault<self::MatchAdminMutator, self::MatchAdminMutator>,
             > ::planus::WriteAsOffset<MutatorSettings>
                 for MutatorSettingsBuilder<(
                     T0,
@@ -31683,6 +34621,12 @@ mod root {
                     T29,
                     T30,
                     T31,
+                    T32,
+                    T33,
+                    T34,
+                    T35,
+                    T36,
+                    T37,
                 )>
             {
                 #[inline]
@@ -31723,11 +34667,17 @@ mod root {
                         v29,
                         v30,
                         v31,
+                        v32,
+                        v33,
+                        v34,
+                        v35,
+                        v36,
+                        v37,
                     ) = &self.0;
                     MutatorSettings::create(
                         builder, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14,
                         v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29,
-                        v30, v31,
+                        v30, v31, v32, v33, v34, v35, v36, v37,
                     )
                 }
             }
@@ -32056,6 +35006,68 @@ mod root {
                             .unwrap_or(self::ScoringRuleMutator::Default),
                     )
                 }
+
+                /// Getter for the [`tri_tip_mode` field](MutatorSettings#structfield.tri_tip_mode).
+                #[inline]
+                pub fn tri_tip_mode(&self) -> ::planus::Result<self::TriTipModeMutator> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(32, "MutatorSettings", "tri_tip_mode")?
+                            .unwrap_or(self::TriTipModeMutator::Off),
+                    )
+                }
+
+                /// Getter for the [`locked_damage_phase` field](MutatorSettings#structfield.locked_damage_phase).
+                #[inline]
+                pub fn locked_damage_phase(
+                    &self,
+                ) -> ::planus::Result<self::LockedDamagePhaseMutator> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(33, "MutatorSettings", "locked_damage_phase")?
+                            .unwrap_or(self::LockedDamagePhaseMutator::Default),
+                    )
+                }
+
+                /// Getter for the [`spawn_demoball` field](MutatorSettings#structfield.spawn_demoball).
+                #[inline]
+                pub fn spawn_demoball(&self) -> ::planus::Result<self::SpawnDemoballMutator> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(34, "MutatorSettings", "spawn_demoball")?
+                            .unwrap_or(self::SpawnDemoballMutator::Off),
+                    )
+                }
+
+                /// Getter for the [`boost_restriction` field](MutatorSettings#structfield.boost_restriction).
+                #[inline]
+                pub fn boost_restriction(&self) -> ::planus::Result<self::BoostRestritionMutator> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(35, "MutatorSettings", "boost_restriction")?
+                            .unwrap_or(self::BoostRestritionMutator::Default),
+                    )
+                }
+
+                /// Getter for the [`keep_up_rules` field](MutatorSettings#structfield.keep_up_rules).
+                #[inline]
+                pub fn keep_up_rules(&self) -> ::planus::Result<self::KeepUpRulesMutator> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(36, "MutatorSettings", "keep_up_rules")?
+                            .unwrap_or(self::KeepUpRulesMutator::Off),
+                    )
+                }
+
+                /// Getter for the [`match_admin` field](MutatorSettings#structfield.match_admin).
+                #[inline]
+                pub fn match_admin(&self) -> ::planus::Result<self::MatchAdminMutator> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(37, "MutatorSettings", "match_admin")?
+                            .unwrap_or(self::MatchAdminMutator::Off),
+                    )
+                }
             }
 
             impl<'a> ::core::fmt::Debug for MutatorSettingsRef<'a> {
@@ -32093,6 +35105,12 @@ mod root {
                     f.field("assist_goal_score", &self.assist_goal_score());
                     f.field("input_restriction", &self.input_restriction());
                     f.field("scoring_rule", &self.scoring_rule());
+                    f.field("tri_tip_mode", &self.tri_tip_mode());
+                    f.field("locked_damage_phase", &self.locked_damage_phase());
+                    f.field("spawn_demoball", &self.spawn_demoball());
+                    f.field("boost_restriction", &self.boost_restriction());
+                    f.field("keep_up_rules", &self.keep_up_rules());
+                    f.field("match_admin", &self.match_admin());
                     f.finish()
                 }
             }
@@ -32153,6 +35171,18 @@ mod root {
                             value.input_restriction()?,
                         )?,
                         scoring_rule: ::core::convert::TryInto::try_into(value.scoring_rule()?)?,
+                        tri_tip_mode: ::core::convert::TryInto::try_into(value.tri_tip_mode()?)?,
+                        locked_damage_phase: ::core::convert::TryInto::try_into(
+                            value.locked_damage_phase()?,
+                        )?,
+                        spawn_demoball: ::core::convert::TryInto::try_into(
+                            value.spawn_demoball()?,
+                        )?,
+                        boost_restriction: ::core::convert::TryInto::try_into(
+                            value.boost_restriction()?,
+                        )?,
+                        keep_up_rules: ::core::convert::TryInto::try_into(value.keep_up_rules()?)?,
+                        match_admin: ::core::convert::TryInto::try_into(value.match_admin()?)?,
                     })
                 }
             }
@@ -32233,7 +35263,7 @@ mod root {
             /// The enum `DebugRendering` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `DebugRendering` in the file `flatbuffers-schema/schema/matchconfig.fbs:513`
+            /// * Enum `DebugRendering` in the file `flatbuffers-schema/schema/matchconfig.fbs:580`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -32411,7 +35441,7 @@ mod root {
             ///  Possible behaviours when a match is started while another match is in progress.
             ///
             /// Generated from these locations:
-            /// * Enum `ExistingMatchBehavior` in the file `flatbuffers-schema/schema/matchconfig.fbs:525`
+            /// * Enum `ExistingMatchBehavior` in the file `flatbuffers-schema/schema/matchconfig.fbs:592`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -32596,7 +35626,7 @@ mod root {
             ///  Possible to launch Rocket League.
             ///
             /// Generated from these locations:
-            /// * Enum `Launcher` in the file `flatbuffers-schema/schema/matchconfig.fbs:539`
+            /// * Enum `Launcher` in the file `flatbuffers-schema/schema/matchconfig.fbs:606`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -32779,7 +35809,7 @@ mod root {
             ///  A ScriptConfiguration defines a script of a match.
             ///
             /// Generated from these locations:
-            /// * Table `ScriptConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:550`
+            /// * Table `ScriptConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:617`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct ScriptConfiguration {
                 ///  The name of the script.
@@ -33206,11 +36236,189 @@ mod root {
                 }
             }
 
+            ///  Controls when the in-game performance monitor is shown.
+            ///
+            /// Generated from these locations:
+            /// * Enum `PerformanceMonitor` in the file `flatbuffers-schema/schema/matchconfig.fbs:639`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum PerformanceMonitor {
+                #[default]
+                /// The variant `ShowWhenSuboptimal` in the enum `PerformanceMonitor`
+                ShowWhenSuboptimal = 0,
+
+                /// The variant `AlwaysShow` in the enum `PerformanceMonitor`
+                AlwaysShow = 1,
+
+                /// The variant `NeverShow` in the enum `PerformanceMonitor`
+                NeverShow = 2,
+            }
+
+            impl PerformanceMonitor {
+                /// Array containing all valid variants of PerformanceMonitor
+                pub const ENUM_VALUES: [Self; 3] =
+                    [Self::ShowWhenSuboptimal, Self::AlwaysShow, Self::NeverShow];
+            }
+
+            impl ::core::convert::TryFrom<u8> for PerformanceMonitor {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(PerformanceMonitor::ShowWhenSuboptimal),
+                        1 => ::core::result::Result::Ok(PerformanceMonitor::AlwaysShow),
+                        2 => ::core::result::Result::Ok(PerformanceMonitor::NeverShow),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<PerformanceMonitor> for u8 {
+                #[inline]
+                fn from(value: PerformanceMonitor) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for PerformanceMonitor {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<PerformanceMonitor> for PerformanceMonitor {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<PerformanceMonitor> for PerformanceMonitor {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> PerformanceMonitor {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<PerformanceMonitor, PerformanceMonitor> for PerformanceMonitor {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &PerformanceMonitor,
+                ) -> ::core::option::Option<PerformanceMonitor> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<PerformanceMonitor> for PerformanceMonitor {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<PerformanceMonitor> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for PerformanceMonitor {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for PerformanceMonitor {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "PerformanceMonitor",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<PerformanceMonitor> for PerformanceMonitor {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
             ///  Definition of a match.
             ///  Can be sent to RLBot to request the start of a match.
             ///
             /// Generated from these locations:
-            /// * Table `MatchConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:573`
+            /// * Table `MatchConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:647`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct MatchConfiguration {
                 ///  How to launch Rocket League.
@@ -33256,6 +36464,8 @@ mod root {
                 ///  If set to true, a free play match is launched instead of an exhibition match.
                 ///  This allows the players to use training keybinds, Bakkesmod plugins, and other features that are only allowed in free play.
                 pub freeplay: bool,
+                ///  Controls when the in-game performance monitor will display.
+                pub performance_monitor: self::PerformanceMonitor,
             }
 
             #[allow(clippy::derivable_impls)]
@@ -33278,6 +36488,7 @@ mod root {
                         enable_state_setting: true,
                         auto_save_replay: false,
                         freeplay: false,
+                        performance_monitor: self::PerformanceMonitor::ShowWhenSuboptimal,
                     }
                 }
             }
@@ -33320,6 +36531,10 @@ mod root {
                     field_enable_state_setting: impl ::planus::WriteAsDefault<bool, bool>,
                     field_auto_save_replay: impl ::planus::WriteAsDefault<bool, bool>,
                     field_freeplay: impl ::planus::WriteAsDefault<bool, bool>,
+                    field_performance_monitor: impl ::planus::WriteAsDefault<
+                        self::PerformanceMonitor,
+                        self::PerformanceMonitor,
+                    >,
                 ) -> ::planus::Offset<Self> {
                     let prepared_launcher = field_launcher.prepare(builder, &self::Launcher::Steam);
                     let prepared_launcher_arg = field_launcher_arg.prepare(builder);
@@ -33344,8 +36559,10 @@ mod root {
                         field_enable_state_setting.prepare(builder, &true);
                     let prepared_auto_save_replay = field_auto_save_replay.prepare(builder, &false);
                     let prepared_freeplay = field_freeplay.prepare(builder, &false);
+                    let prepared_performance_monitor = field_performance_monitor
+                        .prepare(builder, &self::PerformanceMonitor::ShowWhenSuboptimal);
 
-                    let mut table_writer: ::planus::table_writer::TableWriter<36> =
+                    let mut table_writer: ::planus::table_writer::TableWriter<38> =
                         ::core::default::Default::default();
                     table_writer.write_entry::<::planus::Offset<str>>(1);
                     table_writer.write_entry::<::planus::Offset<str>>(4);
@@ -33386,6 +36603,9 @@ mod root {
                     }
                     if prepared_freeplay.is_some() {
                         table_writer.write_entry::<bool>(15);
+                    }
+                    if prepared_performance_monitor.is_some() {
+                        table_writer.write_entry::<self::PerformanceMonitor>(16);
                     }
 
                     unsafe {
@@ -33454,6 +36674,11 @@ mod root {
                             {
                                 object_writer.write::<_, _, 1>(&prepared_freeplay);
                             }
+                            if let ::core::option::Option::Some(prepared_performance_monitor) =
+                                prepared_performance_monitor
+                            {
+                                object_writer.write::<_, _, 1>(&prepared_performance_monitor);
+                            }
                         });
                     }
                     builder.current_offset()
@@ -33508,6 +36733,7 @@ mod root {
                         self.enable_state_setting,
                         self.auto_save_replay,
                         self.freeplay,
+                        self.performance_monitor,
                     )
                 }
             }
@@ -34117,6 +37343,90 @@ mod root {
                     T15,
                 )>
             {
+                /// Setter for the [`performance_monitor` field](MatchConfiguration#structfield.performance_monitor).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn performance_monitor<T16>(
+                    self,
+                    value: T16,
+                ) -> MatchConfigurationBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                )>
+                where
+                    T16: ::planus::WriteAsDefault<self::PerformanceMonitor, self::PerformanceMonitor>,
+                {
+                    let (v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) =
+                        self.0;
+                    MatchConfigurationBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, value,
+                    ))
+                }
+
+                /// Sets the [`performance_monitor` field](MatchConfiguration#structfield.performance_monitor) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn performance_monitor_as_default(
+                    self,
+                ) -> MatchConfigurationBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    ::planus::DefaultValue,
+                )> {
+                    self.performance_monitor(::planus::DefaultValue)
+                }
+            }
+
+            impl<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>
+                MatchConfigurationBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                )>
+            {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [MatchConfiguration].
                 #[inline]
                 pub fn finish(
@@ -34147,6 +37457,7 @@ mod root {
                 T13: ::planus::WriteAsDefault<bool, bool>,
                 T14: ::planus::WriteAsDefault<bool, bool>,
                 T15: ::planus::WriteAsDefault<bool, bool>,
+                T16: ::planus::WriteAsDefault<self::PerformanceMonitor, self::PerformanceMonitor>,
             > ::planus::WriteAs<::planus::Offset<MatchConfiguration>>
                 for MatchConfigurationBuilder<(
                     T0,
@@ -34165,6 +37476,7 @@ mod root {
                     T13,
                     T14,
                     T15,
+                    T16,
                 )>
             {
                 type Prepared = ::planus::Offset<MatchConfiguration>;
@@ -34195,6 +37507,7 @@ mod root {
                 T13: ::planus::WriteAsDefault<bool, bool>,
                 T14: ::planus::WriteAsDefault<bool, bool>,
                 T15: ::planus::WriteAsDefault<bool, bool>,
+                T16: ::planus::WriteAsDefault<self::PerformanceMonitor, self::PerformanceMonitor>,
             > ::planus::WriteAsOptional<::planus::Offset<MatchConfiguration>>
                 for MatchConfigurationBuilder<(
                     T0,
@@ -34213,6 +37526,7 @@ mod root {
                     T13,
                     T14,
                     T15,
+                    T16,
                 )>
             {
                 type Prepared = ::planus::Offset<MatchConfiguration>;
@@ -34243,6 +37557,7 @@ mod root {
                 T13: ::planus::WriteAsDefault<bool, bool>,
                 T14: ::planus::WriteAsDefault<bool, bool>,
                 T15: ::planus::WriteAsDefault<bool, bool>,
+                T16: ::planus::WriteAsDefault<self::PerformanceMonitor, self::PerformanceMonitor>,
             > ::planus::WriteAsOffset<MatchConfiguration>
                 for MatchConfigurationBuilder<(
                     T0,
@@ -34261,6 +37576,7 @@ mod root {
                     T13,
                     T14,
                     T15,
+                    T16,
                 )>
             {
                 #[inline]
@@ -34268,11 +37584,11 @@ mod root {
                     &self,
                     builder: &mut ::planus::Builder,
                 ) -> ::planus::Offset<MatchConfiguration> {
-                    let (v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) =
+                    let (v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16) =
                         &self.0;
                     MatchConfiguration::create(
                         builder, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14,
-                        v15,
+                        v15, v16,
                     )
                 }
             }
@@ -34438,6 +37754,16 @@ mod root {
                             .unwrap_or(false),
                     )
                 }
+
+                /// Getter for the [`performance_monitor` field](MatchConfiguration#structfield.performance_monitor).
+                #[inline]
+                pub fn performance_monitor(&self) -> ::planus::Result<self::PerformanceMonitor> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(16, "MatchConfiguration", "performance_monitor")?
+                            .unwrap_or(self::PerformanceMonitor::ShowWhenSuboptimal),
+                    )
+                }
             }
 
             impl<'a> ::core::fmt::Debug for MatchConfigurationRef<'a> {
@@ -34463,6 +37789,7 @@ mod root {
                     f.field("enable_state_setting", &self.enable_state_setting());
                     f.field("auto_save_replay", &self.auto_save_replay());
                     f.field("freeplay", &self.freeplay());
+                    f.field("performance_monitor", &self.performance_monitor());
                     f.finish()
                 }
             }
@@ -34509,6 +37836,9 @@ mod root {
                             value.auto_save_replay()?,
                         )?,
                         freeplay: ::core::convert::TryInto::try_into(value.freeplay()?)?,
+                        performance_monitor: ::core::convert::TryInto::try_into(
+                            value.performance_monitor()?,
+                        )?,
                     })
                 }
             }

@@ -36,6 +36,8 @@ pub struct MatchConfiguration {
     pub auto_save_replay: bool,
     #[pyo3(set)]
     pub freeplay: bool,
+    #[pyo3(set)]
+    pub performance_monitor: super::PerformanceMonitor,
 }
 
 impl crate::PyDefault for MatchConfiguration {
@@ -59,6 +61,7 @@ impl crate::PyDefault for MatchConfiguration {
                 enable_state_setting: Default::default(),
                 auto_save_replay: Default::default(),
                 freeplay: Default::default(),
+                performance_monitor: Default::default(),
             },
         )
         .unwrap()
@@ -104,6 +107,7 @@ impl FromGil<&flat::MatchConfiguration> for MatchConfiguration {
             enable_state_setting: flat_t.enable_state_setting,
             auto_save_replay: flat_t.auto_save_replay,
             freeplay: flat_t.freeplay,
+            performance_monitor: flat_t.performance_monitor,
         }
     }
 }
@@ -141,6 +145,7 @@ impl FromGil<&MatchConfiguration> for flat::MatchConfiguration {
             enable_state_setting: py_type.enable_state_setting,
             auto_save_replay: py_type.auto_save_replay,
             freeplay: py_type.freeplay,
+            performance_monitor: py_type.performance_monitor,
         }
     }
 }
@@ -149,7 +154,7 @@ impl FromGil<&MatchConfiguration> for flat::MatchConfiguration {
 impl MatchConfiguration {
     #[new]
     #[allow(clippy::too_many_arguments)]
-    #[pyo3(signature = (launcher=Default::default(), launcher_arg=None, auto_start_agents=false, wait_for_agents=false, game_map_upk=None, player_configurations=None, script_configurations=None, game_mode=Default::default(), skip_replays=false, instant_start=false, mutators=None, existing_match_behavior=Default::default(), enable_rendering=Default::default(), enable_state_setting=false, auto_save_replay=false, freeplay=false))]
+    #[pyo3(signature = (launcher=Default::default(), launcher_arg=None, auto_start_agents=false, wait_for_agents=false, game_map_upk=None, player_configurations=None, script_configurations=None, game_mode=Default::default(), skip_replays=false, instant_start=false, mutators=None, existing_match_behavior=Default::default(), enable_rendering=Default::default(), enable_state_setting=false, auto_save_replay=false, freeplay=false, performance_monitor=Default::default()))]
     pub fn new(
         py: Python,
         launcher: super::Launcher,
@@ -168,6 +173,7 @@ impl MatchConfiguration {
         enable_state_setting: bool,
         auto_save_replay: bool,
         freeplay: bool,
+        performance_monitor: super::PerformanceMonitor,
     ) -> Self {
         Self {
             launcher,
@@ -188,6 +194,7 @@ impl MatchConfiguration {
             enable_state_setting,
             auto_save_replay,
             freeplay,
+            performance_monitor,
         }
     }
 
@@ -198,7 +205,7 @@ impl MatchConfiguration {
     #[allow(unused_variables)]
     pub fn __repr__(&self, py: Python) -> String {
         format!(
-            "MatchConfiguration(launcher={}, launcher_arg={:?}, auto_start_agents={}, wait_for_agents={}, game_map_upk={:?}, player_configurations=[{}], script_configurations=[{}], game_mode={}, skip_replays={}, instant_start={}, mutators={}, existing_match_behavior={}, enable_rendering={}, enable_state_setting={}, auto_save_replay={}, freeplay={})",
+            "MatchConfiguration(launcher={}, launcher_arg={:?}, auto_start_agents={}, wait_for_agents={}, game_map_upk={:?}, player_configurations=[{}], script_configurations=[{}], game_mode={}, skip_replays={}, instant_start={}, mutators={}, existing_match_behavior={}, enable_rendering={}, enable_state_setting={}, auto_save_replay={}, freeplay={}, performance_monitor={})",
             self.launcher.__repr__(),
             self.launcher_arg.bind(py).to_cow().unwrap(),
             crate::bool_to_str(self.auto_start_agents),
@@ -235,6 +242,7 @@ impl MatchConfiguration {
             crate::bool_to_str(self.enable_state_setting),
             crate::bool_to_str(self.auto_save_replay),
             crate::bool_to_str(self.freeplay),
+            self.performance_monitor.__repr__(),
         )
     }
 
@@ -259,6 +267,7 @@ impl MatchConfiguration {
                 "enable_state_setting",
                 "auto_save_replay",
                 "freeplay",
+                "performance_monitor",
             ],
         )
         .unwrap()

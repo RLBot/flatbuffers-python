@@ -24,6 +24,7 @@ impl MaxScoreMutator {
             12 => Ok(Self::EightyGoals),
             13 => Ok(Self::NinetyGoals),
             14 => Ok(Self::HundredGoals),
+            15 => Ok(Self::OneHundredFiftyOneGoals),
             v => Err(PyValueError::new_err(format!("Unknown value of {v}"))),
         }
     }
