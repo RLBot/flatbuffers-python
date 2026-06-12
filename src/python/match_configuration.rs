@@ -236,7 +236,7 @@ impl MatchConfiguration {
             crate::bool_to_str(self.instant_start),
             self.mutators
                 .as_ref()
-                .map_or_else(crate::none_str, |x| { x.borrow(py).__repr__(py) }),
+                .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
             self.existing_match_behavior.__repr__(),
             self.enable_rendering.__repr__(),
             crate::bool_to_str(self.enable_state_setting),

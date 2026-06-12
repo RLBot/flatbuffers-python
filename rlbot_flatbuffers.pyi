@@ -1497,6 +1497,89 @@ class RespawnTimeMutator:
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
+class RumbleItem:
+    """
+    All the different Rumble items
+    """
+
+    Boot: RumbleItem
+    """
+    `assert int(RumbleItem.Boot) == 0`
+
+    Kicks an opponent’s car backward
+    """
+    Disruptor: RumbleItem
+    """
+    `assert int(RumbleItem.Disruptor) == 1`
+
+    Forces an opponent to boost uncontrollably at supersonic speeds
+    """
+    Freezer: RumbleItem
+    """
+    `assert int(RumbleItem.Freezer) == 2`
+
+    Halts the ball’s movement temporarily
+    """
+    Haymaker: RumbleItem
+    """
+    `assert int(RumbleItem.Haymaker) == 3`
+
+    Punches the ball with significant force
+    """
+    Magnetizer: RumbleItem
+    """
+    `assert int(RumbleItem.Magnetizer) == 4`
+
+    Attracts the ball toward your car
+    """
+    Plunger: RumbleItem
+    """
+    `assert int(RumbleItem.Plunger) == 5`
+
+    Grabs the ball with a cord and pulls it toward you
+    """
+    Spike: RumbleItem
+    """
+    `assert int(RumbleItem.Spike) == 6`
+
+    Attaches the ball to your car upon impact
+    """
+    Swapper: RumbleItem
+    """
+    `assert int(RumbleItem.Swapper) == 7`
+
+    Swaps your position and momentum with an opponent
+    """
+    Tornado: RumbleItem
+    """
+    `assert int(RumbleItem.Tornado) == 8`
+
+    Creates a funnel cloud that lifts the ball and nearby cars
+    """
+    GrapplingHook: RumbleItem
+    """
+    `assert int(RumbleItem.GrapplingHook) == 9`
+
+    Pulls your car toward the ball
+    """
+    PowerHitter: RumbleItem
+    """
+    `assert int(RumbleItem.PowerHitter) == 10`
+
+    Allows you to demolish opponents on contact and hit the ball harder
+    """
+
+    def __new__(cls, value: int = 0) -> RumbleItem: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
 class RumbleMutator:
     """
     Rumble mutator options.
@@ -1739,6 +1822,43 @@ class TextVAlign:
     """
 
     def __new__(cls, value: int = 0) -> TextVAlign: ...
+    def __init__(self, value: int = 0) -> None:
+        """
+        :raises ValueError: If the `value` is not a valid enum value
+        """
+    def __int__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
+class TileDamageLevel:
+    """
+    The possible damage levels of a dropshot tile.
+    """
+
+    Start: TileDamageLevel
+    """
+    `assert int(TileDamageLevel.Start) == 0`
+
+    The tile has no damage and the ball cannot fall through.
+    """
+    Damaged: TileDamageLevel
+    """
+    `assert int(TileDamageLevel.Damaged) == 1`
+
+    The tile has some damage,
+    but the ball still cannot fall through.
+    """
+    Broken: TileDamageLevel
+    """
+    `assert int(TileDamageLevel.Broken) == 2`
+
+    The tile has been broken,
+    and the ball can now fall through.
+    """
+
+    def __new__(cls, value: int = 0) -> TileDamageLevel: ...
     def __init__(self, value: int = 0) -> None:
         """
         :raises ValueError: If the `value` is not a valid enum value
@@ -4416,6 +4536,50 @@ class SetLoadout:
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
+class Tile:
+    location: Vector3
+    """
+    The location of the tile.
+    """
+    team: int
+    """
+    The team that owns/defends this tile.
+    """
+
+    __match_args__ = (
+        "location",
+        "team",
+    )
+
+    def __new__(
+        cls,
+        location: Vector3 = Vector3(),
+        team: int = 0,
+    ) -> Tile: ...
+    def __init__(
+        self,
+        location: Vector3 = Vector3(),
+        team: int = 0,
+    ) -> None:
+        """
+        NOTE: All field initialization before `__init__`, inside of `__new__`.
+        """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> Tile:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
 class Touch:
     """
     Information about a ball touch.
@@ -4577,21 +4741,40 @@ class BallInfo:
     """
     The collision shape of the ball.
     """
+    charge_level: int
+    """
+    The charge level, if it is a dropshot ball.
+    -1 = Not dropshot
+    0 = No charge
+    1 = Charged
+    2 = Supercharged
+    """
+    target_speed: float
+    """
+    The target homing speed, if it is a heatseeker ball.
+    If it is not a heatseeker ball, this is always 0.
+    """
 
     __match_args__ = (
         "physics",
         "shape",
+        "charge_level",
+        "target_speed",
     )
 
     def __new__(
         cls,
         physics: Physics = Physics(),
         shape: BoxShape | CylinderShape | SphereShape = BoxShape(),
+        charge_level: int = 0,
+        target_speed: float = 0.0,
     ) -> BallInfo: ...
     def __init__(
         self,
         physics: Physics = Physics(),
         shape: BoxShape | CylinderShape | SphereShape = BoxShape(),
+        charge_level: int = 0,
+        target_speed: float = 0.0,
     ) -> None:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
@@ -4646,58 +4829,6 @@ class DesiredCarState:
 
     @staticmethod
     def unpack(data: bytes) -> DesiredCarState:
-        """
-        Deserializes the data into a new instance
-
-        :raises InvalidFlatbuffer: If the `data` is invalid for this type
-        """
-
-    def __str__(self) -> str: ...
-    def __repr__(self) -> str: ...
-
-class FieldInfo:
-    """
-    Static information about the field.
-    Sent to bots, scripts, etc. upon connecting.
-    Dynamic information is found in the GamePacket.
-    """
-
-    boost_pads: Sequence[BoostPad]
-    """
-    Static information about boost pads on the field.
-    The dynamic information is found in the GamePacket
-    The boost pads are ordered by y-coordinate and then x-coordinate.
-    """
-    goals: Sequence[GoalInfo]
-    """
-    Information about the goals on the field.
-    """
-
-    __match_args__ = (
-        "boost_pads",
-        "goals",
-    )
-
-    def __new__(
-        cls,
-        boost_pads: Sequence[BoostPad] = [],
-        goals: Sequence[GoalInfo] = [],
-    ) -> FieldInfo: ...
-    def __init__(
-        self,
-        boost_pads: Sequence[BoostPad] = [],
-        goals: Sequence[GoalInfo] = [],
-    ) -> None:
-        """
-        NOTE: All field initialization before `__init__`, inside of `__new__`.
-        """
-    def pack(self) -> bytes:
-        """
-        Serializes this instance into a byte array
-        """
-
-    @staticmethod
-    def unpack(data: bytes) -> FieldInfo:
         """
         Deserializes the data into a new instance
 
@@ -4840,6 +4971,67 @@ class PsyonixBot:
 
     @staticmethod
     def unpack(data: bytes) -> PsyonixBot:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
+class FieldInfo:
+    """
+    Static information about the field.
+    Sent to bots, scripts, etc. upon connecting.
+    Dynamic information is found in the GamePacket.
+    """
+
+    boost_pads: Sequence[BoostPad]
+    """
+    Static information about boost pads on the field.
+    The dynamic information is found in the GamePacket.
+    The boost pads are ordered by y-coordinate and then x-coordinate.
+    """
+    goals: Sequence[GoalInfo]
+    """
+    Information about the goals on the field.
+    """
+    tiles: Sequence[Tile]
+    """
+    Static information about dropshot tiles on the field.
+    The dynamic information is found in the GamePacket.
+    The tiles are ordered by y-coordinate and then x-coordinate.
+    """
+
+    __match_args__ = (
+        "boost_pads",
+        "goals",
+        "tiles",
+    )
+
+    def __new__(
+        cls,
+        boost_pads: Sequence[BoostPad] = [],
+        goals: Sequence[GoalInfo] = [],
+        tiles: Sequence[Tile] = [],
+    ) -> FieldInfo: ...
+    def __init__(
+        self,
+        boost_pads: Sequence[BoostPad] = [],
+        goals: Sequence[GoalInfo] = [],
+        tiles: Sequence[Tile] = [],
+    ) -> None:
+        """
+        NOTE: All field initialization before `__init__`, inside of `__new__`.
+        """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> FieldInfo:
         """
         Deserializes the data into a new instance
 
@@ -5280,6 +5472,10 @@ class GamePacket:
     """
     The current state of teams, i.e. the team scores.
     """
+    tiles: Sequence[TileDamageLevel]
+    """
+    The state of the dropshot tiles. The tiles are sorted by y-coordinate and then x-coordinate.
+    """
 
     __match_args__ = (
         "players",
@@ -5287,6 +5483,7 @@ class GamePacket:
         "balls",
         "match_info",
         "teams",
+        "tiles",
     )
 
     def __new__(
@@ -5296,6 +5493,7 @@ class GamePacket:
         balls: Sequence[BallInfo] = [],
         match_info: MatchInfo = MatchInfo(),
         teams: Sequence[TeamInfo] = [],
+        tiles: Sequence[TileDamageLevel] = [],
     ) -> GamePacket: ...
     def __init__(
         self,
@@ -5304,6 +5502,7 @@ class GamePacket:
         balls: Sequence[BallInfo] = [],
         match_info: MatchInfo = MatchInfo(),
         teams: Sequence[TeamInfo] = [],
+        tiles: Sequence[TileDamageLevel] = [],
     ) -> None:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
@@ -5443,6 +5642,19 @@ class PlayerInfo:
     The unit direction of the latest dodge.
     The value will be (0,0) if it was a stall.
     """
+    rumble_item: RumbleItem | None
+    """
+    Which item the player has, if any
+    """
+    time_until_next_item: float
+    """
+    If `rumble_item` is null, this is a countdown until the next item is recieved.
+    Otherwise, this field equals 0.
+    """
+    max_time_until_next_item: float
+    """
+    The initial value of `time_until_next_item`.
+    """
 
     __match_args__ = (
         "physics",
@@ -5466,6 +5678,9 @@ class PlayerInfo:
         "has_dodged",
         "dodge_elapsed",
         "dodge_dir",
+        "rumble_item",
+        "time_until_next_item",
+        "max_time_until_next_item",
     )
 
     def __new__(
@@ -5491,6 +5706,9 @@ class PlayerInfo:
         has_dodged: bool = False,
         dodge_elapsed: float = 0.0,
         dodge_dir: Vector2 = Vector2(),
+        rumble_item: RumbleItem | None = None,
+        time_until_next_item: float = 0.0,
+        max_time_until_next_item: float = 0.0,
     ) -> PlayerInfo: ...
     def __init__(
         self,
@@ -5515,6 +5733,9 @@ class PlayerInfo:
         has_dodged: bool = False,
         dodge_elapsed: float = 0.0,
         dodge_dir: Vector2 = Vector2(),
+        rumble_item: RumbleItem | None = None,
+        time_until_next_item: float = 0.0,
+        max_time_until_next_item: float = 0.0,
     ) -> None:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.

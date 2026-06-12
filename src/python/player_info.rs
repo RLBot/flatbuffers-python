@@ -25,6 +25,9 @@ pub struct PlayerInfo {
     pub has_dodged: bool,
     pub dodge_elapsed: Py<PyFloat>,
     pub dodge_dir: Py<super::Vector2>,
+    pub rumble_item: Option<super::RumbleItem>,
+    pub time_until_next_item: Py<PyFloat>,
+    pub max_time_until_next_item: Py<PyFloat>,
 }
 
 impl crate::PyDefault for PlayerInfo {
@@ -53,6 +56,9 @@ impl crate::PyDefault for PlayerInfo {
                 has_dodged: Default::default(),
                 dodge_elapsed: crate::pyfloat_default(py),
                 dodge_dir: super::Vector2::py_default(py),
+                rumble_item: None,
+                time_until_next_item: crate::pyfloat_default(py),
+                max_time_until_next_item: crate::pyfloat_default(py),
             },
         )
         .unwrap()
@@ -87,6 +93,9 @@ impl FromGil<&flat::PlayerInfo> for PlayerInfo {
             has_dodged: flat_t.has_dodged,
             dodge_elapsed: crate::float_to_py(py, flat_t.dodge_elapsed),
             dodge_dir: crate::into_py_from(py, &flat_t.dodge_dir),
+            rumble_item: flat_t.rumble_item,
+            time_until_next_item: crate::float_to_py(py, flat_t.time_until_next_item),
+            max_time_until_next_item: crate::float_to_py(py, flat_t.max_time_until_next_item),
         }
     }
 }
@@ -124,6 +133,9 @@ impl FromGil<&PlayerInfo> for flat::PlayerInfo {
             has_dodged: py_type.has_dodged,
             dodge_elapsed: crate::float_from_py(py, &py_type.dodge_elapsed),
             dodge_dir: crate::from_py_into(py, &py_type.dodge_dir),
+            rumble_item: py_type.rumble_item,
+            time_until_next_item: crate::float_from_py(py, &py_type.time_until_next_item),
+            max_time_until_next_item: crate::float_from_py(py, &py_type.max_time_until_next_item),
         }
     }
 }
@@ -132,7 +144,7 @@ impl FromGil<&PlayerInfo> for flat::PlayerInfo {
 impl PlayerInfo {
     #[new]
     #[allow(clippy::too_many_arguments)]
-    #[pyo3(signature = (physics=None, score_info=None, hitbox=None, hitbox_offset=None, latest_touch=None, air_state=Default::default(), dodge_timeout=0.0, demolished_timeout=0.0, is_supersonic=false, is_bot=false, name=None, team=0, boost=0.0, player_id=0, accolades=None, last_input=None, has_jumped=false, has_double_jumped=false, has_dodged=false, dodge_elapsed=0.0, dodge_dir=None))]
+    #[pyo3(signature = (physics=None, score_info=None, hitbox=None, hitbox_offset=None, latest_touch=None, air_state=Default::default(), dodge_timeout=0.0, demolished_timeout=0.0, is_supersonic=false, is_bot=false, name=None, team=0, boost=0.0, player_id=0, accolades=None, last_input=None, has_jumped=false, has_double_jumped=false, has_dodged=false, dodge_elapsed=0.0, dodge_dir=None, rumble_item=None, time_until_next_item=0.0, max_time_until_next_item=0.0))]
     pub fn new(
         py: Python,
         physics: Option<Py<super::Physics>>,
@@ -156,6 +168,9 @@ impl PlayerInfo {
         has_dodged: bool,
         dodge_elapsed: f64,
         dodge_dir: Option<Py<super::Vector2>>,
+        rumble_item: Option<super::RumbleItem>,
+        time_until_next_item: f64,
+        max_time_until_next_item: f64,
     ) -> Self {
         Self {
             physics: physics.unwrap_or_else(|| super::Physics::py_default(py)),
@@ -179,6 +194,9 @@ impl PlayerInfo {
             has_dodged,
             dodge_elapsed: PyFloat::new(py, dodge_elapsed).unbind(),
             dodge_dir: dodge_dir.unwrap_or_else(|| super::Vector2::py_default(py)),
+            rumble_item,
+            time_until_next_item: PyFloat::new(py, time_until_next_item).unbind(),
+            max_time_until_next_item: PyFloat::new(py, max_time_until_next_item).unbind(),
         }
     }
 
@@ -189,14 +207,14 @@ impl PlayerInfo {
     #[allow(unused_variables)]
     pub fn __repr__(&self, py: Python) -> String {
         format!(
-            "PlayerInfo(physics={}, score_info={}, hitbox={}, hitbox_offset={}, latest_touch={}, air_state={}, dodge_timeout={}, demolished_timeout={}, is_supersonic={}, is_bot={}, name={:?}, team={}, boost={}, player_id={}, accolades=[{}], last_input={}, has_jumped={}, has_double_jumped={}, has_dodged={}, dodge_elapsed={}, dodge_dir={})",
+            "PlayerInfo(physics={}, score_info={}, hitbox={}, hitbox_offset={}, latest_touch={}, air_state={}, dodge_timeout={}, demolished_timeout={}, is_supersonic={}, is_bot={}, name={:?}, team={}, boost={}, player_id={}, accolades=[{}], last_input={}, has_jumped={}, has_double_jumped={}, has_dodged={}, dodge_elapsed={}, dodge_dir={}, rumble_item={}, time_until_next_item={}, max_time_until_next_item={})",
             self.physics.borrow(py).__repr__(py),
             self.score_info.borrow(py).__repr__(py),
             self.hitbox.borrow(py).__repr__(py),
             self.hitbox_offset.borrow(py).__repr__(py),
             self.latest_touch
                 .as_ref()
-                .map_or_else(crate::none_str, |x| { x.borrow(py).__repr__(py) }),
+                .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
             self.air_state.__repr__(),
             self.dodge_timeout,
             self.demolished_timeout,
@@ -218,6 +236,11 @@ impl PlayerInfo {
             crate::bool_to_str(self.has_dodged),
             self.dodge_elapsed,
             self.dodge_dir.borrow(py).__repr__(py),
+            self.rumble_item
+                .as_ref()
+                .map_or_else(crate::none_str, |x| x.__repr__()),
+            self.time_until_next_item,
+            self.max_time_until_next_item,
         )
     }
 
@@ -247,6 +270,9 @@ impl PlayerInfo {
                 "has_dodged",
                 "dodge_elapsed",
                 "dodge_dir",
+                "rumble_item",
+                "time_until_next_item",
+                "max_time_until_next_item",
             ],
         )
         .unwrap()

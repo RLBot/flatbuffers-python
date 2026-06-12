@@ -82,7 +82,7 @@ impl PsyonixBot {
             self.name.bind(py).to_cow().unwrap(),
             self.loadout
                 .as_ref()
-                .map_or_else(crate::none_str, |x| { x.borrow(py).__repr__(py) }),
+                .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
             self.bot_skill.__repr__(),
         )
     }

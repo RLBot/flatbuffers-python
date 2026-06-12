@@ -241,6 +241,11 @@ impl<'a> TableBindGenerator<'a> {
                     TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
                         format!("PyBytes::new(py, &flat_t.{field_name}).unbind()")
                     }
+                    TypeKind::SimpleType(SimpleType::Enum(_)) => {
+                        format!(
+                            "PyList::new(py, flat_t.{field_name}.iter().copied()).unwrap().unbind()"
+                        )
+                    }
                     TypeKind::Table(idx) | TypeKind::SimpleType(SimpleType::Struct(idx)) => {
                         let (path, _) = self.all_items.get_index(idx.0).unwrap();
                         let type_name = path.0.last().unwrap();
@@ -353,6 +358,11 @@ impl<'a> TableBindGenerator<'a> {
                     TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
                         format!("py_type.{field_name}.as_bytes(py).to_vec()")
                     }
+                    TypeKind::SimpleType(SimpleType::Enum(_)) => {
+                        format!(
+                            "py_type.{field_name}.bind_borrowed(py).iter().map(|x| x.extract::<u8>().unwrap().try_into().unwrap()).collect()"
+                        )
+                    }
                     TypeKind::Table(_) | TypeKind::SimpleType(SimpleType::Struct(_)) => {
                         format!(
                             "py_type.{field_name}.bind_borrowed(py).iter().map(|x| crate::from_pyany_into(py, x)).collect()"
@@ -460,7 +470,12 @@ impl<'a> TableBindGenerator<'a> {
                     SimpleType::Enum(idx) => {
                         let (path, _) = self.all_items.get_index(idx.0).unwrap();
                         let name = path.0.last().unwrap();
-                        Cow::Owned(format!("super::{name}"))
+
+                        Cow::Owned(if matches!(field_info.assign_mode, AssignMode::Optional) {
+                            format!("Option<super::{name}>")
+                        } else {
+                            format!("super::{name}")
+                        })
                     }
                     SimpleType::Struct(idx) => {
                         let (path, _) = self.all_items.get_index(idx.0).unwrap();
@@ -684,7 +699,15 @@ impl<'a> TableBindGenerator<'a> {
                         write_fmt!(self, "            self.{field_name},");
                     }
                     SimpleType::Enum(_) => {
-                        write_fmt!(self, "            self.{field_name}.__repr__(),")
+                        if matches!(field_info.assign_mode, AssignMode::Optional) {
+                            write_fmt!(self, "            self.{field_name}.as_ref()");
+                            write_str!(
+                                self,
+                                "            .map_or_else(crate::none_str, |x| x.__repr__()),"
+                            );
+                        } else {
+                            write_fmt!(self, "            self.{field_name}.__repr__(),");
+                        }
                     }
                 },
                 TypeKind::String => {
@@ -708,9 +731,9 @@ impl<'a> TableBindGenerator<'a> {
                     AssignMode::Optional => {
                         write_fmt!(self, "            self.{field_name}");
                         write_str!(self, "                .as_ref()");
-                        write_str!(self, "                .map_or_else(crate::none_str, |x| {");
+                        write_str!(self, "                .map_or_else(crate::none_str, |x| ");
                         write_str!(self, "                    x.borrow(py).__repr__(py)");
-                        write_str!(self, "                }),");
+                        write_str!(self, "                ),");
                     }
                     _ => {
                         write_fmt!(
@@ -764,6 +787,14 @@ impl<'a> TableBindGenerator<'a> {
                                     self,
                                     "                .map(|x| x.cast_into::<super::{name}>().unwrap().borrow().__repr__(py))"
                                 );
+                            }
+                            SimpleType::Enum(idx) => {
+                                let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                                let name = path.0.last().unwrap();
+                                write_str!(self, ".bind_borrowed(py).iter()");
+                                write_str!(self, ".map(|x| x.extract::<u8>().unwrap())");
+                                write_fmt!(self, ".map(|x| super::{name}::try_from(x).unwrap())");
+                                write_str!(self, ".map(|x| x.__repr__())");
                             }
                             _ => {
                                 write_str!(self, "                .iter()");

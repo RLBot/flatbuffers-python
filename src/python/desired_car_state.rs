@@ -80,7 +80,7 @@ impl DesiredCarState {
             "DesiredCarState(physics={}, boost_amount={})",
             self.physics
                 .as_ref()
-                .map_or_else(crate::none_str, |x| { x.borrow(py).__repr__(py) }),
+                .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
             self.boost_amount
                 .as_ref()
                 .map_or_else(crate::none_str, |x| { x.to_string() }),

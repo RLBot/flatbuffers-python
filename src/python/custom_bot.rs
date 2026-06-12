@@ -105,7 +105,7 @@ impl CustomBot {
             self.run_command.bind(py).to_cow().unwrap(),
             self.loadout
                 .as_ref()
-                .map_or_else(crate::none_str, |x| { x.borrow(py).__repr__(py) }),
+                .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
             self.agent_id.bind(py).to_cow().unwrap(),
             crate::bool_to_str(self.hivemind),
         )

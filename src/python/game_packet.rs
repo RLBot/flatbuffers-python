@@ -9,6 +9,7 @@ pub struct GamePacket {
     pub balls: Py<PyList>,
     pub match_info: Py<super::MatchInfo>,
     pub teams: Py<PyList>,
+    pub tiles: Py<PyList>,
 }
 
 impl crate::PyDefault for GamePacket {
@@ -21,6 +22,7 @@ impl crate::PyDefault for GamePacket {
                 balls: PyList::empty(py).unbind(),
                 match_info: super::MatchInfo::py_default(py),
                 teams: PyList::empty(py).unbind(),
+                tiles: PyList::empty(py).unbind(),
             },
         )
         .unwrap()
@@ -68,6 +70,9 @@ impl FromGil<&flat::GamePacket> for GamePacket {
             )
             .unwrap()
             .unbind(),
+            tiles: PyList::new(py, flat_t.tiles.iter().copied())
+                .unwrap()
+                .unbind(),
         }
     }
 }
@@ -101,6 +106,12 @@ impl FromGil<&GamePacket> for flat::GamePacket {
                 .iter()
                 .map(|x| crate::from_pyany_into(py, x))
                 .collect(),
+            tiles: py_type
+                .tiles
+                .bind_borrowed(py)
+                .iter()
+                .map(|x| x.extract::<u8>().unwrap().try_into().unwrap())
+                .collect(),
         }
     }
 }
@@ -108,7 +119,7 @@ impl FromGil<&GamePacket> for flat::GamePacket {
 #[pymethods]
 impl GamePacket {
     #[new]
-    #[pyo3(signature = (players=None, boost_pads=None, balls=None, match_info=None, teams=None))]
+    #[pyo3(signature = (players=None, boost_pads=None, balls=None, match_info=None, teams=None, tiles=None))]
     pub fn new(
         py: Python,
         players: Option<Py<PyList>>,
@@ -116,6 +127,7 @@ impl GamePacket {
         balls: Option<Py<PyList>>,
         match_info: Option<Py<super::MatchInfo>>,
         teams: Option<Py<PyList>>,
+        tiles: Option<Py<PyList>>,
     ) -> Self {
         Self {
             players: players.unwrap_or_else(|| PyList::empty(py).unbind()),
@@ -123,6 +135,7 @@ impl GamePacket {
             balls: balls.unwrap_or_else(|| PyList::empty(py).unbind()),
             match_info: match_info.unwrap_or_else(|| super::MatchInfo::py_default(py)),
             teams: teams.unwrap_or_else(|| PyList::empty(py).unbind()),
+            tiles: tiles.unwrap_or_else(|| PyList::empty(py).unbind()),
         }
     }
 
@@ -133,7 +146,7 @@ impl GamePacket {
     #[allow(unused_variables)]
     pub fn __repr__(&self, py: Python) -> String {
         format!(
-            "GamePacket(players=[{}], boost_pads=[{}], balls=[{}], match_info={}, teams=[{}])",
+            "GamePacket(players=[{}], boost_pads=[{}], balls=[{}], match_info={}, teams=[{}], tiles=[{}])",
             self.players
                 .bind_borrowed(py)
                 .iter()
@@ -175,6 +188,14 @@ impl GamePacket {
                     .__repr__(py))
                 .collect::<Vec<String>>()
                 .join(", "),
+            self.tiles
+                .bind_borrowed(py)
+                .iter()
+                .map(|x| x.extract::<u8>().unwrap())
+                .map(|x| super::TileDamageLevel::try_from(x).unwrap())
+                .map(|x| x.__repr__())
+                .collect::<Vec<String>>()
+                .join(", "),
         )
     }
 
@@ -185,8 +206,16 @@ impl GamePacket {
         &'static str,
         &'static str,
         &'static str,
+        &'static str,
     ) {
-        ("players", "boost_pads", "balls", "match_info", "teams")
+        (
+            "players",
+            "boost_pads",
+            "balls",
+            "match_info",
+            "teams",
+            "tiles",
+        )
     }
 
     fn pack<'py>(&self, py: Python<'py>) -> Bound<'py, PyBytes> {

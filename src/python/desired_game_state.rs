@@ -147,7 +147,7 @@ impl DesiredGameState {
                 .join(", "),
             self.match_info
                 .as_ref()
-                .map_or_else(crate::none_str, |x| { x.borrow(py).__repr__(py) }),
+                .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
             self.console_commands
                 .bind_borrowed(py)
                 .iter()

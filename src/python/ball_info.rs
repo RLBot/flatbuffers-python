@@ -6,6 +6,8 @@ use pyo3::{prelude::*, types::*};
 pub struct BallInfo {
     pub physics: Py<super::Physics>,
     pub shape: Py<PyAny>,
+    pub charge_level: i32,
+    pub target_speed: Py<PyFloat>,
 }
 
 impl crate::PyDefault for BallInfo {
@@ -15,6 +17,8 @@ impl crate::PyDefault for BallInfo {
             Self {
                 physics: super::Physics::py_default(py),
                 shape: super::CollisionShape::py_default(py),
+                charge_level: Default::default(),
+                target_speed: crate::pyfloat_default(py),
             },
         )
         .unwrap()
@@ -27,6 +31,8 @@ impl FromGil<&flat::BallInfo> for BallInfo {
         BallInfo {
             physics: crate::into_py_from(py, &flat_t.physics),
             shape: IntoGil::<super::CollisionShape>::into_gil(&flat_t.shape, py).into_any(),
+            charge_level: flat_t.charge_level,
+            target_speed: crate::float_to_py(py, flat_t.target_speed),
         }
     }
 }
@@ -40,6 +46,8 @@ impl FromGil<&BallInfo> for flat::BallInfo {
                 .as_ref()
                 .unwrap()
                 .into_gil(py),
+            charge_level: py_type.charge_level,
+            target_speed: crate::float_from_py(py, &py_type.target_speed),
         }
     }
 }
@@ -47,11 +55,19 @@ impl FromGil<&BallInfo> for flat::BallInfo {
 #[pymethods]
 impl BallInfo {
     #[new]
-    #[pyo3(signature = (physics=None, shape=None))]
-    pub fn new(py: Python, physics: Option<Py<super::Physics>>, shape: Option<Py<PyAny>>) -> Self {
+    #[pyo3(signature = (physics=None, shape=None, charge_level=0, target_speed=0.0))]
+    pub fn new(
+        py: Python,
+        physics: Option<Py<super::Physics>>,
+        shape: Option<Py<PyAny>>,
+        charge_level: i32,
+        target_speed: f64,
+    ) -> Self {
         Self {
             physics: physics.unwrap_or_else(|| super::Physics::py_default(py)),
             shape: shape.unwrap_or_else(|| super::CollisionShape::py_default(py)),
+            charge_level,
+            target_speed: PyFloat::new(py, target_speed).unbind(),
         }
     }
 
@@ -62,17 +78,19 @@ impl BallInfo {
     #[allow(unused_variables)]
     pub fn __repr__(&self, py: Python) -> String {
         format!(
-            "BallInfo(physics={}, shape={})",
+            "BallInfo(physics={}, shape={}, charge_level={}, target_speed={})",
             self.physics.borrow(py).__repr__(py),
             super::CollisionShape::extract(self.shape.bind_borrowed(py))
                 .unwrap()
                 .__repr__(py),
+            self.charge_level,
+            self.target_speed,
         )
     }
 
     #[classattr]
-    fn __match_args__() -> (&'static str, &'static str) {
-        ("physics", "shape")
+    fn __match_args__() -> (&'static str, &'static str, &'static str, &'static str) {
+        ("physics", "shape", "charge_level", "target_speed")
     }
 
     fn pack<'py>(&self, py: Python<'py>) -> Bound<'py, PyBytes> {

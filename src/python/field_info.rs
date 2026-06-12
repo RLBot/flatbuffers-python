@@ -6,6 +6,7 @@ use pyo3::{prelude::*, types::*};
 pub struct FieldInfo {
     pub boost_pads: Py<PyList>,
     pub goals: Py<PyList>,
+    pub tiles: Py<PyList>,
 }
 
 impl crate::PyDefault for FieldInfo {
@@ -15,6 +16,7 @@ impl crate::PyDefault for FieldInfo {
             Self {
                 boost_pads: PyList::empty(py).unbind(),
                 goals: PyList::empty(py).unbind(),
+                tiles: PyList::empty(py).unbind(),
             },
         )
         .unwrap()
@@ -43,6 +45,15 @@ impl FromGil<&flat::FieldInfo> for FieldInfo {
             )
             .unwrap()
             .unbind(),
+            tiles: PyList::new(
+                py,
+                flat_t
+                    .tiles
+                    .iter()
+                    .map(|x| crate::into_py_from::<_, super::Tile>(py, x)),
+            )
+            .unwrap()
+            .unbind(),
         }
     }
 }
@@ -63,6 +74,12 @@ impl FromGil<&FieldInfo> for flat::FieldInfo {
                 .iter()
                 .map(|x| crate::from_pyany_into(py, x))
                 .collect(),
+            tiles: py_type
+                .tiles
+                .bind_borrowed(py)
+                .iter()
+                .map(|x| crate::from_pyany_into(py, x))
+                .collect(),
         }
     }
 }
@@ -70,11 +87,17 @@ impl FromGil<&FieldInfo> for flat::FieldInfo {
 #[pymethods]
 impl FieldInfo {
     #[new]
-    #[pyo3(signature = (boost_pads=None, goals=None))]
-    pub fn new(py: Python, boost_pads: Option<Py<PyList>>, goals: Option<Py<PyList>>) -> Self {
+    #[pyo3(signature = (boost_pads=None, goals=None, tiles=None))]
+    pub fn new(
+        py: Python,
+        boost_pads: Option<Py<PyList>>,
+        goals: Option<Py<PyList>>,
+        tiles: Option<Py<PyList>>,
+    ) -> Self {
         Self {
             boost_pads: boost_pads.unwrap_or_else(|| PyList::empty(py).unbind()),
             goals: goals.unwrap_or_else(|| PyList::empty(py).unbind()),
+            tiles: tiles.unwrap_or_else(|| PyList::empty(py).unbind()),
         }
     }
 
@@ -85,7 +108,7 @@ impl FieldInfo {
     #[allow(unused_variables)]
     pub fn __repr__(&self, py: Python) -> String {
         format!(
-            "FieldInfo(boost_pads=[{}], goals=[{}])",
+            "FieldInfo(boost_pads=[{}], goals=[{}], tiles=[{}])",
             self.boost_pads
                 .bind_borrowed(py)
                 .iter()
@@ -106,12 +129,18 @@ impl FieldInfo {
                     .__repr__(py))
                 .collect::<Vec<String>>()
                 .join(", "),
+            self.tiles
+                .bind_borrowed(py)
+                .iter()
+                .map(|x| x.cast_into::<super::Tile>().unwrap().borrow().__repr__(py))
+                .collect::<Vec<String>>()
+                .join(", "),
         )
     }
 
     #[classattr]
-    fn __match_args__() -> (&'static str, &'static str) {
-        ("boost_pads", "goals")
+    fn __match_args__() -> (&'static str, &'static str, &'static str) {
+        ("boost_pads", "goals", "tiles")
     }
 
     fn pack<'py>(&self, py: Python<'py>) -> Bound<'py, PyBytes> {

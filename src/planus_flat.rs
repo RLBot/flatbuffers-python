@@ -9518,10 +9518,231 @@ mod root {
                 }
             }
 
+            ///  All the different Rumble items
+            ///
+            /// Generated from these locations:
+            /// * Enum `RumbleItem` in the file `flatbuffers-schema/schema/gamedata.fbs:157`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum RumbleItem {
+                #[default]
+                ///  Kicks an opponent’s car backward
+                Boot = 0,
+
+                ///  Forces an opponent to boost uncontrollably at supersonic speeds
+                Disruptor = 1,
+
+                ///  Halts the ball’s movement temporarily
+                Freezer = 2,
+
+                ///  Punches the ball with significant force
+                Haymaker = 3,
+
+                ///  Attracts the ball toward your car
+                Magnetizer = 4,
+
+                ///  Grabs the ball with a cord and pulls it toward you
+                Plunger = 5,
+
+                ///  Attaches the ball to your car upon impact
+                Spike = 6,
+
+                ///  Swaps your position and momentum with an opponent
+                Swapper = 7,
+
+                ///  Creates a funnel cloud that lifts the ball and nearby cars
+                Tornado = 8,
+
+                ///  Pulls your car toward the ball
+                GrapplingHook = 9,
+
+                ///  Allows you to demolish opponents on contact and hit the ball harder
+                PowerHitter = 10,
+            }
+
+            impl RumbleItem {
+                /// Array containing all valid variants of RumbleItem
+                pub const ENUM_VALUES: [Self; 11] = [
+                    Self::Boot,
+                    Self::Disruptor,
+                    Self::Freezer,
+                    Self::Haymaker,
+                    Self::Magnetizer,
+                    Self::Plunger,
+                    Self::Spike,
+                    Self::Swapper,
+                    Self::Tornado,
+                    Self::GrapplingHook,
+                    Self::PowerHitter,
+                ];
+            }
+
+            impl ::core::convert::TryFrom<u8> for RumbleItem {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(RumbleItem::Boot),
+                        1 => ::core::result::Result::Ok(RumbleItem::Disruptor),
+                        2 => ::core::result::Result::Ok(RumbleItem::Freezer),
+                        3 => ::core::result::Result::Ok(RumbleItem::Haymaker),
+                        4 => ::core::result::Result::Ok(RumbleItem::Magnetizer),
+                        5 => ::core::result::Result::Ok(RumbleItem::Plunger),
+                        6 => ::core::result::Result::Ok(RumbleItem::Spike),
+                        7 => ::core::result::Result::Ok(RumbleItem::Swapper),
+                        8 => ::core::result::Result::Ok(RumbleItem::Tornado),
+                        9 => ::core::result::Result::Ok(RumbleItem::GrapplingHook),
+                        10 => ::core::result::Result::Ok(RumbleItem::PowerHitter),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<RumbleItem> for u8 {
+                #[inline]
+                fn from(value: RumbleItem) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for RumbleItem {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<RumbleItem> for RumbleItem {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<RumbleItem> for RumbleItem {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> RumbleItem {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<RumbleItem, RumbleItem> for RumbleItem {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &RumbleItem,
+                ) -> ::core::option::Option<RumbleItem> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<RumbleItem> for RumbleItem {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<RumbleItem> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for RumbleItem {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for RumbleItem {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "RumbleItem",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<RumbleItem> for RumbleItem {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
             ///  A collection of information about a player and their car.
             ///
             /// Generated from these locations:
-            /// * Table `PlayerInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:157`
+            /// * Table `PlayerInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:193`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct PlayerInfo {
                 ///  The physical state of the player's car.
@@ -9596,6 +9817,13 @@ mod root {
                 ///  The unit direction of the latest dodge.
                 ///  The value will be (0,0) if it was a stall.
                 pub dodge_dir: self::Vector2,
+                ///  Which item the player has, if any
+                pub rumble_item: ::core::option::Option<self::RumbleItem>,
+                ///  If `rumble_item` is null, this is a countdown until the next item is recieved.
+                ///  Otherwise, this field equals 0.
+                pub time_until_next_item: f32,
+                ///  The initial value of `time_until_next_item`.
+                pub max_time_until_next_item: f32,
             }
 
             #[allow(clippy::derivable_impls)]
@@ -9623,6 +9851,9 @@ mod root {
                         has_dodged: false,
                         dodge_elapsed: 0.0,
                         dodge_dir: ::core::default::Default::default(),
+                        rumble_item: ::core::default::Default::default(),
+                        time_until_next_item: 0.0,
+                        max_time_until_next_item: 0.0,
                     }
                 }
             }
@@ -9658,6 +9889,9 @@ mod root {
                     field_has_dodged: impl ::planus::WriteAsDefault<bool, bool>,
                     field_dodge_elapsed: impl ::planus::WriteAsDefault<f32, f32>,
                     field_dodge_dir: impl ::planus::WriteAs<self::Vector2>,
+                    field_rumble_item: impl ::planus::WriteAsOptional<self::RumbleItem>,
+                    field_time_until_next_item: impl ::planus::WriteAsDefault<f32, f32>,
+                    field_max_time_until_next_item: impl ::planus::WriteAsDefault<f32, f32>,
                 ) -> ::planus::Offset<Self> {
                     let prepared_physics = field_physics.prepare(builder);
                     let prepared_score_info = field_score_info.prepare(builder);
@@ -9683,8 +9917,13 @@ mod root {
                     let prepared_has_dodged = field_has_dodged.prepare(builder, &false);
                     let prepared_dodge_elapsed = field_dodge_elapsed.prepare(builder, &0.0);
                     let prepared_dodge_dir = field_dodge_dir.prepare(builder);
+                    let prepared_rumble_item = field_rumble_item.prepare(builder);
+                    let prepared_time_until_next_item =
+                        field_time_until_next_item.prepare(builder, &0.0);
+                    let prepared_max_time_until_next_item =
+                        field_max_time_until_next_item.prepare(builder, &0.0);
 
-                    let mut table_writer: ::planus::table_writer::TableWriter<46> =
+                    let mut table_writer: ::planus::table_writer::TableWriter<52> =
                         ::core::default::Default::default();
                     table_writer.write_entry::<self::Physics>(0);
                     table_writer.write_entry::<self::ScoreInfo>(1);
@@ -9715,6 +9954,12 @@ mod root {
                         table_writer.write_entry::<f32>(19);
                     }
                     table_writer.write_entry::<self::Vector2>(20);
+                    if prepared_time_until_next_item.is_some() {
+                        table_writer.write_entry::<f32>(22);
+                    }
+                    if prepared_max_time_until_next_item.is_some() {
+                        table_writer.write_entry::<f32>(23);
+                    }
                     if prepared_air_state.is_some() {
                         table_writer.write_entry::<self::AirState>(5);
                     }
@@ -9732,6 +9977,9 @@ mod root {
                     }
                     if prepared_has_dodged.is_some() {
                         table_writer.write_entry::<bool>(18);
+                    }
+                    if prepared_rumble_item.is_some() {
+                        table_writer.write_entry::<self::RumbleItem>(21);
                     }
 
                     unsafe {
@@ -9775,6 +10023,16 @@ mod root {
                                 object_writer.write::<_, _, 4>(&prepared_dodge_elapsed);
                             }
                             object_writer.write::<_, _, 8>(&prepared_dodge_dir);
+                            if let ::core::option::Option::Some(prepared_time_until_next_item) =
+                                prepared_time_until_next_item
+                            {
+                                object_writer.write::<_, _, 4>(&prepared_time_until_next_item);
+                            }
+                            if let ::core::option::Option::Some(prepared_max_time_until_next_item) =
+                                prepared_max_time_until_next_item
+                            {
+                                object_writer.write::<_, _, 4>(&prepared_max_time_until_next_item);
+                            }
                             if let ::core::option::Option::Some(prepared_air_state) =
                                 prepared_air_state
                             {
@@ -9802,6 +10060,11 @@ mod root {
                                 prepared_has_dodged
                             {
                                 object_writer.write::<_, _, 1>(&prepared_has_dodged);
+                            }
+                            if let ::core::option::Option::Some(prepared_rumble_item) =
+                                prepared_rumble_item
+                            {
+                                object_writer.write::<_, _, 1>(&prepared_rumble_item);
                             }
                         });
                     }
@@ -9856,6 +10119,9 @@ mod root {
                         self.has_dodged,
                         self.dodge_elapsed,
                         self.dodge_dir,
+                        self.rumble_item,
+                        self.time_until_next_item,
+                        self.max_time_until_next_item,
                     )
                 }
             }
@@ -10860,6 +11126,453 @@ mod root {
                     T20,
                 )>
             {
+                /// Setter for the [`rumble_item` field](PlayerInfo#structfield.rumble_item).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn rumble_item<T21>(
+                    self,
+                    value: T21,
+                ) -> PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                )>
+                where
+                    T21: ::planus::WriteAsOptional<self::RumbleItem>,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                    ) = self.0;
+                    PlayerInfoBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, value,
+                    ))
+                }
+
+                /// Sets the [`rumble_item` field](PlayerInfo#structfield.rumble_item) to null.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn rumble_item_as_null(
+                    self,
+                ) -> PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    (),
+                )> {
+                    self.rumble_item(())
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+            >
+                PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                )>
+            {
+                /// Setter for the [`time_until_next_item` field](PlayerInfo#structfield.time_until_next_item).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn time_until_next_item<T22>(
+                    self,
+                    value: T22,
+                ) -> PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                )>
+                where
+                    T22: ::planus::WriteAsDefault<f32, f32>,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                        v21,
+                    ) = self.0;
+                    PlayerInfoBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, v21, value,
+                    ))
+                }
+
+                /// Sets the [`time_until_next_item` field](PlayerInfo#structfield.time_until_next_item) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn time_until_next_item_as_default(
+                    self,
+                ) -> PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    ::planus::DefaultValue,
+                )> {
+                    self.time_until_next_item(::planus::DefaultValue)
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+                T22,
+            >
+                PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                )>
+            {
+                /// Setter for the [`max_time_until_next_item` field](PlayerInfo#structfield.max_time_until_next_item).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn max_time_until_next_item<T23>(
+                    self,
+                    value: T23,
+                ) -> PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                )>
+                where
+                    T23: ::planus::WriteAsDefault<f32, f32>,
+                {
+                    let (
+                        v0,
+                        v1,
+                        v2,
+                        v3,
+                        v4,
+                        v5,
+                        v6,
+                        v7,
+                        v8,
+                        v9,
+                        v10,
+                        v11,
+                        v12,
+                        v13,
+                        v14,
+                        v15,
+                        v16,
+                        v17,
+                        v18,
+                        v19,
+                        v20,
+                        v21,
+                        v22,
+                    ) = self.0;
+                    PlayerInfoBuilder((
+                        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+                        v17, v18, v19, v20, v21, v22, value,
+                    ))
+                }
+
+                /// Sets the [`max_time_until_next_item` field](PlayerInfo#structfield.max_time_until_next_item) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn max_time_until_next_item_as_default(
+                    self,
+                ) -> PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    ::planus::DefaultValue,
+                )> {
+                    self.max_time_until_next_item(::planus::DefaultValue)
+                }
+            }
+
+            impl<
+                T0,
+                T1,
+                T2,
+                T3,
+                T4,
+                T5,
+                T6,
+                T7,
+                T8,
+                T9,
+                T10,
+                T11,
+                T12,
+                T13,
+                T14,
+                T15,
+                T16,
+                T17,
+                T18,
+                T19,
+                T20,
+                T21,
+                T22,
+                T23,
+            >
+                PlayerInfoBuilder<(
+                    T0,
+                    T1,
+                    T2,
+                    T3,
+                    T4,
+                    T5,
+                    T6,
+                    T7,
+                    T8,
+                    T9,
+                    T10,
+                    T11,
+                    T12,
+                    T13,
+                    T14,
+                    T15,
+                    T16,
+                    T17,
+                    T18,
+                    T19,
+                    T20,
+                    T21,
+                    T22,
+                    T23,
+                )>
+            {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [PlayerInfo].
                 #[inline]
                 pub fn finish(self, builder: &mut ::planus::Builder) -> ::planus::Offset<PlayerInfo>
@@ -10892,6 +11605,9 @@ mod root {
                 T18: ::planus::WriteAsDefault<bool, bool>,
                 T19: ::planus::WriteAsDefault<f32, f32>,
                 T20: ::planus::WriteAs<self::Vector2>,
+                T21: ::planus::WriteAsOptional<self::RumbleItem>,
+                T22: ::planus::WriteAsDefault<f32, f32>,
+                T23: ::planus::WriteAsDefault<f32, f32>,
             > ::planus::WriteAs<::planus::Offset<PlayerInfo>>
                 for PlayerInfoBuilder<(
                     T0,
@@ -10915,6 +11631,9 @@ mod root {
                     T18,
                     T19,
                     T20,
+                    T21,
+                    T22,
+                    T23,
                 )>
             {
                 type Prepared = ::planus::Offset<PlayerInfo>;
@@ -10947,6 +11666,9 @@ mod root {
                 T18: ::planus::WriteAsDefault<bool, bool>,
                 T19: ::planus::WriteAsDefault<f32, f32>,
                 T20: ::planus::WriteAs<self::Vector2>,
+                T21: ::planus::WriteAsOptional<self::RumbleItem>,
+                T22: ::planus::WriteAsDefault<f32, f32>,
+                T23: ::planus::WriteAsDefault<f32, f32>,
             > ::planus::WriteAsOptional<::planus::Offset<PlayerInfo>>
                 for PlayerInfoBuilder<(
                     T0,
@@ -10970,6 +11692,9 @@ mod root {
                     T18,
                     T19,
                     T20,
+                    T21,
+                    T22,
+                    T23,
                 )>
             {
                 type Prepared = ::planus::Offset<PlayerInfo>;
@@ -11005,6 +11730,9 @@ mod root {
                 T18: ::planus::WriteAsDefault<bool, bool>,
                 T19: ::planus::WriteAsDefault<f32, f32>,
                 T20: ::planus::WriteAs<self::Vector2>,
+                T21: ::planus::WriteAsOptional<self::RumbleItem>,
+                T22: ::planus::WriteAsDefault<f32, f32>,
+                T23: ::planus::WriteAsDefault<f32, f32>,
             > ::planus::WriteAsOffset<PlayerInfo>
                 for PlayerInfoBuilder<(
                     T0,
@@ -11028,6 +11756,9 @@ mod root {
                     T18,
                     T19,
                     T20,
+                    T21,
+                    T22,
+                    T23,
                 )>
             {
                 #[inline]
@@ -11054,10 +11785,13 @@ mod root {
                         v18,
                         v19,
                         v20,
+                        v21,
+                        v22,
+                        v23,
                     ) = &self.0;
                     PlayerInfo::create(
                         builder, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14,
-                        v15, v16, v17, v18, v19, v20,
+                        v15, v16, v17, v18, v19, v20, v21, v22, v23,
                     )
                 }
             }
@@ -11238,6 +11972,34 @@ mod root {
                 pub fn dodge_dir(&self) -> ::planus::Result<self::Vector2Ref<'a>> {
                     self.0.access_required(20, "PlayerInfo", "dodge_dir")
                 }
+
+                /// Getter for the [`rumble_item` field](PlayerInfo#structfield.rumble_item).
+                #[inline]
+                pub fn rumble_item(
+                    &self,
+                ) -> ::planus::Result<::core::option::Option<self::RumbleItem>> {
+                    self.0.access(21, "PlayerInfo", "rumble_item")
+                }
+
+                /// Getter for the [`time_until_next_item` field](PlayerInfo#structfield.time_until_next_item).
+                #[inline]
+                pub fn time_until_next_item(&self) -> ::planus::Result<f32> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(22, "PlayerInfo", "time_until_next_item")?
+                            .unwrap_or(0.0),
+                    )
+                }
+
+                /// Getter for the [`max_time_until_next_item` field](PlayerInfo#structfield.max_time_until_next_item).
+                #[inline]
+                pub fn max_time_until_next_item(&self) -> ::planus::Result<f32> {
+                    ::core::result::Result::Ok(
+                        self.0
+                            .access(23, "PlayerInfo", "max_time_until_next_item")?
+                            .unwrap_or(0.0),
+                    )
+                }
             }
 
             impl<'a> ::core::fmt::Debug for PlayerInfoRef<'a> {
@@ -11268,6 +12030,13 @@ mod root {
                     f.field("has_dodged", &self.has_dodged());
                     f.field("dodge_elapsed", &self.dodge_elapsed());
                     f.field("dodge_dir", &self.dodge_dir());
+                    if let ::core::option::Option::Some(field_rumble_item) =
+                        self.rumble_item().transpose()
+                    {
+                        f.field("rumble_item", &field_rumble_item);
+                    }
+                    f.field("time_until_next_item", &self.time_until_next_item());
+                    f.field("max_time_until_next_item", &self.max_time_until_next_item());
                     f.finish()
                 }
             }
@@ -11313,6 +12082,21 @@ mod root {
                         has_dodged: ::core::convert::TryInto::try_into(value.has_dodged()?)?,
                         dodge_elapsed: ::core::convert::TryInto::try_into(value.dodge_elapsed()?)?,
                         dodge_dir: ::core::convert::Into::into(value.dodge_dir()?),
+                        rumble_item: if let ::core::option::Option::Some(rumble_item) =
+                            value.rumble_item()?
+                        {
+                            ::core::option::Option::Some(::core::convert::TryInto::try_into(
+                                rumble_item,
+                            )?)
+                        } else {
+                            ::core::option::Option::None
+                        },
+                        time_until_next_item: ::core::convert::TryInto::try_into(
+                            value.time_until_next_item()?,
+                        )?,
+                        max_time_until_next_item: ::core::convert::TryInto::try_into(
+                            value.max_time_until_next_item()?,
+                        )?,
                     })
                 }
             }
@@ -11393,13 +12177,22 @@ mod root {
             ///  Information about a ball.
             ///
             /// Generated from these locations:
-            /// * Table `BallInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:253`
+            /// * Table `BallInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:299`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct BallInfo {
                 ///  The physical state of the ball.
                 pub physics: self::Physics,
                 ///  The collision shape of the ball.
                 pub shape: self::CollisionShape,
+                ///  The charge level, if it is a dropshot ball.
+                ///  -1 = Not dropshot
+                ///  0 = No charge
+                ///  1 = Charged
+                ///  2 = Supercharged
+                pub charge_level: i32,
+                ///  The target homing speed, if it is a heatseeker ball.
+                ///  If it is not a heatseeker ball, this is always 0.
+                pub target_speed: f32,
             }
 
             impl BallInfo {
@@ -11414,20 +12207,40 @@ mod root {
                     builder: &mut ::planus::Builder,
                     field_physics: impl ::planus::WriteAs<self::Physics>,
                     field_shape: impl ::planus::WriteAsUnion<self::CollisionShape>,
+                    field_charge_level: impl ::planus::WriteAsDefault<i32, i32>,
+                    field_target_speed: impl ::planus::WriteAsDefault<f32, f32>,
                 ) -> ::planus::Offset<Self> {
                     let prepared_physics = field_physics.prepare(builder);
                     let prepared_shape = field_shape.prepare(builder);
+                    let prepared_charge_level = field_charge_level.prepare(builder, &0);
+                    let prepared_target_speed = field_target_speed.prepare(builder, &0.0);
 
-                    let mut table_writer: ::planus::table_writer::TableWriter<10> =
+                    let mut table_writer: ::planus::table_writer::TableWriter<14> =
                         ::core::default::Default::default();
                     table_writer.write_entry::<self::Physics>(0);
                     table_writer.write_entry::<::planus::Offset<self::CollisionShape>>(2);
+                    if prepared_charge_level.is_some() {
+                        table_writer.write_entry::<i32>(3);
+                    }
+                    if prepared_target_speed.is_some() {
+                        table_writer.write_entry::<f32>(4);
+                    }
                     table_writer.write_entry::<u8>(1);
 
                     unsafe {
                         table_writer.finish(builder, |object_writer| {
                             object_writer.write::<_, _, 48>(&prepared_physics);
                             object_writer.write::<_, _, 4>(&prepared_shape.offset());
+                            if let ::core::option::Option::Some(prepared_charge_level) =
+                                prepared_charge_level
+                            {
+                                object_writer.write::<_, _, 4>(&prepared_charge_level);
+                            }
+                            if let ::core::option::Option::Some(prepared_target_speed) =
+                                prepared_target_speed
+                            {
+                                object_writer.write::<_, _, 4>(&prepared_target_speed);
+                            }
                             object_writer.write::<_, _, 1>(&prepared_shape.tag());
                         });
                     }
@@ -11459,7 +12272,13 @@ mod root {
             impl ::planus::WriteAsOffset<BallInfo> for BallInfo {
                 #[inline]
                 fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<BallInfo> {
-                    BallInfo::create(builder, self.physics, &self.shape)
+                    BallInfo::create(
+                        builder,
+                        self.physics,
+                        &self.shape,
+                        self.charge_level,
+                        self.target_speed,
+                    )
                 }
             }
 
@@ -11496,6 +12315,50 @@ mod root {
             }
 
             impl<T0, T1> BallInfoBuilder<(T0, T1)> {
+                /// Setter for the [`charge_level` field](BallInfo#structfield.charge_level).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn charge_level<T2>(self, value: T2) -> BallInfoBuilder<(T0, T1, T2)>
+                where
+                    T2: ::planus::WriteAsDefault<i32, i32>,
+                {
+                    let (v0, v1) = self.0;
+                    BallInfoBuilder((v0, v1, value))
+                }
+
+                /// Sets the [`charge_level` field](BallInfo#structfield.charge_level) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn charge_level_as_default(
+                    self,
+                ) -> BallInfoBuilder<(T0, T1, ::planus::DefaultValue)> {
+                    self.charge_level(::planus::DefaultValue)
+                }
+            }
+
+            impl<T0, T1, T2> BallInfoBuilder<(T0, T1, T2)> {
+                /// Setter for the [`target_speed` field](BallInfo#structfield.target_speed).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn target_speed<T3>(self, value: T3) -> BallInfoBuilder<(T0, T1, T2, T3)>
+                where
+                    T3: ::planus::WriteAsDefault<f32, f32>,
+                {
+                    let (v0, v1, v2) = self.0;
+                    BallInfoBuilder((v0, v1, v2, value))
+                }
+
+                /// Sets the [`target_speed` field](BallInfo#structfield.target_speed) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn target_speed_as_default(
+                    self,
+                ) -> BallInfoBuilder<(T0, T1, T2, ::planus::DefaultValue)> {
+                    self.target_speed(::planus::DefaultValue)
+                }
+            }
+
+            impl<T0, T1, T2, T3> BallInfoBuilder<(T0, T1, T2, T3)> {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [BallInfo].
                 #[inline]
                 pub fn finish(self, builder: &mut ::planus::Builder) -> ::planus::Offset<BallInfo>
@@ -11509,7 +12372,9 @@ mod root {
             impl<
                 T0: ::planus::WriteAs<self::Physics>,
                 T1: ::planus::WriteAsUnion<self::CollisionShape>,
-            > ::planus::WriteAs<::planus::Offset<BallInfo>> for BallInfoBuilder<(T0, T1)>
+                T2: ::planus::WriteAsDefault<i32, i32>,
+                T3: ::planus::WriteAsDefault<f32, f32>,
+            > ::planus::WriteAs<::planus::Offset<BallInfo>> for BallInfoBuilder<(T0, T1, T2, T3)>
             {
                 type Prepared = ::planus::Offset<BallInfo>;
 
@@ -11522,7 +12387,10 @@ mod root {
             impl<
                 T0: ::planus::WriteAs<self::Physics>,
                 T1: ::planus::WriteAsUnion<self::CollisionShape>,
-            > ::planus::WriteAsOptional<::planus::Offset<BallInfo>> for BallInfoBuilder<(T0, T1)>
+                T2: ::planus::WriteAsDefault<i32, i32>,
+                T3: ::planus::WriteAsDefault<f32, f32>,
+            > ::planus::WriteAsOptional<::planus::Offset<BallInfo>>
+                for BallInfoBuilder<(T0, T1, T2, T3)>
             {
                 type Prepared = ::planus::Offset<BallInfo>;
 
@@ -11538,12 +12406,14 @@ mod root {
             impl<
                 T0: ::planus::WriteAs<self::Physics>,
                 T1: ::planus::WriteAsUnion<self::CollisionShape>,
-            > ::planus::WriteAsOffset<BallInfo> for BallInfoBuilder<(T0, T1)>
+                T2: ::planus::WriteAsDefault<i32, i32>,
+                T3: ::planus::WriteAsDefault<f32, f32>,
+            > ::planus::WriteAsOffset<BallInfo> for BallInfoBuilder<(T0, T1, T2, T3)>
             {
                 #[inline]
                 fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<BallInfo> {
-                    let (v0, v1) = &self.0;
-                    BallInfo::create(builder, v0, v1)
+                    let (v0, v1, v2, v3) = &self.0;
+                    BallInfo::create(builder, v0, v1, v2, v3)
                 }
             }
 
@@ -11563,6 +12433,22 @@ mod root {
                 pub fn shape(&self) -> ::planus::Result<self::CollisionShapeRef<'a>> {
                     self.0.access_union_required(1, "BallInfo", "shape")
                 }
+
+                /// Getter for the [`charge_level` field](BallInfo#structfield.charge_level).
+                #[inline]
+                pub fn charge_level(&self) -> ::planus::Result<i32> {
+                    ::core::result::Result::Ok(
+                        self.0.access(3, "BallInfo", "charge_level")?.unwrap_or(0),
+                    )
+                }
+
+                /// Getter for the [`target_speed` field](BallInfo#structfield.target_speed).
+                #[inline]
+                pub fn target_speed(&self) -> ::planus::Result<f32> {
+                    ::core::result::Result::Ok(
+                        self.0.access(4, "BallInfo", "target_speed")?.unwrap_or(0.0),
+                    )
+                }
             }
 
             impl<'a> ::core::fmt::Debug for BallInfoRef<'a> {
@@ -11570,6 +12456,8 @@ mod root {
                     let mut f = f.debug_struct("BallInfoRef");
                     f.field("physics", &self.physics());
                     f.field("shape", &self.shape());
+                    f.field("charge_level", &self.charge_level());
+                    f.field("target_speed", &self.target_speed());
                     f.finish()
                 }
             }
@@ -11582,6 +12470,8 @@ mod root {
                     ::core::result::Result::Ok(Self {
                         physics: ::core::convert::Into::into(value.physics()?),
                         shape: ::core::convert::TryInto::try_into(value.shape()?)?,
+                        charge_level: ::core::convert::TryInto::try_into(value.charge_level()?)?,
+                        target_speed: ::core::convert::TryInto::try_into(value.target_speed()?)?,
                     })
                 }
             }
@@ -11663,7 +12553,7 @@ mod root {
             ///  Note, static properties of boost pads, such as their location and size, are found in the field info.
             ///
             /// Generated from these locations:
-            /// * Struct `BoostPadState` in the file `flatbuffers-schema/schema/gamedata.fbs:263`
+            /// * Struct `BoostPadState` in the file `flatbuffers-schema/schema/gamedata.fbs:320`
             #[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Default)]
             pub struct BoostPadState {
                 ///  True if the boost can be picked up right now.
@@ -11862,7 +12752,7 @@ mod root {
             ///  Possible phases of the match.
             ///
             /// Generated from these locations:
-            /// * Enum `MatchPhase` in the file `flatbuffers-schema/schema/gamedata.fbs:274`
+            /// * Enum `MatchPhase` in the file `flatbuffers-schema/schema/gamedata.fbs:331`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -12069,7 +12959,7 @@ mod root {
             ///  Information about the current match such as time and gravity.
             ///
             /// Generated from these locations:
-            /// * Table `MatchInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:302`
+            /// * Table `MatchInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:359`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct MatchInfo {
                 ///  How many seconds have elapsed since the first game packet of the match.
@@ -12778,7 +13668,7 @@ mod root {
             ///  Information about teams. Currently only the number of goals scored.
             ///
             /// Generated from these locations:
-            /// * Struct `TeamInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:337`
+            /// * Struct `TeamInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:394`
             #[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Default)]
             pub struct TeamInfo {
                 ///  The index of the team. Blue is 0, orange is 1.
@@ -12981,12 +13871,191 @@ mod root {
                 }
             }
 
+            ///  The possible damage levels of a dropshot tile.
+            ///
+            /// Generated from these locations:
+            /// * Enum `TileDamageLevel` in the file `flatbuffers-schema/schema/gamedata.fbs:405`
+            #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+            #[repr(u8)]
+            #[::pyo3::pyclass(
+                module = "rlbot_flatbuffers",
+                from_py_object,
+                frozen,
+                hash,
+                eq,
+                eq_int
+            )]
+            pub enum TileDamageLevel {
+                #[default]
+                ///  The tile has no damage and the ball cannot fall through.
+                Start = 0,
+
+                ///  The tile has some damage,
+                ///  but the ball still cannot fall through.
+                Damaged = 1,
+
+                ///  The tile has been broken,
+                ///  and the ball can now fall through.
+                Broken = 2,
+            }
+
+            impl TileDamageLevel {
+                /// Array containing all valid variants of TileDamageLevel
+                pub const ENUM_VALUES: [Self; 3] = [Self::Start, Self::Damaged, Self::Broken];
+            }
+
+            impl ::core::convert::TryFrom<u8> for TileDamageLevel {
+                type Error = ::planus::errors::UnknownEnumTagKind;
+                #[inline]
+                fn try_from(
+                    value: u8,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTagKind>
+                {
+                    #[allow(clippy::match_single_binding)]
+                    match value {
+                        0 => ::core::result::Result::Ok(TileDamageLevel::Start),
+                        1 => ::core::result::Result::Ok(TileDamageLevel::Damaged),
+                        2 => ::core::result::Result::Ok(TileDamageLevel::Broken),
+
+                        _ => ::core::result::Result::Err(::planus::errors::UnknownEnumTagKind {
+                            tag: value as i128,
+                        }),
+                    }
+                }
+            }
+
+            impl ::core::convert::From<TileDamageLevel> for u8 {
+                #[inline]
+                fn from(value: TileDamageLevel) -> Self {
+                    value as u8
+                }
+            }
+
+            /// # Safety
+            /// The Planus compiler correctly calculates `ALIGNMENT` and `SIZE`.
+            unsafe impl ::planus::Primitive for TileDamageLevel {
+                const ALIGNMENT: usize = 1;
+                const SIZE: usize = 1;
+            }
+
+            impl ::planus::WriteAsPrimitive<TileDamageLevel> for TileDamageLevel {
+                #[inline]
+                fn write<const N: usize>(
+                    &self,
+                    cursor: ::planus::Cursor<'_, N>,
+                    buffer_position: u32,
+                ) {
+                    (*self as u8).write(cursor, buffer_position);
+                }
+            }
+
+            impl ::planus::WriteAs<TileDamageLevel> for TileDamageLevel {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> TileDamageLevel {
+                    *self
+                }
+            }
+
+            impl ::planus::WriteAsDefault<TileDamageLevel, TileDamageLevel> for TileDamageLevel {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                    default: &TileDamageLevel,
+                ) -> ::core::option::Option<TileDamageLevel> {
+                    if self == default {
+                        ::core::option::Option::None
+                    } else {
+                        ::core::option::Option::Some(*self)
+                    }
+                }
+            }
+
+            impl ::planus::WriteAsOptional<TileDamageLevel> for TileDamageLevel {
+                type Prepared = Self;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    _builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<TileDamageLevel> {
+                    ::core::option::Option::Some(*self)
+                }
+            }
+
+            impl<'buf> ::planus::TableRead<'buf> for TileDamageLevel {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    let n: u8 = ::planus::TableRead::from_buffer(buffer, offset)?;
+                    ::core::result::Result::Ok(::core::convert::TryInto::try_into(n)?)
+                }
+            }
+
+            impl<'buf> ::planus::VectorReadInner<'buf> for TileDamageLevel {
+                type Error = ::planus::errors::UnknownEnumTag;
+                const STRIDE: usize = 1;
+                #[inline]
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'buf>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::UnknownEnumTag>
+                {
+                    let value = unsafe { *buffer.buffer.get_unchecked(offset) };
+                    let value: ::core::result::Result<Self, _> =
+                        ::core::convert::TryInto::try_into(value);
+                    value.map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "TileDamageLevel",
+                            "VectorRead::from_buffer",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<TileDamageLevel> for TileDamageLevel {
+                const STRIDE: usize = 1;
+
+                type Value = Self;
+
+                #[inline]
+                fn prepare(&self, _builder: &mut ::planus::Builder) -> Self {
+                    *self
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[Self],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 1];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - i as u32,
+                        );
+                    }
+                }
+            }
+
             ///  A packet of data from the game.
             ///  Is is sent every tick to bots, scripts, etc.
             ///  Static data is found in the FieldInfo.
             ///
             /// Generated from these locations:
-            /// * Table `GamePacket` in the file `flatbuffers-schema/schema/gamedata.fbs:350`
+            /// * Table `GamePacket` in the file `flatbuffers-schema/schema/gamedata.fbs:421`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct GamePacket {
                 ///  The current state of all players and their cars.
@@ -13001,6 +14070,8 @@ mod root {
                 pub match_info: ::planus::alloc::boxed::Box<self::MatchInfo>,
                 ///  The current state of teams, i.e. the team scores.
                 pub teams: ::planus::alloc::vec::Vec<self::TeamInfo>,
+                ///  The state of the dropshot tiles. The tiles are sorted by y-coordinate and then x-coordinate.
+                pub tiles: ::planus::alloc::vec::Vec<self::TileDamageLevel>,
             }
 
             #[allow(clippy::derivable_impls)]
@@ -13012,6 +14083,7 @@ mod root {
                         balls: ::core::default::Default::default(),
                         match_info: ::core::default::Default::default(),
                         teams: ::core::default::Default::default(),
+                        tiles: ::core::default::Default::default(),
                     }
                 }
             }
@@ -13035,14 +14107,16 @@ mod root {
                     >,
                     field_match_info: impl ::planus::WriteAs<::planus::Offset<self::MatchInfo>>,
                     field_teams: impl ::planus::WriteAs<::planus::Offset<[self::TeamInfo]>>,
+                    field_tiles: impl ::planus::WriteAs<::planus::Offset<[self::TileDamageLevel]>>,
                 ) -> ::planus::Offset<Self> {
                     let prepared_players = field_players.prepare(builder);
                     let prepared_boost_pads = field_boost_pads.prepare(builder);
                     let prepared_balls = field_balls.prepare(builder);
                     let prepared_match_info = field_match_info.prepare(builder);
                     let prepared_teams = field_teams.prepare(builder);
+                    let prepared_tiles = field_tiles.prepare(builder);
 
-                    let mut table_writer: ::planus::table_writer::TableWriter<14> =
+                    let mut table_writer: ::planus::table_writer::TableWriter<16> =
                         ::core::default::Default::default();
                     table_writer
                         .write_entry::<::planus::Offset<[::planus::Offset<self::PlayerInfo>]>>(0);
@@ -13051,6 +14125,7 @@ mod root {
                         .write_entry::<::planus::Offset<[::planus::Offset<self::BallInfo>]>>(2);
                     table_writer.write_entry::<::planus::Offset<self::MatchInfo>>(3);
                     table_writer.write_entry::<::planus::Offset<[self::TeamInfo]>>(4);
+                    table_writer.write_entry::<::planus::Offset<[self::TileDamageLevel]>>(5);
 
                     unsafe {
                         table_writer.finish(builder, |object_writer| {
@@ -13059,6 +14134,7 @@ mod root {
                             object_writer.write::<_, _, 4>(&prepared_balls);
                             object_writer.write::<_, _, 4>(&prepared_match_info);
                             object_writer.write::<_, _, 4>(&prepared_teams);
+                            object_writer.write::<_, _, 4>(&prepared_tiles);
                         });
                     }
                     builder.current_offset()
@@ -13096,6 +14172,7 @@ mod root {
                         &self.balls,
                         &self.match_info,
                         &self.teams,
+                        &self.tiles,
                     )
                 }
             }
@@ -13172,6 +14249,19 @@ mod root {
             }
 
             impl<T0, T1, T2, T3, T4> GamePacketBuilder<(T0, T1, T2, T3, T4)> {
+                /// Setter for the [`tiles` field](GamePacket#structfield.tiles).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn tiles<T5>(self, value: T5) -> GamePacketBuilder<(T0, T1, T2, T3, T4, T5)>
+                where
+                    T5: ::planus::WriteAs<::planus::Offset<[self::TileDamageLevel]>>,
+                {
+                    let (v0, v1, v2, v3, v4) = self.0;
+                    GamePacketBuilder((v0, v1, v2, v3, v4, value))
+                }
+            }
+
+            impl<T0, T1, T2, T3, T4, T5> GamePacketBuilder<(T0, T1, T2, T3, T4, T5)> {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [GamePacket].
                 #[inline]
                 pub fn finish(self, builder: &mut ::planus::Builder) -> ::planus::Offset<GamePacket>
@@ -13188,8 +14278,9 @@ mod root {
                 T2: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::BallInfo>]>>,
                 T3: ::planus::WriteAs<::planus::Offset<self::MatchInfo>>,
                 T4: ::planus::WriteAs<::planus::Offset<[self::TeamInfo]>>,
+                T5: ::planus::WriteAs<::planus::Offset<[self::TileDamageLevel]>>,
             > ::planus::WriteAs<::planus::Offset<GamePacket>>
-                for GamePacketBuilder<(T0, T1, T2, T3, T4)>
+                for GamePacketBuilder<(T0, T1, T2, T3, T4, T5)>
             {
                 type Prepared = ::planus::Offset<GamePacket>;
 
@@ -13205,8 +14296,9 @@ mod root {
                 T2: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::BallInfo>]>>,
                 T3: ::planus::WriteAs<::planus::Offset<self::MatchInfo>>,
                 T4: ::planus::WriteAs<::planus::Offset<[self::TeamInfo]>>,
+                T5: ::planus::WriteAs<::planus::Offset<[self::TileDamageLevel]>>,
             > ::planus::WriteAsOptional<::planus::Offset<GamePacket>>
-                for GamePacketBuilder<(T0, T1, T2, T3, T4)>
+                for GamePacketBuilder<(T0, T1, T2, T3, T4, T5)>
             {
                 type Prepared = ::planus::Offset<GamePacket>;
 
@@ -13225,12 +14317,13 @@ mod root {
                 T2: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::BallInfo>]>>,
                 T3: ::planus::WriteAs<::planus::Offset<self::MatchInfo>>,
                 T4: ::planus::WriteAs<::planus::Offset<[self::TeamInfo]>>,
-            > ::planus::WriteAsOffset<GamePacket> for GamePacketBuilder<(T0, T1, T2, T3, T4)>
+                T5: ::planus::WriteAs<::planus::Offset<[self::TileDamageLevel]>>,
+            > ::planus::WriteAsOffset<GamePacket> for GamePacketBuilder<(T0, T1, T2, T3, T4, T5)>
             {
                 #[inline]
                 fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<GamePacket> {
-                    let (v0, v1, v2, v3, v4) = &self.0;
-                    GamePacket::create(builder, v0, v1, v2, v3, v4)
+                    let (v0, v1, v2, v3, v4, v5) = &self.0;
+                    GamePacket::create(builder, v0, v1, v2, v3, v4, v5)
                 }
             }
 
@@ -13279,6 +14372,22 @@ mod root {
                 ) -> ::planus::Result<::planus::Vector<'a, self::TeamInfoRef<'a>>> {
                     self.0.access_required(4, "GamePacket", "teams")
                 }
+
+                /// Getter for the [`tiles` field](GamePacket#structfield.tiles).
+                #[inline]
+                pub fn tiles(
+                    &self,
+                ) -> ::planus::Result<
+                    ::planus::Vector<
+                        'a,
+                        ::core::result::Result<
+                            self::TileDamageLevel,
+                            ::planus::errors::UnknownEnumTag,
+                        >,
+                    >,
+                > {
+                    self.0.access_required(5, "GamePacket", "tiles")
+                }
             }
 
             impl<'a> ::core::fmt::Debug for GamePacketRef<'a> {
@@ -13289,6 +14398,7 @@ mod root {
                     f.field("balls", &self.balls());
                     f.field("match_info", &self.match_info());
                     f.field("teams", &self.teams());
+                    f.field("tiles", &self.tiles());
                     f.finish()
                 }
             }
@@ -13306,6 +14416,7 @@ mod root {
                             ::core::convert::TryInto::try_into(value.match_info()?)?,
                         ),
                         teams: value.teams()?.to_vec()?,
+                        tiles: value.tiles()?.to_vec_result()?,
                     })
                 }
             }
@@ -13387,7 +14498,7 @@ mod root {
             ///  More values can be found on https://wiki.rlbot.org/botmaking/useful-game-values/
             ///
             /// Generated from these locations:
-            /// * Table `GoalInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:373`
+            /// * Table `GoalInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:447`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct GoalInfo {
                 ///  The index of the team that this goal belongs to.
@@ -13811,7 +14922,7 @@ mod root {
             ///  Static information about a boost pad such as location and size.
             ///
             /// Generated from these locations:
-            /// * Table `BoostPad` in the file `flatbuffers-schema/schema/gamedata.fbs:391`
+            /// * Table `BoostPad` in the file `flatbuffers-schema/schema/gamedata.fbs:465`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct BoostPad {
                 ///  The location of the boost pad.
@@ -14101,20 +15212,302 @@ mod root {
                 }
             }
 
+            /// The table `Tile` in the namespace `rlbot.flat`
+            ///
+            /// Generated from these locations:
+            /// * Table `Tile` in the file `flatbuffers-schema/schema/gamedata.fbs:475`
+            #[derive(Clone, Debug, PartialEq, PartialOrd)]
+            pub struct Tile {
+                ///  The location of the tile.
+                pub location: self::Vector3,
+                ///  The team that owns/defends this tile.
+                pub team: u32,
+            }
+
+            #[allow(clippy::derivable_impls)]
+            impl ::core::default::Default for Tile {
+                fn default() -> Self {
+                    Self {
+                        location: ::core::default::Default::default(),
+                        team: 0,
+                    }
+                }
+            }
+
+            impl Tile {
+                /// Creates a [TileBuilder] for serializing an instance of this table.
+                #[inline]
+                pub fn builder() -> TileBuilder<()> {
+                    TileBuilder(())
+                }
+
+                #[allow(clippy::too_many_arguments)]
+                pub fn create(
+                    builder: &mut ::planus::Builder,
+                    field_location: impl ::planus::WriteAs<self::Vector3>,
+                    field_team: impl ::planus::WriteAsDefault<u32, u32>,
+                ) -> ::planus::Offset<Self> {
+                    let prepared_location = field_location.prepare(builder);
+                    let prepared_team = field_team.prepare(builder, &0);
+
+                    let mut table_writer: ::planus::table_writer::TableWriter<8> =
+                        ::core::default::Default::default();
+                    table_writer.write_entry::<self::Vector3>(0);
+                    if prepared_team.is_some() {
+                        table_writer.write_entry::<u32>(1);
+                    }
+
+                    unsafe {
+                        table_writer.finish(builder, |object_writer| {
+                            object_writer.write::<_, _, 12>(&prepared_location);
+                            if let ::core::option::Option::Some(prepared_team) = prepared_team {
+                                object_writer.write::<_, _, 4>(&prepared_team);
+                            }
+                        });
+                    }
+                    builder.current_offset()
+                }
+            }
+
+            impl ::planus::WriteAs<::planus::Offset<Tile>> for Tile {
+                type Prepared = ::planus::Offset<Self>;
+
+                #[inline]
+                fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<Tile> {
+                    ::planus::WriteAsOffset::prepare(self, builder)
+                }
+            }
+
+            impl ::planus::WriteAsOptional<::planus::Offset<Tile>> for Tile {
+                type Prepared = ::planus::Offset<Self>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<::planus::Offset<Tile>> {
+                    ::core::option::Option::Some(::planus::WriteAsOffset::prepare(self, builder))
+                }
+            }
+
+            impl ::planus::WriteAsOffset<Tile> for Tile {
+                #[inline]
+                fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<Tile> {
+                    Tile::create(builder, self.location, self.team)
+                }
+            }
+
+            /// Builder for serializing an instance of the [Tile] type.
+            ///
+            /// Can be created using the [Tile::builder] method.
+            #[derive(Debug)]
+            #[must_use]
+            pub struct TileBuilder<State>(State);
+
+            impl TileBuilder<()> {
+                /// Setter for the [`location` field](Tile#structfield.location).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn location<T0>(self, value: T0) -> TileBuilder<(T0,)>
+                where
+                    T0: ::planus::WriteAs<self::Vector3>,
+                {
+                    TileBuilder((value,))
+                }
+            }
+
+            impl<T0> TileBuilder<(T0,)> {
+                /// Setter for the [`team` field](Tile#structfield.team).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn team<T1>(self, value: T1) -> TileBuilder<(T0, T1)>
+                where
+                    T1: ::planus::WriteAsDefault<u32, u32>,
+                {
+                    let (v0,) = self.0;
+                    TileBuilder((v0, value))
+                }
+
+                /// Sets the [`team` field](Tile#structfield.team) to the default value.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn team_as_default(self) -> TileBuilder<(T0, ::planus::DefaultValue)> {
+                    self.team(::planus::DefaultValue)
+                }
+            }
+
+            impl<T0, T1> TileBuilder<(T0, T1)> {
+                /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [Tile].
+                #[inline]
+                pub fn finish(self, builder: &mut ::planus::Builder) -> ::planus::Offset<Tile>
+                where
+                    Self: ::planus::WriteAsOffset<Tile>,
+                {
+                    ::planus::WriteAsOffset::prepare(&self, builder)
+                }
+            }
+
+            impl<T0: ::planus::WriteAs<self::Vector3>, T1: ::planus::WriteAsDefault<u32, u32>>
+                ::planus::WriteAs<::planus::Offset<Tile>> for TileBuilder<(T0, T1)>
+            {
+                type Prepared = ::planus::Offset<Tile>;
+
+                #[inline]
+                fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<Tile> {
+                    ::planus::WriteAsOffset::prepare(self, builder)
+                }
+            }
+
+            impl<T0: ::planus::WriteAs<self::Vector3>, T1: ::planus::WriteAsDefault<u32, u32>>
+                ::planus::WriteAsOptional<::planus::Offset<Tile>> for TileBuilder<(T0, T1)>
+            {
+                type Prepared = ::planus::Offset<Tile>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<::planus::Offset<Tile>> {
+                    ::core::option::Option::Some(::planus::WriteAsOffset::prepare(self, builder))
+                }
+            }
+
+            impl<T0: ::planus::WriteAs<self::Vector3>, T1: ::planus::WriteAsDefault<u32, u32>>
+                ::planus::WriteAsOffset<Tile> for TileBuilder<(T0, T1)>
+            {
+                #[inline]
+                fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<Tile> {
+                    let (v0, v1) = &self.0;
+                    Tile::create(builder, v0, v1)
+                }
+            }
+
+            /// Reference to a deserialized [Tile].
+            #[derive(Copy, Clone)]
+            pub struct TileRef<'a>(::planus::table_reader::Table<'a>);
+
+            impl<'a> TileRef<'a> {
+                /// Getter for the [`location` field](Tile#structfield.location).
+                #[inline]
+                pub fn location(&self) -> ::planus::Result<self::Vector3Ref<'a>> {
+                    self.0.access_required(0, "Tile", "location")
+                }
+
+                /// Getter for the [`team` field](Tile#structfield.team).
+                #[inline]
+                pub fn team(&self) -> ::planus::Result<u32> {
+                    ::core::result::Result::Ok(self.0.access(1, "Tile", "team")?.unwrap_or(0))
+                }
+            }
+
+            impl<'a> ::core::fmt::Debug for TileRef<'a> {
+                fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+                    let mut f = f.debug_struct("TileRef");
+                    f.field("location", &self.location());
+                    f.field("team", &self.team());
+                    f.finish()
+                }
+            }
+
+            impl<'a> ::core::convert::TryFrom<TileRef<'a>> for Tile {
+                type Error = ::planus::Error;
+
+                #[allow(unreachable_code)]
+                fn try_from(value: TileRef<'a>) -> ::planus::Result<Self> {
+                    ::core::result::Result::Ok(Self {
+                        location: ::core::convert::Into::into(value.location()?),
+                        team: ::core::convert::TryInto::try_into(value.team()?)?,
+                    })
+                }
+            }
+
+            impl<'a> ::planus::TableRead<'a> for TileRef<'a> {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'a>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    ::core::result::Result::Ok(Self(::planus::table_reader::Table::from_buffer(
+                        buffer, offset,
+                    )?))
+                }
+            }
+
+            impl<'a> ::planus::VectorReadInner<'a> for TileRef<'a> {
+                type Error = ::planus::Error;
+                const STRIDE: usize = 4;
+
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'a>,
+                    offset: usize,
+                ) -> ::planus::Result<Self> {
+                    ::planus::TableRead::from_buffer(buffer, offset).map_err(|error_kind| {
+                        error_kind.with_error_location("[TileRef]", "get", buffer.offset_from_start)
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<::planus::Offset<Tile>> for Tile {
+                type Value = ::planus::Offset<Tile>;
+                const STRIDE: usize = 4;
+                #[inline]
+                fn prepare(&self, builder: &mut ::planus::Builder) -> Self::Value {
+                    ::planus::WriteAs::prepare(self, builder)
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[::planus::Offset<Tile>],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 4];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - (Self::STRIDE * i) as u32,
+                        );
+                    }
+                }
+            }
+
+            impl<'a> ::planus::ReadAsRoot<'a> for TileRef<'a> {
+                fn read_as_root(slice: &'a [u8]) -> ::planus::Result<Self> {
+                    ::planus::TableRead::from_buffer(
+                        ::planus::SliceWithStartOffset {
+                            buffer: slice,
+                            offset_from_start: 0,
+                        },
+                        0,
+                    )
+                    .map_err(|error_kind| {
+                        error_kind.with_error_location("[TileRef]", "read_as_root", 0)
+                    })
+                }
+            }
+
             ///  Static information about the field.
             ///  Sent to bots, scripts, etc. upon connecting.
             ///  Dynamic information is found in the GamePacket.
             ///
             /// Generated from these locations:
-            /// * Table `FieldInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:404`
+            /// * Table `FieldInfo` in the file `flatbuffers-schema/schema/gamedata.fbs:486`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct FieldInfo {
                 ///  Static information about boost pads on the field.
-                ///  The dynamic information is found in the GamePacket
+                ///  The dynamic information is found in the GamePacket.
                 ///  The boost pads are ordered by y-coordinate and then x-coordinate.
                 pub boost_pads: ::planus::alloc::vec::Vec<self::BoostPad>,
                 ///  Information about the goals on the field.
                 pub goals: ::planus::alloc::vec::Vec<self::GoalInfo>,
+                ///  Static information about dropshot tiles on the field.
+                ///  The dynamic information is found in the GamePacket.
+                ///  The tiles are ordered by y-coordinate and then x-coordinate.
+                pub tiles: ::planus::alloc::vec::Vec<self::Tile>,
             }
 
             #[allow(clippy::derivable_impls)]
@@ -14123,6 +15516,7 @@ mod root {
                     Self {
                         boost_pads: ::core::default::Default::default(),
                         goals: ::core::default::Default::default(),
+                        tiles: ::core::default::Default::default(),
                     }
                 }
             }
@@ -14143,21 +15537,27 @@ mod root {
                     field_goals: impl ::planus::WriteAs<
                         ::planus::Offset<[::planus::Offset<self::GoalInfo>]>,
                     >,
+                    field_tiles: impl ::planus::WriteAs<
+                        ::planus::Offset<[::planus::Offset<self::Tile>]>,
+                    >,
                 ) -> ::planus::Offset<Self> {
                     let prepared_boost_pads = field_boost_pads.prepare(builder);
                     let prepared_goals = field_goals.prepare(builder);
+                    let prepared_tiles = field_tiles.prepare(builder);
 
-                    let mut table_writer: ::planus::table_writer::TableWriter<8> =
+                    let mut table_writer: ::planus::table_writer::TableWriter<10> =
                         ::core::default::Default::default();
                     table_writer
                         .write_entry::<::planus::Offset<[::planus::Offset<self::BoostPad>]>>(0);
                     table_writer
                         .write_entry::<::planus::Offset<[::planus::Offset<self::GoalInfo>]>>(1);
+                    table_writer.write_entry::<::planus::Offset<[::planus::Offset<self::Tile>]>>(2);
 
                     unsafe {
                         table_writer.finish(builder, |object_writer| {
                             object_writer.write::<_, _, 4>(&prepared_boost_pads);
                             object_writer.write::<_, _, 4>(&prepared_goals);
+                            object_writer.write::<_, _, 4>(&prepared_tiles);
                         });
                     }
                     builder.current_offset()
@@ -14188,7 +15588,7 @@ mod root {
             impl ::planus::WriteAsOffset<FieldInfo> for FieldInfo {
                 #[inline]
                 fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<FieldInfo> {
-                    FieldInfo::create(builder, &self.boost_pads, &self.goals)
+                    FieldInfo::create(builder, &self.boost_pads, &self.goals, &self.tiles)
                 }
             }
 
@@ -14225,6 +15625,19 @@ mod root {
             }
 
             impl<T0, T1> FieldInfoBuilder<(T0, T1)> {
+                /// Setter for the [`tiles` field](FieldInfo#structfield.tiles).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn tiles<T2>(self, value: T2) -> FieldInfoBuilder<(T0, T1, T2)>
+                where
+                    T2: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::Tile>]>>,
+                {
+                    let (v0, v1) = self.0;
+                    FieldInfoBuilder((v0, v1, value))
+                }
+            }
+
+            impl<T0, T1, T2> FieldInfoBuilder<(T0, T1, T2)> {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [FieldInfo].
                 #[inline]
                 pub fn finish(self, builder: &mut ::planus::Builder) -> ::planus::Offset<FieldInfo>
@@ -14238,7 +15651,8 @@ mod root {
             impl<
                 T0: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::BoostPad>]>>,
                 T1: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::GoalInfo>]>>,
-            > ::planus::WriteAs<::planus::Offset<FieldInfo>> for FieldInfoBuilder<(T0, T1)>
+                T2: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::Tile>]>>,
+            > ::planus::WriteAs<::planus::Offset<FieldInfo>> for FieldInfoBuilder<(T0, T1, T2)>
             {
                 type Prepared = ::planus::Offset<FieldInfo>;
 
@@ -14251,8 +15665,9 @@ mod root {
             impl<
                 T0: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::BoostPad>]>>,
                 T1: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::GoalInfo>]>>,
+                T2: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::Tile>]>>,
             > ::planus::WriteAsOptional<::planus::Offset<FieldInfo>>
-                for FieldInfoBuilder<(T0, T1)>
+                for FieldInfoBuilder<(T0, T1, T2)>
             {
                 type Prepared = ::planus::Offset<FieldInfo>;
 
@@ -14268,12 +15683,13 @@ mod root {
             impl<
                 T0: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::BoostPad>]>>,
                 T1: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::GoalInfo>]>>,
-            > ::planus::WriteAsOffset<FieldInfo> for FieldInfoBuilder<(T0, T1)>
+                T2: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::Tile>]>>,
+            > ::planus::WriteAsOffset<FieldInfo> for FieldInfoBuilder<(T0, T1, T2)>
             {
                 #[inline]
                 fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<FieldInfo> {
-                    let (v0, v1) = &self.0;
-                    FieldInfo::create(builder, v0, v1)
+                    let (v0, v1, v2) = &self.0;
+                    FieldInfo::create(builder, v0, v1, v2)
                 }
             }
 
@@ -14299,6 +15715,15 @@ mod root {
                 {
                     self.0.access_required(1, "FieldInfo", "goals")
                 }
+
+                /// Getter for the [`tiles` field](FieldInfo#structfield.tiles).
+                #[inline]
+                pub fn tiles(
+                    &self,
+                ) -> ::planus::Result<::planus::Vector<'a, ::planus::Result<self::TileRef<'a>>>>
+                {
+                    self.0.access_required(2, "FieldInfo", "tiles")
+                }
             }
 
             impl<'a> ::core::fmt::Debug for FieldInfoRef<'a> {
@@ -14306,6 +15731,7 @@ mod root {
                     let mut f = f.debug_struct("FieldInfoRef");
                     f.field("boost_pads", &self.boost_pads());
                     f.field("goals", &self.goals());
+                    f.field("tiles", &self.tiles());
                     f.finish()
                 }
             }
@@ -14318,6 +15744,7 @@ mod root {
                     ::core::result::Result::Ok(Self {
                         boost_pads: value.boost_pads()?.to_vec_result()?,
                         goals: value.goals()?.to_vec_result()?,
+                        tiles: value.tiles()?.to_vec_result()?,
                     })
                 }
             }
@@ -14398,7 +15825,7 @@ mod root {
             ///  An entry in the ball prediction describing where a ball will be at some future time.
             ///
             /// Generated from these locations:
-            /// * Struct `PredictionSlice` in the file `flatbuffers-schema/schema/gamedata.fbs:415`
+            /// * Struct `PredictionSlice` in the file `flatbuffers-schema/schema/gamedata.fbs:502`
             #[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Default)]
             pub struct PredictionSlice {
                 ///  The moment in game time that this prediction corresponds to.
@@ -14595,7 +16022,7 @@ mod root {
             ///  A prediction of a ball's trajectory, assuming no collision with cars.
             ///
             /// Generated from these locations:
-            /// * Table `BallPrediction` in the file `flatbuffers-schema/schema/gamedata.fbs:425`
+            /// * Table `BallPrediction` in the file `flatbuffers-schema/schema/gamedata.fbs:512`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct BallPrediction {
                 ///  A list of predicted states of the ball at specific times in the future, assuming no collision with cars.

@@ -195,7 +195,7 @@ impl PlayerLoadout {
             self.goal_explosion_id,
             self.loadout_paint
                 .as_ref()
-                .map_or_else(crate::none_str, |x| { x.borrow(py).__repr__(py) }),
+                .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
             self.primary_color_lookup
                 .as_ref()
                 .map_or_else(crate::none_str, |x| { x.borrow(py).__repr__(py) }),
