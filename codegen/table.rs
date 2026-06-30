@@ -234,26 +234,49 @@ impl<'a> TableBindGenerator<'a> {
                         format!("crate::into_py_from(py, &*flat_t.{field_name})")
                     }
                 },
-                TypeKind::Vector(inner_type) => match &inner_type.kind {
-                    TypeKind::String => {
-                        format!("crate::into_pystringlist_from(py, &flat_t.{field_name})")
+                TypeKind::Vector(inner_type) => match field_info.assign_mode {
+                    AssignMode::Optional => {
+                        let inner: String = match &inner_type.kind {
+                            TypeKind::String => "crate::into_pystringlist_from(py, x)".into(),
+                            TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
+                                "PyBytes::new(py, x).unbind()".into()
+                            }
+                            TypeKind::SimpleType(SimpleType::Enum(_)) => {
+                                "PyList::new(py, x.iter().copied()).unwrap().unbind()".into()
+                            }
+                            TypeKind::Table(idx)
+                            | TypeKind::SimpleType(SimpleType::Struct(idx)) => {
+                                let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                                let type_name = path.0.last().unwrap();
+                                format!(
+                                    "PyList::new(py, x.iter().map(|y| crate::into_py_from::<_, super::{type_name}>(py, y))).unwrap().unbind()"
+                                )
+                            }
+                            _ => todo!("Unknown field type for {field_name} in {}", self.name),
+                        };
+                        format!("flat_t.{field_name}.as_ref().map(|x| {inner})")
                     }
-                    TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
-                        format!("PyBytes::new(py, &flat_t.{field_name}).unbind()")
-                    }
-                    TypeKind::SimpleType(SimpleType::Enum(_)) => {
-                        format!(
-                            "PyList::new(py, flat_t.{field_name}.iter().copied()).unwrap().unbind()"
-                        )
-                    }
-                    TypeKind::Table(idx) | TypeKind::SimpleType(SimpleType::Struct(idx)) => {
-                        let (path, _) = self.all_items.get_index(idx.0).unwrap();
-                        let type_name = path.0.last().unwrap();
-                        format!(
-                            "PyList::new(py, flat_t.{field_name}.iter().map(|x| crate::into_py_from::<_, super::{type_name}>(py, x))).unwrap().unbind()"
-                        )
-                    }
-                    _ => todo!("Unknown field type for {field_name} in {}", self.name),
+                    _ => match &inner_type.kind {
+                        TypeKind::String => {
+                            format!("crate::into_pystringlist_from(py, &flat_t.{field_name})")
+                        }
+                        TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
+                            format!("PyBytes::new(py, &flat_t.{field_name}).unbind()")
+                        }
+                        TypeKind::SimpleType(SimpleType::Enum(_)) => {
+                            format!(
+                                "PyList::new(py, flat_t.{field_name}.iter().copied()).unwrap().unbind()"
+                            )
+                        }
+                        TypeKind::Table(idx) | TypeKind::SimpleType(SimpleType::Struct(idx)) => {
+                            let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                            let type_name = path.0.last().unwrap();
+                            format!(
+                                "PyList::new(py, flat_t.{field_name}.iter().map(|x| crate::into_py_from::<_, super::{type_name}>(py, x))).unwrap().unbind()"
+                            )
+                        }
+                        _ => todo!("Unknown field type for {field_name} in {}", self.name),
+                    },
                 },
                 TypeKind::Union(idx) => {
                     let (path, _) = self.all_items.get_index(idx.0).unwrap();
@@ -351,24 +374,44 @@ impl<'a> TableBindGenerator<'a> {
                         format!("Box::new(crate::from_py_into(py, &py_type.{field_name}))",)
                     }
                 },
-                TypeKind::Vector(inner_type) => match &inner_type.kind {
-                    TypeKind::String => format!(
-                        "py_type.{field_name}.bind_borrowed(py).iter().map(|x| crate::from_pystring_into(x)).collect()"
-                    ),
-                    TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
-                        format!("py_type.{field_name}.as_bytes(py).to_vec()")
+                TypeKind::Vector(inner_type) => match field_info.assign_mode {
+                    AssignMode::Optional => {
+                        let inner: String = match &inner_type.kind {
+                            TypeKind::String => {
+                                "x.bind_borrowed(py).iter().map(|y| crate::from_pystring_into(y)).collect()".into()
+                            }
+                            TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
+                                "x.as_bytes(py).to_vec()".into()
+                            }
+                            TypeKind::SimpleType(SimpleType::Enum(_)) => {
+                                "x.bind_borrowed(py).iter().map(|y| y.extract::<u8>().unwrap().try_into().unwrap()).collect()".into()
+                            }
+                            TypeKind::Table(_) | TypeKind::SimpleType(SimpleType::Struct(_)) => {
+                                "x.bind_borrowed(py).iter().map(|y| crate::from_pyany_into(py, y)).collect()".into()
+                            }
+                            _ => todo!("Unknown field type for {field_name} in {}", self.name),
+                        };
+                        format!("py_type.{field_name}.as_ref().map(|x| {inner})")
                     }
-                    TypeKind::SimpleType(SimpleType::Enum(_)) => {
-                        format!(
-                            "py_type.{field_name}.bind_borrowed(py).iter().map(|x| x.extract::<u8>().unwrap().try_into().unwrap()).collect()"
-                        )
-                    }
-                    TypeKind::Table(_) | TypeKind::SimpleType(SimpleType::Struct(_)) => {
-                        format!(
-                            "py_type.{field_name}.bind_borrowed(py).iter().map(|x| crate::from_pyany_into(py, x)).collect()"
-                        )
-                    }
-                    _ => todo!("Unknown field type for {field_name} in {}", self.name),
+                    _ => match &inner_type.kind {
+                        TypeKind::String => format!(
+                            "py_type.{field_name}.bind_borrowed(py).iter().map(|x| crate::from_pystring_into(x)).collect()"
+                        ),
+                        TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
+                            format!("py_type.{field_name}.as_bytes(py).to_vec()")
+                        }
+                        TypeKind::SimpleType(SimpleType::Enum(_)) => {
+                            format!(
+                                "py_type.{field_name}.bind_borrowed(py).iter().map(|x| x.extract::<u8>().unwrap().try_into().unwrap()).collect()"
+                            )
+                        }
+                        TypeKind::Table(_) | TypeKind::SimpleType(SimpleType::Struct(_)) => {
+                            format!(
+                                "py_type.{field_name}.bind_borrowed(py).iter().map(|x| crate::from_pyany_into(py, x)).collect()"
+                            )
+                        }
+                        _ => todo!("Unknown field type for {field_name} in {}", self.name),
+                    },
                 },
                 TypeKind::Union(idx) => {
                     let (path, _) = self.all_items.get_index(idx.0).unwrap();
@@ -650,12 +693,18 @@ impl<'a> TableBindGenerator<'a> {
                         format!("{field_name}={{:?}}")
                     }
                 }
-                TypeKind::Vector(inner_type) => match inner_type.kind {
-                    TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
-                        format!("{field_name}=bytes([{{}}])")
+                TypeKind::Vector(inner_type) => {
+                    if matches!(field_info.assign_mode, AssignMode::Optional) {
+                        format!("{field_name}={{}}")
+                    } else {
+                        match inner_type.kind {
+                            TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
+                                format!("{field_name}=bytes([{{}}])")
+                            }
+                            _ => format!("{field_name}=[{{}}]"),
+                        }
                     }
-                    _ => format!("{field_name}=[{{}}]"),
-                },
+                }
                 _ => format!("{field_name}={{}}"),
             })
             .collect::<Vec<_>>()
@@ -769,16 +818,96 @@ impl<'a> TableBindGenerator<'a> {
                     }
                 }
                 TypeKind::Vector(inner_type) => {
-                    write_fmt!(self, "            self.{field_name}");
+                    if matches!(field_info.assign_mode, AssignMode::Optional) {
+                        write_fmt!(self, "            self.{field_name}.as_ref()");
+                        write_str!(self, "                .map_or_else(crate::none_str, |v| {");
 
-                    match inner_type.kind {
-                        TypeKind::SimpleType(simple_type) => match simple_type {
-                            SimpleType::Integer(IntegerType::U8) => {
-                                write_str!(self, "                .as_bytes(py)");
-                                write_str!(self, "                .iter()");
-                                write_str!(self, "                .map(ToString::to_string)");
+                        match inner_type.kind {
+                            TypeKind::SimpleType(SimpleType::Integer(IntegerType::U8)) => {
+                                write_str!(
+                                    self,
+                                    "                    format!(\"bytes({:?})\", v.as_bytes(py))"
+                                );
                             }
-                            SimpleType::Struct(idx) => {
+                            TypeKind::SimpleType(SimpleType::Struct(idx)) => {
+                                let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                                let name = path.0.last().unwrap();
+                                write_fmt!(
+                                    self,
+                                    "                    format!(\"[{{}}]\", v.bind_borrowed(py).iter().map(|x| x.cast_into::<super::{name}>().unwrap().borrow().__repr__(py)).collect::<Vec<String>>().join(\", \"))"
+                                );
+                            }
+                            TypeKind::SimpleType(SimpleType::Enum(idx)) => {
+                                let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                                let name = path.0.last().unwrap();
+                                write_fmt!(
+                                    self,
+                                    "                    format!(\"[{{}}]\", v.bind_borrowed(py).iter().map(|x| x.extract::<u8>().unwrap()).map(|x| super::{name}::try_from(x).unwrap()).map(|x| x.__repr__()).collect::<Vec<String>>().join(\", \"))"
+                                );
+                            }
+                            TypeKind::String => {
+                                write_str!(
+                                    self,
+                                    "                    format!(\"[{}]\", v.bind_borrowed(py).iter().map(|s| crate::format_string(crate::from_pystring_into(s))).collect::<Vec<String>>().join(\", \"))"
+                                );
+                            }
+                            TypeKind::Table(idx) => {
+                                let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                                let name = path.0.last().unwrap();
+                                write_fmt!(
+                                    self,
+                                    "                    format!(\"[{{}}]\", v.bind_borrowed(py).iter().map(|x| x.cast_into::<super::{name}>().unwrap().borrow().__repr__(py)).collect::<Vec<String>>().join(\", \"))"
+                                );
+                            }
+                            _ => continue,
+                        }
+
+                        write_str!(self, "                }),");
+                    } else {
+                        write_fmt!(self, "            self.{field_name}");
+
+                        match inner_type.kind {
+                            TypeKind::SimpleType(simple_type) => match simple_type {
+                                SimpleType::Integer(IntegerType::U8) => {
+                                    write_str!(self, "                .as_bytes(py)");
+                                    write_str!(self, "                .iter()");
+                                    write_str!(self, "                .map(ToString::to_string)");
+                                }
+                                SimpleType::Struct(idx) => {
+                                    let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                                    let name = path.0.last().unwrap();
+                                    write_str!(self, "                .bind_borrowed(py)");
+                                    write_str!(self, "                .iter()");
+                                    write_fmt!(
+                                        self,
+                                        "                .map(|x| x.cast_into::<super::{name}>().unwrap().borrow().__repr__(py))"
+                                    );
+                                }
+                                SimpleType::Enum(idx) => {
+                                    let (path, _) = self.all_items.get_index(idx.0).unwrap();
+                                    let name = path.0.last().unwrap();
+                                    write_str!(self, ".bind_borrowed(py).iter()");
+                                    write_str!(self, ".map(|x| x.extract::<u8>().unwrap())");
+                                    write_fmt!(
+                                        self,
+                                        ".map(|x| super::{name}::try_from(x).unwrap())"
+                                    );
+                                    write_str!(self, ".map(|x| x.__repr__())");
+                                }
+                                _ => {
+                                    write_str!(self, "                .iter()");
+                                    write_str!(self, "                .map(ToString::to_string)");
+                                }
+                            },
+                            TypeKind::String => {
+                                write_str!(self, "                .bind_borrowed(py)");
+                                write_str!(self, "                .iter()");
+                                write_str!(
+                                    self,
+                                    "                .map(|s| crate::format_string(crate::from_pystring_into(s)))"
+                                );
+                            }
+                            TypeKind::Table(idx) => {
                                 let (path, _) = self.all_items.get_index(idx.0).unwrap();
                                 let name = path.0.last().unwrap();
                                 write_str!(self, "                .bind_borrowed(py)");
@@ -788,42 +917,12 @@ impl<'a> TableBindGenerator<'a> {
                                     "                .map(|x| x.cast_into::<super::{name}>().unwrap().borrow().__repr__(py))"
                                 );
                             }
-                            SimpleType::Enum(idx) => {
-                                let (path, _) = self.all_items.get_index(idx.0).unwrap();
-                                let name = path.0.last().unwrap();
-                                write_str!(self, ".bind_borrowed(py).iter()");
-                                write_str!(self, ".map(|x| x.extract::<u8>().unwrap())");
-                                write_fmt!(self, ".map(|x| super::{name}::try_from(x).unwrap())");
-                                write_str!(self, ".map(|x| x.__repr__())");
-                            }
-                            _ => {
-                                write_str!(self, "                .iter()");
-                                write_str!(self, "                .map(ToString::to_string)");
-                            }
-                        },
-                        TypeKind::String => {
-                            write_str!(self, "                .bind_borrowed(py)");
-                            write_str!(self, "                .iter()");
-                            write_str!(
-                                self,
-                                "                .map(|s| crate::format_string(crate::from_pystring_into(s)))"
-                            );
+                            _ => continue,
                         }
-                        TypeKind::Table(idx) => {
-                            let (path, _) = self.all_items.get_index(idx.0).unwrap();
-                            let name = path.0.last().unwrap();
-                            write_str!(self, "                .bind_borrowed(py)");
-                            write_str!(self, "                .iter()");
-                            write_fmt!(
-                                self,
-                                "                .map(|x| x.cast_into::<super::{name}>().unwrap().borrow().__repr__(py))"
-                            );
-                        }
-                        _ => continue,
-                    }
 
-                    write_str!(self, "                .collect::<Vec<String>>()");
-                    write_str!(self, "                .join(\", \"),");
+                        write_str!(self, "                .collect::<Vec<String>>()");
+                        write_str!(self, "                .join(\", \"),");
+                    }
                 }
                 _ => write_fmt!(self, "            self.{field_name}.__repr__(),"),
             }

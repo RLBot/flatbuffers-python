@@ -198,6 +198,7 @@ pynamedmodule! {
         DesiredPhysics,
         DisconnectSignal,
         DodgeTimerMutator,
+        EnvironmentVariable,
         ExistingMatchBehavior,
         FieldInfo,
         GameEventMutator,

@@ -19513,10 +19513,309 @@ mod root {
                 }
             }
 
+            ///  A user-defined environment variable to pass to an agent process.
+            ///
+            /// Generated from these locations:
+            /// * Table `EnvironmentVariable` in the file `flatbuffers-schema/schema/matchconfig.fbs:9`
+            #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
+            pub struct EnvironmentVariable {
+                ///  Environment variable name.
+                pub name: ::planus::alloc::string::String,
+                ///  Environment variable value.
+                pub value: ::planus::alloc::string::String,
+            }
+
+            #[allow(clippy::derivable_impls)]
+            impl ::core::default::Default for EnvironmentVariable {
+                fn default() -> Self {
+                    Self {
+                        name: ::core::default::Default::default(),
+                        value: ::core::default::Default::default(),
+                    }
+                }
+            }
+
+            impl EnvironmentVariable {
+                /// Creates a [EnvironmentVariableBuilder] for serializing an instance of this table.
+                #[inline]
+                pub fn builder() -> EnvironmentVariableBuilder<()> {
+                    EnvironmentVariableBuilder(())
+                }
+
+                #[allow(clippy::too_many_arguments)]
+                pub fn create(
+                    builder: &mut ::planus::Builder,
+                    field_name: impl ::planus::WriteAs<::planus::Offset<str>>,
+                    field_value: impl ::planus::WriteAs<::planus::Offset<str>>,
+                ) -> ::planus::Offset<Self> {
+                    let prepared_name = field_name.prepare(builder);
+                    let prepared_value = field_value.prepare(builder);
+
+                    let mut table_writer: ::planus::table_writer::TableWriter<8> =
+                        ::core::default::Default::default();
+                    table_writer.write_entry::<::planus::Offset<str>>(0);
+                    table_writer.write_entry::<::planus::Offset<str>>(1);
+
+                    unsafe {
+                        table_writer.finish(builder, |object_writer| {
+                            object_writer.write::<_, _, 4>(&prepared_name);
+                            object_writer.write::<_, _, 4>(&prepared_value);
+                        });
+                    }
+                    builder.current_offset()
+                }
+            }
+
+            impl ::planus::WriteAs<::planus::Offset<EnvironmentVariable>> for EnvironmentVariable {
+                type Prepared = ::planus::Offset<Self>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<EnvironmentVariable> {
+                    ::planus::WriteAsOffset::prepare(self, builder)
+                }
+            }
+
+            impl ::planus::WriteAsOptional<::planus::Offset<EnvironmentVariable>> for EnvironmentVariable {
+                type Prepared = ::planus::Offset<Self>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<::planus::Offset<EnvironmentVariable>> {
+                    ::core::option::Option::Some(::planus::WriteAsOffset::prepare(self, builder))
+                }
+            }
+
+            impl ::planus::WriteAsOffset<EnvironmentVariable> for EnvironmentVariable {
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<EnvironmentVariable> {
+                    EnvironmentVariable::create(builder, &self.name, &self.value)
+                }
+            }
+
+            /// Builder for serializing an instance of the [EnvironmentVariable] type.
+            ///
+            /// Can be created using the [EnvironmentVariable::builder] method.
+            #[derive(Debug)]
+            #[must_use]
+            pub struct EnvironmentVariableBuilder<State>(State);
+
+            impl EnvironmentVariableBuilder<()> {
+                /// Setter for the [`name` field](EnvironmentVariable#structfield.name).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn name<T0>(self, value: T0) -> EnvironmentVariableBuilder<(T0,)>
+                where
+                    T0: ::planus::WriteAs<::planus::Offset<str>>,
+                {
+                    EnvironmentVariableBuilder((value,))
+                }
+            }
+
+            impl<T0> EnvironmentVariableBuilder<(T0,)> {
+                /// Setter for the [`value` field](EnvironmentVariable#structfield.value).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn value<T1>(self, value: T1) -> EnvironmentVariableBuilder<(T0, T1)>
+                where
+                    T1: ::planus::WriteAs<::planus::Offset<str>>,
+                {
+                    let (v0,) = self.0;
+                    EnvironmentVariableBuilder((v0, value))
+                }
+            }
+
+            impl<T0, T1> EnvironmentVariableBuilder<(T0, T1)> {
+                /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [EnvironmentVariable].
+                #[inline]
+                pub fn finish(
+                    self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<EnvironmentVariable>
+                where
+                    Self: ::planus::WriteAsOffset<EnvironmentVariable>,
+                {
+                    ::planus::WriteAsOffset::prepare(&self, builder)
+                }
+            }
+
+            impl<
+                T0: ::planus::WriteAs<::planus::Offset<str>>,
+                T1: ::planus::WriteAs<::planus::Offset<str>>,
+            > ::planus::WriteAs<::planus::Offset<EnvironmentVariable>>
+                for EnvironmentVariableBuilder<(T0, T1)>
+            {
+                type Prepared = ::planus::Offset<EnvironmentVariable>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<EnvironmentVariable> {
+                    ::planus::WriteAsOffset::prepare(self, builder)
+                }
+            }
+
+            impl<
+                T0: ::planus::WriteAs<::planus::Offset<str>>,
+                T1: ::planus::WriteAs<::planus::Offset<str>>,
+            > ::planus::WriteAsOptional<::planus::Offset<EnvironmentVariable>>
+                for EnvironmentVariableBuilder<(T0, T1)>
+            {
+                type Prepared = ::planus::Offset<EnvironmentVariable>;
+
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<::planus::Offset<EnvironmentVariable>> {
+                    ::core::option::Option::Some(::planus::WriteAsOffset::prepare(self, builder))
+                }
+            }
+
+            impl<
+                T0: ::planus::WriteAs<::planus::Offset<str>>,
+                T1: ::planus::WriteAs<::planus::Offset<str>>,
+            > ::planus::WriteAsOffset<EnvironmentVariable>
+                for EnvironmentVariableBuilder<(T0, T1)>
+            {
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::Offset<EnvironmentVariable> {
+                    let (v0, v1) = &self.0;
+                    EnvironmentVariable::create(builder, v0, v1)
+                }
+            }
+
+            /// Reference to a deserialized [EnvironmentVariable].
+            #[derive(Copy, Clone)]
+            pub struct EnvironmentVariableRef<'a>(::planus::table_reader::Table<'a>);
+
+            impl<'a> EnvironmentVariableRef<'a> {
+                /// Getter for the [`name` field](EnvironmentVariable#structfield.name).
+                #[inline]
+                pub fn name(&self) -> ::planus::Result<&'a ::core::primitive::str> {
+                    self.0.access_required(0, "EnvironmentVariable", "name")
+                }
+
+                /// Getter for the [`value` field](EnvironmentVariable#structfield.value).
+                #[inline]
+                pub fn value(&self) -> ::planus::Result<&'a ::core::primitive::str> {
+                    self.0.access_required(1, "EnvironmentVariable", "value")
+                }
+            }
+
+            impl<'a> ::core::fmt::Debug for EnvironmentVariableRef<'a> {
+                fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+                    let mut f = f.debug_struct("EnvironmentVariableRef");
+                    f.field("name", &self.name());
+                    f.field("value", &self.value());
+                    f.finish()
+                }
+            }
+
+            impl<'a> ::core::convert::TryFrom<EnvironmentVariableRef<'a>> for EnvironmentVariable {
+                type Error = ::planus::Error;
+
+                #[allow(unreachable_code)]
+                fn try_from(value: EnvironmentVariableRef<'a>) -> ::planus::Result<Self> {
+                    ::core::result::Result::Ok(Self {
+                        name: ::core::convert::Into::into(value.name()?),
+                        value: ::core::convert::Into::into(value.value()?),
+                    })
+                }
+            }
+
+            impl<'a> ::planus::TableRead<'a> for EnvironmentVariableRef<'a> {
+                #[inline]
+                fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'a>,
+                    offset: usize,
+                ) -> ::core::result::Result<Self, ::planus::errors::ErrorKind> {
+                    ::core::result::Result::Ok(Self(::planus::table_reader::Table::from_buffer(
+                        buffer, offset,
+                    )?))
+                }
+            }
+
+            impl<'a> ::planus::VectorReadInner<'a> for EnvironmentVariableRef<'a> {
+                type Error = ::planus::Error;
+                const STRIDE: usize = 4;
+
+                unsafe fn from_buffer(
+                    buffer: ::planus::SliceWithStartOffset<'a>,
+                    offset: usize,
+                ) -> ::planus::Result<Self> {
+                    ::planus::TableRead::from_buffer(buffer, offset).map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "[EnvironmentVariableRef]",
+                            "get",
+                            buffer.offset_from_start,
+                        )
+                    })
+                }
+            }
+
+            /// # Safety
+            /// The planus compiler generates implementations that initialize
+            /// the bytes in `write_values`.
+            unsafe impl ::planus::VectorWrite<::planus::Offset<EnvironmentVariable>> for EnvironmentVariable {
+                type Value = ::planus::Offset<EnvironmentVariable>;
+                const STRIDE: usize = 4;
+                #[inline]
+                fn prepare(&self, builder: &mut ::planus::Builder) -> Self::Value {
+                    ::planus::WriteAs::prepare(self, builder)
+                }
+
+                #[inline]
+                unsafe fn write_values(
+                    values: &[::planus::Offset<EnvironmentVariable>],
+                    bytes: *mut ::core::mem::MaybeUninit<u8>,
+                    buffer_position: u32,
+                ) {
+                    let bytes = bytes as *mut [::core::mem::MaybeUninit<u8>; 4];
+                    for (i, v) in ::core::iter::Iterator::enumerate(values.iter()) {
+                        ::planus::WriteAsPrimitive::write(
+                            v,
+                            ::planus::Cursor::new(unsafe { &mut *bytes.add(i) }),
+                            buffer_position - (Self::STRIDE * i) as u32,
+                        );
+                    }
+                }
+            }
+
+            impl<'a> ::planus::ReadAsRoot<'a> for EnvironmentVariableRef<'a> {
+                fn read_as_root(slice: &'a [u8]) -> ::planus::Result<Self> {
+                    ::planus::TableRead::from_buffer(
+                        ::planus::SliceWithStartOffset {
+                            buffer: slice,
+                            offset_from_start: 0,
+                        },
+                        0,
+                    )
+                    .map_err(|error_kind| {
+                        error_kind.with_error_location(
+                            "[EnvironmentVariableRef]",
+                            "read_as_root",
+                            0,
+                        )
+                    })
+                }
+            }
+
             ///  A bot controlled by the RLBot framework.
             ///
             /// Generated from these locations:
-            /// * Table `CustomBot` in the file `flatbuffers-schema/schema/matchconfig.fbs:9`
+            /// * Table `CustomBot` in the file `flatbuffers-schema/schema/matchconfig.fbs:18`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct CustomBot {
                 ///  Requested bot name. When match start, RLBot will ensure each bot has a unique name; bots with
@@ -19537,6 +19836,9 @@ mod root {
                 ///  Whether this player is part of a hivemind bot where all players/cars are controlled by the same process.
                 ///  Players in the hivemind must have the same name, team, run command, and agent id.
                 pub hivemind: bool,
+                ///  User-defined environment variables to pass to the bot process.
+                pub environment:
+                    ::core::option::Option<::planus::alloc::vec::Vec<self::EnvironmentVariable>>,
             }
 
             #[allow(clippy::derivable_impls)]
@@ -19549,6 +19851,7 @@ mod root {
                         loadout: ::core::default::Default::default(),
                         agent_id: ::core::default::Default::default(),
                         hivemind: false,
+                        environment: ::core::default::Default::default(),
                     }
                 }
             }
@@ -19569,6 +19872,9 @@ mod root {
                     field_loadout: impl ::planus::WriteAsOptional<::planus::Offset<self::PlayerLoadout>>,
                     field_agent_id: impl ::planus::WriteAs<::planus::Offset<str>>,
                     field_hivemind: impl ::planus::WriteAsDefault<bool, bool>,
+                    field_environment: impl ::planus::WriteAsOptional<
+                        ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                    >,
                 ) -> ::planus::Offset<Self> {
                     let prepared_name = field_name.prepare(builder);
                     let prepared_root_dir = field_root_dir.prepare(builder);
@@ -19576,8 +19882,9 @@ mod root {
                     let prepared_loadout = field_loadout.prepare(builder);
                     let prepared_agent_id = field_agent_id.prepare(builder);
                     let prepared_hivemind = field_hivemind.prepare(builder, &false);
+                    let prepared_environment = field_environment.prepare(builder);
 
-                    let mut table_writer: ::planus::table_writer::TableWriter<16> =
+                    let mut table_writer: ::planus::table_writer::TableWriter<18> =
                         ::core::default::Default::default();
                     table_writer.write_entry::<::planus::Offset<str>>(0);
                     table_writer.write_entry::<::planus::Offset<str>>(1);
@@ -19586,6 +19893,9 @@ mod root {
                         table_writer.write_entry::<::planus::Offset<self::PlayerLoadout>>(3);
                     }
                     table_writer.write_entry::<::planus::Offset<str>>(4);
+                    if prepared_environment.is_some() {
+                        table_writer.write_entry::<::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>>(6);
+                    }
                     if prepared_hivemind.is_some() {
                         table_writer.write_entry::<bool>(5);
                     }
@@ -19600,6 +19910,11 @@ mod root {
                                 object_writer.write::<_, _, 4>(&prepared_loadout);
                             }
                             object_writer.write::<_, _, 4>(&prepared_agent_id);
+                            if let ::core::option::Option::Some(prepared_environment) =
+                                prepared_environment
+                            {
+                                object_writer.write::<_, _, 4>(&prepared_environment);
+                            }
                             if let ::core::option::Option::Some(prepared_hivemind) =
                                 prepared_hivemind
                             {
@@ -19643,6 +19958,7 @@ mod root {
                         &self.loadout,
                         &self.agent_id,
                         self.hivemind,
+                        &self.environment,
                     )
                 }
             }
@@ -19749,6 +20065,31 @@ mod root {
             }
 
             impl<T0, T1, T2, T3, T4, T5> CustomBotBuilder<(T0, T1, T2, T3, T4, T5)> {
+                /// Setter for the [`environment` field](CustomBot#structfield.environment).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn environment<T6>(
+                    self,
+                    value: T6,
+                ) -> CustomBotBuilder<(T0, T1, T2, T3, T4, T5, T6)>
+                where
+                    T6: ::planus::WriteAsOptional<
+                            ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                        >,
+                {
+                    let (v0, v1, v2, v3, v4, v5) = self.0;
+                    CustomBotBuilder((v0, v1, v2, v3, v4, v5, value))
+                }
+
+                /// Sets the [`environment` field](CustomBot#structfield.environment) to null.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn environment_as_null(self) -> CustomBotBuilder<(T0, T1, T2, T3, T4, T5, ())> {
+                    self.environment(())
+                }
+            }
+
+            impl<T0, T1, T2, T3, T4, T5, T6> CustomBotBuilder<(T0, T1, T2, T3, T4, T5, T6)> {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [CustomBot].
                 #[inline]
                 pub fn finish(self, builder: &mut ::planus::Builder) -> ::planus::Offset<CustomBot>
@@ -19766,8 +20107,11 @@ mod root {
                 T3: ::planus::WriteAsOptional<::planus::Offset<self::PlayerLoadout>>,
                 T4: ::planus::WriteAs<::planus::Offset<str>>,
                 T5: ::planus::WriteAsDefault<bool, bool>,
+                T6: ::planus::WriteAsOptional<
+                        ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                    >,
             > ::planus::WriteAs<::planus::Offset<CustomBot>>
-                for CustomBotBuilder<(T0, T1, T2, T3, T4, T5)>
+                for CustomBotBuilder<(T0, T1, T2, T3, T4, T5, T6)>
             {
                 type Prepared = ::planus::Offset<CustomBot>;
 
@@ -19784,8 +20128,11 @@ mod root {
                 T3: ::planus::WriteAsOptional<::planus::Offset<self::PlayerLoadout>>,
                 T4: ::planus::WriteAs<::planus::Offset<str>>,
                 T5: ::planus::WriteAsDefault<bool, bool>,
+                T6: ::planus::WriteAsOptional<
+                        ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                    >,
             > ::planus::WriteAsOptional<::planus::Offset<CustomBot>>
-                for CustomBotBuilder<(T0, T1, T2, T3, T4, T5)>
+                for CustomBotBuilder<(T0, T1, T2, T3, T4, T5, T6)>
             {
                 type Prepared = ::planus::Offset<CustomBot>;
 
@@ -19805,12 +20152,16 @@ mod root {
                 T3: ::planus::WriteAsOptional<::planus::Offset<self::PlayerLoadout>>,
                 T4: ::planus::WriteAs<::planus::Offset<str>>,
                 T5: ::planus::WriteAsDefault<bool, bool>,
-            > ::planus::WriteAsOffset<CustomBot> for CustomBotBuilder<(T0, T1, T2, T3, T4, T5)>
+                T6: ::planus::WriteAsOptional<
+                        ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                    >,
+            > ::planus::WriteAsOffset<CustomBot>
+                for CustomBotBuilder<(T0, T1, T2, T3, T4, T5, T6)>
             {
                 #[inline]
                 fn prepare(&self, builder: &mut ::planus::Builder) -> ::planus::Offset<CustomBot> {
-                    let (v0, v1, v2, v3, v4, v5) = &self.0;
-                    CustomBot::create(builder, v0, v1, v2, v3, v4, v5)
+                    let (v0, v1, v2, v3, v4, v5, v6) = &self.0;
+                    CustomBot::create(builder, v0, v1, v2, v3, v4, v5, v6)
                 }
             }
 
@@ -19859,6 +20210,18 @@ mod root {
                         self.0.access(5, "CustomBot", "hivemind")?.unwrap_or(false),
                     )
                 }
+
+                /// Getter for the [`environment` field](CustomBot#structfield.environment).
+                #[inline]
+                pub fn environment(
+                    &self,
+                ) -> ::planus::Result<
+                    ::core::option::Option<
+                        ::planus::Vector<'a, ::planus::Result<self::EnvironmentVariableRef<'a>>>,
+                    >,
+                > {
+                    self.0.access(6, "CustomBot", "environment")
+                }
             }
 
             impl<'a> ::core::fmt::Debug for CustomBotRef<'a> {
@@ -19873,6 +20236,11 @@ mod root {
                     }
                     f.field("agent_id", &self.agent_id());
                     f.field("hivemind", &self.hivemind());
+                    if let ::core::option::Option::Some(field_environment) =
+                        self.environment().transpose()
+                    {
+                        f.field("environment", &field_environment);
+                    }
                     f.finish()
                 }
             }
@@ -19895,6 +20263,13 @@ mod root {
                         },
                         agent_id: ::core::convert::Into::into(value.agent_id()?),
                         hivemind: ::core::convert::TryInto::try_into(value.hivemind()?)?,
+                        environment: if let ::core::option::Option::Some(environment) =
+                            value.environment()?
+                        {
+                            ::core::option::Option::Some(environment.to_vec_result()?)
+                        } else {
+                            ::core::option::Option::None
+                        },
                     })
                 }
             }
@@ -19975,7 +20350,7 @@ mod root {
             ///  Various skill levels of Psyonix bots.
             ///
             /// Generated from these locations:
-            /// * Enum `PsyonixSkill` in the file `flatbuffers-schema/schema/matchconfig.fbs:35`
+            /// * Enum `PsyonixSkill` in the file `flatbuffers-schema/schema/matchconfig.fbs:47`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -20157,7 +20532,7 @@ mod root {
             ///  A Psyonix bot, e.g. All Star bot.
             ///
             /// Generated from these locations:
-            /// * Table `PsyonixBot` in the file `flatbuffers-schema/schema/matchconfig.fbs:43`
+            /// * Table `PsyonixBot` in the file `flatbuffers-schema/schema/matchconfig.fbs:55`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct PsyonixBot {
                 ///  Requested bot name. When match start, RLBot will ensure each bot has a unique name; bots with
@@ -20516,7 +20891,7 @@ mod root {
             ///  Possible player types.
             ///
             /// Generated from these locations:
-            /// * Union `PlayerClass` in the file `flatbuffers-schema/schema/matchconfig.fbs:56`
+            /// * Union `PlayerClass` in the file `flatbuffers-schema/schema/matchconfig.fbs:68`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub enum PlayerClass {
                 /// The variant of type `Human` in the union `PlayerClass`
@@ -20781,7 +21156,7 @@ mod root {
             ///  A PlayerConfiguration defines a player of a match.
             ///
             /// Generated from these locations:
-            /// * Table `PlayerConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:63`
+            /// * Table `PlayerConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:75`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct PlayerConfiguration {
                 ///  The type of the player, i.e. human, Psyonix bot, or a custom bot.
@@ -21142,7 +21517,7 @@ mod root {
             ///  See https://wiki.rlbot.org/botmaking/bot-customization/
             ///
             /// Generated from these locations:
-            /// * Table `PlayerLoadout` in the file `flatbuffers-schema/schema/matchconfig.fbs:80`
+            /// * Table `PlayerLoadout` in the file `flatbuffers-schema/schema/matchconfig.fbs:92`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct PlayerLoadout {
                 /// The field `team_color_id` in the table `PlayerLoadout`
@@ -22494,7 +22869,7 @@ mod root {
             ///  Specification for 'painted' items. See https://wiki.rlbot.org/botmaking/bot-customization/
             ///
             /// Generated from these locations:
-            /// * Table `LoadoutPaint` in the file `flatbuffers-schema/schema/matchconfig.fbs:106`
+            /// * Table `LoadoutPaint` in the file `flatbuffers-schema/schema/matchconfig.fbs:118`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct LoadoutPaint {
                 /// The field `car_paint_id` in the table `LoadoutPaint`
@@ -23165,7 +23540,7 @@ mod root {
             ///  Various game modes.
             ///
             /// Generated from these locations:
-            /// * Enum `GameMode` in the file `flatbuffers-schema/schema/matchconfig.fbs:118`
+            /// * Enum `GameMode` in the file `flatbuffers-schema/schema/matchconfig.fbs:130`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -23371,7 +23746,7 @@ mod root {
             ///  Match length mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `MatchLengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:130`
+            /// * Enum `MatchLengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:142`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -23557,7 +23932,7 @@ mod root {
             ///  Max score mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `MaxScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:138`
+            /// * Enum `MaxScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:150`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -23803,7 +24178,7 @@ mod root {
             ///  Multi ball mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `MultiBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:158`
+            /// * Enum `MultiBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:170`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -23984,7 +24359,7 @@ mod root {
             ///  Overtime mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `OvertimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:166`
+            /// * Enum `OvertimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:178`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24165,7 +24540,7 @@ mod root {
             ///  Series length mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `SeriesLengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:173`
+            /// * Enum `SeriesLengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:185`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24351,7 +24726,7 @@ mod root {
             ///  Game speed mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `GameSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:181`
+            /// * Enum `GameSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:193`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24528,7 +24903,7 @@ mod root {
             ///  Ball max speed mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallMaxSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:188`
+            /// * Enum `BallMaxSpeedMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:200`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24710,7 +25085,7 @@ mod root {
             ///  Ball type mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallTypeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:196`
+            /// * Enum `BallTypeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:208`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -24961,7 +25336,7 @@ mod root {
             ///  Ball weight mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallWeightMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:217`
+            /// * Enum `BallWeightMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:229`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25172,7 +25547,7 @@ mod root {
             ///  Ball size mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallSizeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:230`
+            /// * Enum `BallSizeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:242`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25363,7 +25738,7 @@ mod root {
             ///  Ball bounciness mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallBouncinessMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:239`
+            /// * Enum `BallBouncinessMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:251`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25556,7 +25931,7 @@ mod root {
             ///  Ball gravity mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BallGravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:248`
+            /// * Enum `BallGravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:260`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25738,7 +26113,7 @@ mod root {
             ///  Boost amount mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BoostAmountMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:256`
+            /// * Enum `BoostAmountMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:268`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -25929,7 +26304,7 @@ mod root {
             ///  Rumble mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `RumbleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:265`
+            /// * Enum `RumbleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:277`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26170,7 +26545,7 @@ mod root {
             ///  Boost strength mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `BoostStrengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:284`
+            /// * Enum `BoostStrengthMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:296`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26361,7 +26736,7 @@ mod root {
             ///  Gravity mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `GravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:293`
+            /// * Enum `GravityMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:305`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26552,7 +26927,7 @@ mod root {
             ///  Demolition mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `DemolishMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:302`
+            /// * Enum `DemolishMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:314`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26763,7 +27138,7 @@ mod root {
             ///  Respawn time mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `RespawnTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:315`
+            /// * Enum `RespawnTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:327`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -26949,7 +27324,7 @@ mod root {
             ///  Max time mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `MaxTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:323`
+            /// * Enum `MaxTimeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:335`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27195,7 +27570,7 @@ mod root {
             ///  Game event mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `GameEventMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:343`
+            /// * Enum `GameEventMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:355`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27372,7 +27747,7 @@ mod root {
             ///  Audio mutator options.
             ///
             /// Generated from these locations:
-            /// * Enum `AudioMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:350`
+            /// * Enum `AudioMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:362`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27545,7 +27920,7 @@ mod root {
             /// The enum `TerritoryMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `TerritoryMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:355`
+            /// * Enum `TerritoryMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:367`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27718,7 +28093,7 @@ mod root {
             /// The enum `StaleBallMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `StaleBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:360`
+            /// * Enum `StaleBallMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:372`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -27891,7 +28266,7 @@ mod root {
             /// The enum `JumpMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `JumpMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:365`
+            /// * Enum `JumpMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:377`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -28092,7 +28467,7 @@ mod root {
             /// The enum `DodgeTimerMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `DodgeTimerMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:375`
+            /// * Enum `DodgeTimerMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:387`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -28280,7 +28655,7 @@ mod root {
             /// The enum `PossessionScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `PossessionScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:382`
+            /// * Enum `PossessionScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:394`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -28468,7 +28843,7 @@ mod root {
             /// The enum `DemolishScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `DemolishScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:389`
+            /// * Enum `DemolishScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:401`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -28649,7 +29024,7 @@ mod root {
             /// The enum `NormalGoalScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `NormalGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:396`
+            /// * Enum `NormalGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:408`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -28847,7 +29222,7 @@ mod root {
             /// The enum `AerialGoalScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `AerialGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:405`
+            /// * Enum `AerialGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:417`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -29045,7 +29420,7 @@ mod root {
             /// The enum `AssistGoalScoreMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `AssistGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:414`
+            /// * Enum `AssistGoalScoreMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:426`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -29228,7 +29603,7 @@ mod root {
             /// The enum `InputRestrictionMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `InputRestrictionMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:421`
+            /// * Enum `InputRestrictionMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:433`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -29403,7 +29778,7 @@ mod root {
             /// The enum `ScoringRuleMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `ScoringRuleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:426`
+            /// * Enum `ScoringRuleMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:438`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -29576,7 +29951,7 @@ mod root {
             /// The enum `TriTipModeMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `TriTipModeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:431`
+            /// * Enum `TriTipModeMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:443`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -29749,7 +30124,7 @@ mod root {
             /// The enum `LockedDamagePhaseMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `LockedDamagePhaseMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:436`
+            /// * Enum `LockedDamagePhaseMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:448`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -29924,7 +30299,7 @@ mod root {
             /// The enum `SpawnDemoballMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `SpawnDemoballMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:441`
+            /// * Enum `SpawnDemoballMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:453`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -30097,7 +30472,7 @@ mod root {
             /// The enum `BoostRestritionMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `BoostRestritionMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:446`
+            /// * Enum `BoostRestritionMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:458`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -30272,7 +30647,7 @@ mod root {
             /// The enum `KeepUpRulesMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `KeepUpRulesMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:451`
+            /// * Enum `KeepUpRulesMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:463`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -30450,7 +30825,7 @@ mod root {
             /// The enum `MatchAdminMutator` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `MatchAdminMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:457`
+            /// * Enum `MatchAdminMutator` in the file `flatbuffers-schema/schema/matchconfig.fbs:469`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -30623,7 +30998,7 @@ mod root {
             ///  All mutators options.
             ///
             /// Generated from these locations:
-            /// * Table `MutatorSettings` in the file `flatbuffers-schema/schema/matchconfig.fbs:463`
+            /// * Table `MutatorSettings` in the file `flatbuffers-schema/schema/matchconfig.fbs:475`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct MutatorSettings {
                 ///  Duration of the match.
@@ -36690,7 +37065,7 @@ mod root {
             /// The enum `DebugRendering` in the namespace `rlbot.flat`
             ///
             /// Generated from these locations:
-            /// * Enum `DebugRendering` in the file `flatbuffers-schema/schema/matchconfig.fbs:580`
+            /// * Enum `DebugRendering` in the file `flatbuffers-schema/schema/matchconfig.fbs:592`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -36868,7 +37243,7 @@ mod root {
             ///  Possible behaviours when a match is started while another match is in progress.
             ///
             /// Generated from these locations:
-            /// * Enum `ExistingMatchBehavior` in the file `flatbuffers-schema/schema/matchconfig.fbs:592`
+            /// * Enum `ExistingMatchBehavior` in the file `flatbuffers-schema/schema/matchconfig.fbs:604`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -37053,7 +37428,7 @@ mod root {
             ///  Possible to launch Rocket League.
             ///
             /// Generated from these locations:
-            /// * Enum `Launcher` in the file `flatbuffers-schema/schema/matchconfig.fbs:606`
+            /// * Enum `Launcher` in the file `flatbuffers-schema/schema/matchconfig.fbs:618`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -37236,7 +37611,7 @@ mod root {
             ///  A ScriptConfiguration defines a script of a match.
             ///
             /// Generated from these locations:
-            /// * Table `ScriptConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:617`
+            /// * Table `ScriptConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:629`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct ScriptConfiguration {
                 ///  The name of the script.
@@ -37253,6 +37628,9 @@ mod root {
                 ///  Upon connecting the process announces that it is responsible for this agent id and RLBot will pair the two.
                 ///  The recommended format for agent ids is "developername/botname".
                 pub agent_id: ::planus::alloc::string::String,
+                ///  User-defined environment variables to pass to the script process.
+                pub environment:
+                    ::core::option::Option<::planus::alloc::vec::Vec<self::EnvironmentVariable>>,
             }
 
             #[allow(clippy::derivable_impls)]
@@ -37264,6 +37642,7 @@ mod root {
                         run_command: ::core::default::Default::default(),
                         script_id: 0,
                         agent_id: ::core::default::Default::default(),
+                        environment: ::core::default::Default::default(),
                     }
                 }
             }
@@ -37283,14 +37662,18 @@ mod root {
                     field_run_command: impl ::planus::WriteAs<::planus::Offset<str>>,
                     field_script_id: impl ::planus::WriteAsDefault<i32, i32>,
                     field_agent_id: impl ::planus::WriteAs<::planus::Offset<str>>,
+                    field_environment: impl ::planus::WriteAsOptional<
+                        ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                    >,
                 ) -> ::planus::Offset<Self> {
                     let prepared_name = field_name.prepare(builder);
                     let prepared_root_dir = field_root_dir.prepare(builder);
                     let prepared_run_command = field_run_command.prepare(builder);
                     let prepared_script_id = field_script_id.prepare(builder, &0);
                     let prepared_agent_id = field_agent_id.prepare(builder);
+                    let prepared_environment = field_environment.prepare(builder);
 
-                    let mut table_writer: ::planus::table_writer::TableWriter<14> =
+                    let mut table_writer: ::planus::table_writer::TableWriter<16> =
                         ::core::default::Default::default();
                     table_writer.write_entry::<::planus::Offset<str>>(0);
                     table_writer.write_entry::<::planus::Offset<str>>(1);
@@ -37299,6 +37682,9 @@ mod root {
                         table_writer.write_entry::<i32>(3);
                     }
                     table_writer.write_entry::<::planus::Offset<str>>(4);
+                    if prepared_environment.is_some() {
+                        table_writer.write_entry::<::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>>(5);
+                    }
 
                     unsafe {
                         table_writer.finish(builder, |object_writer| {
@@ -37311,6 +37697,11 @@ mod root {
                                 object_writer.write::<_, _, 4>(&prepared_script_id);
                             }
                             object_writer.write::<_, _, 4>(&prepared_agent_id);
+                            if let ::core::option::Option::Some(prepared_environment) =
+                                prepared_environment
+                            {
+                                object_writer.write::<_, _, 4>(&prepared_environment);
+                            }
                         });
                     }
                     builder.current_offset()
@@ -37354,6 +37745,7 @@ mod root {
                         &self.run_command,
                         self.script_id,
                         &self.agent_id,
+                        &self.environment,
                     )
                 }
             }
@@ -37446,6 +37838,33 @@ mod root {
             }
 
             impl<T0, T1, T2, T3, T4> ScriptConfigurationBuilder<(T0, T1, T2, T3, T4)> {
+                /// Setter for the [`environment` field](ScriptConfiguration#structfield.environment).
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn environment<T5>(
+                    self,
+                    value: T5,
+                ) -> ScriptConfigurationBuilder<(T0, T1, T2, T3, T4, T5)>
+                where
+                    T5: ::planus::WriteAsOptional<
+                            ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                        >,
+                {
+                    let (v0, v1, v2, v3, v4) = self.0;
+                    ScriptConfigurationBuilder((v0, v1, v2, v3, v4, value))
+                }
+
+                /// Sets the [`environment` field](ScriptConfiguration#structfield.environment) to null.
+                #[inline]
+                #[allow(clippy::type_complexity)]
+                pub fn environment_as_null(
+                    self,
+                ) -> ScriptConfigurationBuilder<(T0, T1, T2, T3, T4, ())> {
+                    self.environment(())
+                }
+            }
+
+            impl<T0, T1, T2, T3, T4, T5> ScriptConfigurationBuilder<(T0, T1, T2, T3, T4, T5)> {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [ScriptConfiguration].
                 #[inline]
                 pub fn finish(
@@ -37465,8 +37884,11 @@ mod root {
                 T2: ::planus::WriteAs<::planus::Offset<str>>,
                 T3: ::planus::WriteAsDefault<i32, i32>,
                 T4: ::planus::WriteAs<::planus::Offset<str>>,
+                T5: ::planus::WriteAsOptional<
+                        ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                    >,
             > ::planus::WriteAs<::planus::Offset<ScriptConfiguration>>
-                for ScriptConfigurationBuilder<(T0, T1, T2, T3, T4)>
+                for ScriptConfigurationBuilder<(T0, T1, T2, T3, T4, T5)>
             {
                 type Prepared = ::planus::Offset<ScriptConfiguration>;
 
@@ -37485,8 +37907,11 @@ mod root {
                 T2: ::planus::WriteAs<::planus::Offset<str>>,
                 T3: ::planus::WriteAsDefault<i32, i32>,
                 T4: ::planus::WriteAs<::planus::Offset<str>>,
+                T5: ::planus::WriteAsOptional<
+                        ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                    >,
             > ::planus::WriteAsOptional<::planus::Offset<ScriptConfiguration>>
-                for ScriptConfigurationBuilder<(T0, T1, T2, T3, T4)>
+                for ScriptConfigurationBuilder<(T0, T1, T2, T3, T4, T5)>
             {
                 type Prepared = ::planus::Offset<ScriptConfiguration>;
 
@@ -37505,16 +37930,19 @@ mod root {
                 T2: ::planus::WriteAs<::planus::Offset<str>>,
                 T3: ::planus::WriteAsDefault<i32, i32>,
                 T4: ::planus::WriteAs<::planus::Offset<str>>,
+                T5: ::planus::WriteAsOptional<
+                        ::planus::Offset<[::planus::Offset<self::EnvironmentVariable>]>,
+                    >,
             > ::planus::WriteAsOffset<ScriptConfiguration>
-                for ScriptConfigurationBuilder<(T0, T1, T2, T3, T4)>
+                for ScriptConfigurationBuilder<(T0, T1, T2, T3, T4, T5)>
             {
                 #[inline]
                 fn prepare(
                     &self,
                     builder: &mut ::planus::Builder,
                 ) -> ::planus::Offset<ScriptConfiguration> {
-                    let (v0, v1, v2, v3, v4) = &self.0;
-                    ScriptConfiguration::create(builder, v0, v1, v2, v3, v4)
+                    let (v0, v1, v2, v3, v4, v5) = &self.0;
+                    ScriptConfiguration::create(builder, v0, v1, v2, v3, v4, v5)
                 }
             }
 
@@ -37557,6 +37985,18 @@ mod root {
                 pub fn agent_id(&self) -> ::planus::Result<&'a ::core::primitive::str> {
                     self.0.access_required(4, "ScriptConfiguration", "agent_id")
                 }
+
+                /// Getter for the [`environment` field](ScriptConfiguration#structfield.environment).
+                #[inline]
+                pub fn environment(
+                    &self,
+                ) -> ::planus::Result<
+                    ::core::option::Option<
+                        ::planus::Vector<'a, ::planus::Result<self::EnvironmentVariableRef<'a>>>,
+                    >,
+                > {
+                    self.0.access(5, "ScriptConfiguration", "environment")
+                }
             }
 
             impl<'a> ::core::fmt::Debug for ScriptConfigurationRef<'a> {
@@ -37567,6 +38007,11 @@ mod root {
                     f.field("run_command", &self.run_command());
                     f.field("script_id", &self.script_id());
                     f.field("agent_id", &self.agent_id());
+                    if let ::core::option::Option::Some(field_environment) =
+                        self.environment().transpose()
+                    {
+                        f.field("environment", &field_environment);
+                    }
                     f.finish()
                 }
             }
@@ -37582,6 +38027,13 @@ mod root {
                         run_command: ::core::convert::Into::into(value.run_command()?),
                         script_id: ::core::convert::TryInto::try_into(value.script_id()?)?,
                         agent_id: ::core::convert::Into::into(value.agent_id()?),
+                        environment: if let ::core::option::Option::Some(environment) =
+                            value.environment()?
+                        {
+                            ::core::option::Option::Some(environment.to_vec_result()?)
+                        } else {
+                            ::core::option::Option::None
+                        },
                     })
                 }
             }
@@ -37666,7 +38118,7 @@ mod root {
             ///  Controls when the in-game performance monitor is shown.
             ///
             /// Generated from these locations:
-            /// * Enum `PerformanceMonitor` in the file `flatbuffers-schema/schema/matchconfig.fbs:639`
+            /// * Enum `PerformanceMonitor` in the file `flatbuffers-schema/schema/matchconfig.fbs:654`
             #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[repr(u8)]
             #[::pyo3::pyclass(
@@ -37845,7 +38297,7 @@ mod root {
             ///  Can be sent to RLBot to request the start of a match.
             ///
             /// Generated from these locations:
-            /// * Table `MatchConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:647`
+            /// * Table `MatchConfiguration` in the file `flatbuffers-schema/schema/matchconfig.fbs:662`
             #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
             pub struct MatchConfiguration {
                 ///  How to launch Rocket League.

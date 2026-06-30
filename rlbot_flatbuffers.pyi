@@ -2720,6 +2720,54 @@ class DisconnectSignal:
     def __new__(cls) -> DisconnectSignal: ...
     def __init__(self) -> None: ...
 
+class EnvironmentVariable:
+    """
+    A user-defined environment variable to pass to an agent process.
+    """
+
+    name: str
+    """
+    Environment variable name.
+    """
+    value: str
+    """
+    Environment variable value.
+    """
+
+    __match_args__ = (
+        "name",
+        "value",
+    )
+
+    def __new__(
+        cls,
+        name: str = "",
+        value: str = "",
+    ) -> EnvironmentVariable: ...
+    def __init__(
+        self,
+        name: str = "",
+        value: str = "",
+    ) -> None:
+        """
+        NOTE: All field initialization before `__init__`, inside of `__new__`.
+        """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> EnvironmentVariable:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
 class MatchComm:
     """
     A message sent to other bots and scripts through RLBot.
@@ -3465,79 +3513,6 @@ class RemoveRenderGroup:
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
-class ScriptConfiguration:
-    """
-    A ScriptConfiguration defines a script of a match.
-    """
-
-    name: str
-    """
-    The name of the script.
-    """
-    root_dir: str
-    """
-    The root directory of the script and the working directory for the run command.
-    """
-    run_command: str
-    """
-    A console command that will start up the script.
-    """
-    script_id: int
-    """
-    The id of the script.
-    This value is mostly used internally to keep track of participants in the match.
-    """
-    agent_id: str
-    """
-    A unique user-defined string that is used to connect clients to the right players/scripts.
-    If a bot/script has a run command, RLBot will pass this agent id to the process using an environment variable, RLBOT_AGENT_ID.
-    Upon connecting the process announces that it is responsible for this agent id and RLBot will pair the two.
-    The recommended format for agent ids is "developername/botname".
-    """
-
-    __match_args__ = (
-        "name",
-        "root_dir",
-        "run_command",
-        "script_id",
-        "agent_id",
-    )
-
-    def __new__(
-        cls,
-        name: str = "",
-        root_dir: str = "",
-        run_command: str = "",
-        script_id: int = 0,
-        agent_id: str = "",
-    ) -> ScriptConfiguration: ...
-    def __init__(
-        self,
-        name: str = "",
-        root_dir: str = "",
-        run_command: str = "",
-        script_id: int = 0,
-        agent_id: str = "",
-    ) -> None:
-        """
-        NOTE: All field initialization before `__init__`, inside of `__new__`.
-        """
-    def pack(self) -> bytes:
-        """
-        Serializes this instance into a byte array
-        """
-
-    @staticmethod
-    def unpack(data: bytes) -> ScriptConfiguration:
-        """
-        Deserializes the data into a new instance
-
-        :raises InvalidFlatbuffer: If the `data` is invalid for this type
-        """
-
-    def __str__(self) -> str: ...
-    def __repr__(self) -> str: ...
-
 class SphereShape:
     """
     A sphere with diameter.
@@ -3887,87 +3862,6 @@ class ControllableTeamInfo:
 
     @staticmethod
     def unpack(data: bytes) -> ControllableTeamInfo:
-        """
-        Deserializes the data into a new instance
-
-        :raises InvalidFlatbuffer: If the `data` is invalid for this type
-        """
-
-    def __str__(self) -> str: ...
-    def __repr__(self) -> str: ...
-
-class CustomBot:
-    """
-    A bot controlled by the RLBot framework.
-    """
-
-    name: str
-    """
-    Requested bot name. When match start, RLBot will ensure each bot has a unique name; bots with
-    duplicate names will be renamed with a suffix like `(2)`
-    """
-    root_dir: str
-    """
-    The root directory of the bot and the working directory for the run command.
-    """
-    run_command: str
-    """
-    The console command that starts this bot.
-    """
-    loadout: PlayerLoadout | None
-    """
-    The loadout of the player.
-    """
-    agent_id: str
-    """
-    A unique user-defined string that is used to connect clients to the right players/scripts.
-    If a bot/script has a run command, RLBot will pass this agent id to the process using an environment variable, RLBOT_AGENT_ID.
-    Upon connecting the process announces that it is responsible for this agent id and RLBot will pair the two.
-    The recommended format for agent ids is "developer_name/bot_name".
-    """
-    hivemind: bool
-    """
-    Whether this player is part of a hivemind bot where all players/cars are controlled by the same process.
-    Players in the hivemind must have the same name, team, run command, and agent id.
-    """
-
-    __match_args__ = (
-        "name",
-        "root_dir",
-        "run_command",
-        "loadout",
-        "agent_id",
-        "hivemind",
-    )
-
-    def __new__(
-        cls,
-        name: str = "",
-        root_dir: str = "",
-        run_command: str = "",
-        loadout: PlayerLoadout | None = None,
-        agent_id: str = "",
-        hivemind: bool = False,
-    ) -> CustomBot: ...
-    def __init__(
-        self,
-        name: str = "",
-        root_dir: str = "",
-        run_command: str = "",
-        loadout: PlayerLoadout | None = None,
-        agent_id: str = "",
-        hivemind: bool = False,
-    ) -> None:
-        """
-        NOTE: All field initialization before `__init__`, inside of `__new__`.
-        """
-    def pack(self) -> bytes:
-        """
-        Serializes this instance into a byte array
-        """
-
-    @staticmethod
-    def unpack(data: bytes) -> CustomBot:
         """
         Deserializes the data into a new instance
 
@@ -4485,6 +4379,86 @@ class RotatorPartial:
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
+class ScriptConfiguration:
+    """
+    A ScriptConfiguration defines a script of a match.
+    """
+
+    name: str
+    """
+    The name of the script.
+    """
+    root_dir: str
+    """
+    The root directory of the script and the working directory for the run command.
+    """
+    run_command: str
+    """
+    A console command that will start up the script.
+    """
+    script_id: int
+    """
+    The id of the script.
+    This value is mostly used internally to keep track of participants in the match.
+    """
+    agent_id: str
+    """
+    A unique user-defined string that is used to connect clients to the right players/scripts.
+    If a bot/script has a run command, RLBot will pass this agent id to the process using an environment variable, RLBOT_AGENT_ID.
+    Upon connecting the process announces that it is responsible for this agent id and RLBot will pair the two.
+    The recommended format for agent ids is "developername/botname".
+    """
+    environment: Sequence[EnvironmentVariable] | None
+    """
+    User-defined environment variables to pass to the script process.
+    """
+
+    __match_args__ = (
+        "name",
+        "root_dir",
+        "run_command",
+        "script_id",
+        "agent_id",
+        "environment",
+    )
+
+    def __new__(
+        cls,
+        name: str = "",
+        root_dir: str = "",
+        run_command: str = "",
+        script_id: int = 0,
+        agent_id: str = "",
+        environment: Sequence[EnvironmentVariable] | None = None,
+    ) -> ScriptConfiguration: ...
+    def __init__(
+        self,
+        name: str = "",
+        root_dir: str = "",
+        run_command: str = "",
+        script_id: int = 0,
+        agent_id: str = "",
+        environment: Sequence[EnvironmentVariable] | None = None,
+    ) -> None:
+        """
+        NOTE: All field initialization before `__init__`, inside of `__new__`.
+        """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> ScriptConfiguration:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
 class SetLoadout:
     """
     A client message to change the loadout of a car.
@@ -4786,6 +4760,94 @@ class BallInfo:
 
     @staticmethod
     def unpack(data: bytes) -> BallInfo:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
+class CustomBot:
+    """
+    A bot controlled by the RLBot framework.
+    """
+
+    name: str
+    """
+    Requested bot name. When match start, RLBot will ensure each bot has a unique name; bots with
+    duplicate names will be renamed with a suffix like `(2)`
+    """
+    root_dir: str
+    """
+    The root directory of the bot and the working directory for the run command.
+    """
+    run_command: str
+    """
+    The console command that starts this bot.
+    """
+    loadout: PlayerLoadout | None
+    """
+    The loadout of the player.
+    """
+    agent_id: str
+    """
+    A unique user-defined string that is used to connect clients to the right players/scripts.
+    If a bot/script has a run command, RLBot will pass this agent id to the process using an environment variable, RLBOT_AGENT_ID.
+    Upon connecting the process announces that it is responsible for this agent id and RLBot will pair the two.
+    The recommended format for agent ids is "developer_name/bot_name".
+    """
+    hivemind: bool
+    """
+    Whether this player is part of a hivemind bot where all players/cars are controlled by the same process.
+    Players in the hivemind must have the same name, team, run command, and agent id.
+    """
+    environment: Sequence[EnvironmentVariable] | None
+    """
+    User-defined environment variables to pass to the bot process.
+    """
+
+    __match_args__ = (
+        "name",
+        "root_dir",
+        "run_command",
+        "loadout",
+        "agent_id",
+        "hivemind",
+        "environment",
+    )
+
+    def __new__(
+        cls,
+        name: str = "",
+        root_dir: str = "",
+        run_command: str = "",
+        loadout: PlayerLoadout | None = None,
+        agent_id: str = "",
+        hivemind: bool = False,
+        environment: Sequence[EnvironmentVariable] | None = None,
+    ) -> CustomBot: ...
+    def __init__(
+        self,
+        name: str = "",
+        root_dir: str = "",
+        run_command: str = "",
+        loadout: PlayerLoadout | None = None,
+        agent_id: str = "",
+        hivemind: bool = False,
+        environment: Sequence[EnvironmentVariable] | None = None,
+    ) -> None:
+        """
+        NOTE: All field initialization before `__init__`, inside of `__new__`.
+        """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> CustomBot:
         """
         Deserializes the data into a new instance
 

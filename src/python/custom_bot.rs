@@ -16,6 +16,8 @@ pub struct CustomBot {
     pub agent_id: Py<PyString>,
     #[pyo3(set)]
     pub hivemind: bool,
+    #[pyo3(set)]
+    pub environment: Option<Py<PyList>>,
 }
 
 impl crate::PyDefault for CustomBot {
@@ -29,6 +31,7 @@ impl crate::PyDefault for CustomBot {
                 loadout: None,
                 agent_id: crate::pydefault_string(py),
                 hivemind: Default::default(),
+                environment: None,
             },
         )
         .unwrap()
@@ -48,6 +51,15 @@ impl FromGil<&flat::CustomBot> for CustomBot {
                 .map(|x| crate::into_py_from(py, &**x)),
             agent_id: PyString::new(py, &flat_t.agent_id).unbind(),
             hivemind: flat_t.hivemind,
+            environment: flat_t.environment.as_ref().map(|x| {
+                PyList::new(
+                    py,
+                    x.iter()
+                        .map(|y| crate::into_py_from::<_, super::EnvironmentVariable>(py, y)),
+                )
+                .unwrap()
+                .unbind()
+            }),
         }
     }
 }
@@ -65,6 +77,12 @@ impl FromGil<&CustomBot> for flat::CustomBot {
                 .map(|x| Box::new(crate::from_py_into(py, x))),
             agent_id: py_type.agent_id.to_str(py).unwrap().to_string(),
             hivemind: py_type.hivemind,
+            environment: py_type.environment.as_ref().map(|x| {
+                x.bind_borrowed(py)
+                    .iter()
+                    .map(|y| crate::from_pyany_into(py, y))
+                    .collect()
+            }),
         }
     }
 }
@@ -72,7 +90,8 @@ impl FromGil<&CustomBot> for flat::CustomBot {
 #[pymethods]
 impl CustomBot {
     #[new]
-    #[pyo3(signature = (name=None, root_dir=None, run_command=None, loadout=None, agent_id=None, hivemind=false))]
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (name=None, root_dir=None, run_command=None, loadout=None, agent_id=None, hivemind=false, environment=None))]
     pub fn new(
         py: Python,
         name: Option<Py<PyString>>,
@@ -81,6 +100,7 @@ impl CustomBot {
         loadout: Option<Py<super::PlayerLoadout>>,
         agent_id: Option<Py<PyString>>,
         hivemind: bool,
+        environment: Option<Py<PyList>>,
     ) -> Self {
         Self {
             name: name.unwrap_or_else(|| crate::pydefault_string(py)),
@@ -89,6 +109,7 @@ impl CustomBot {
             loadout,
             agent_id: agent_id.unwrap_or_else(|| crate::pydefault_string(py)),
             hivemind,
+            environment,
         }
     }
 
@@ -99,7 +120,7 @@ impl CustomBot {
     #[allow(unused_variables)]
     pub fn __repr__(&self, py: Python) -> String {
         format!(
-            "CustomBot(name={:?}, root_dir={:?}, run_command={:?}, loadout={}, agent_id={:?}, hivemind={})",
+            "CustomBot(name={:?}, root_dir={:?}, run_command={:?}, loadout={}, agent_id={:?}, hivemind={}, environment={})",
             self.name.bind(py).to_cow().unwrap(),
             self.root_dir.bind(py).to_cow().unwrap(),
             self.run_command.bind(py).to_cow().unwrap(),
@@ -108,11 +129,26 @@ impl CustomBot {
                 .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
             self.agent_id.bind(py).to_cow().unwrap(),
             crate::bool_to_str(self.hivemind),
+            self.environment.as_ref().map_or_else(crate::none_str, |v| {
+                format!(
+                    "[{}]",
+                    v.bind_borrowed(py)
+                        .iter()
+                        .map(|x| x
+                            .cast_into::<super::EnvironmentVariable>()
+                            .unwrap()
+                            .borrow()
+                            .__repr__(py))
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                )
+            }),
         )
     }
 
     #[classattr]
     fn __match_args__() -> (
+        &'static str,
         &'static str,
         &'static str,
         &'static str,
@@ -127,6 +163,7 @@ impl CustomBot {
             "loadout",
             "agent_id",
             "hivemind",
+            "environment",
         )
     }
 

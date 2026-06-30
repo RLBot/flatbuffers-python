@@ -1,19 +1,29 @@
-[build-system]
-requires = ["maturin>=1.3,<2.0"]
-build-backend = "maturin"
-
 [project]
 name = "rlbot_flatbuffers"
 requires-python = ">=3.10"
 classifiers = [
-    "Programming Language :: Rust",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Programming Language :: Rust",
 ]
-dynamic = ["version", "description", "urls", "readme"]
+dynamic = ["description", "readme", "urls", "version"]
+
+[dependency-groups]
+dev = [
+  "numpy>=2.2.6",
+  "pytest>=9.1.1",
+]
+
+[build-system]
+requires = ["maturin>=1.3,<2.0"]
+build-backend = "maturin"
 
 [tool.maturin]
 features = ["pyo3/extension-module", "pyo3/abi3-py310"]
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
 
 [tool.ruff.lint]
 ignore = ["F403", "F405"]

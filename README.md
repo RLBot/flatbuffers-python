@@ -25,22 +25,27 @@ The crate used to generate Python binds (PyO3) supports all the way back to Pyth
 ### Dev setup
 
 - Ensure Python 3.10+ is installed
-- Create a virtual Python environment
-    - `python3 -m venv venv`
-- Activate the virtual environment
-    - Windows: `venv\Scripts\activate.bat`
-    - Linux: `source venv/bin/activate`
-- Install maturin
-    - `pip install maturin`
-- Build & install for testing
-    - `maturin develop --release`
+- Install [uv](https://docs.astral.sh/uv/) (if not already installed)
+    - `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- Sync the Python environment (this builds the Rust extension)
+    - `uv sync`
+- If you've made changes to the Rust code and `uv sync` doesn't rebuild, force reinstall:
+    - `uv sync --reinstall-package rlbot-flatbuffers`
 
-To use in another Python environment, like if testing [python-interface](https://github.com/RLBot/python-interface), you can build the wheel:
+To use in another Python environment, like if testing [python-interface](https://github.com/RLBot/python-interface), you can build a wheel:
 
-- `maturin build --release`
+- `uv run maturin build --release`
 - (In another environment) `pip install path/to/file.whl`
 
 The exact path of the wheel will be printed by maturin, just copy+paste it.
+
+### Running tests
+
+Tests are written with [pytest](https://docs.pytest.org/) and live in the `tests/` directory. Run them with:
+
+```sh
+uv run pytest
+```
 
 ### Basic usage
 
