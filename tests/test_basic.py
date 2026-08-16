@@ -122,7 +122,6 @@ class TestDesiredGameState:
         dgs.match_info.game_speed += 1
         assert dgs.match_info.game_speed == 3
 
-        dgs.console_commands = [ConsoleCommand("dump_items")]
         dgs.ball_states = [DesiredBallState()]
 
 

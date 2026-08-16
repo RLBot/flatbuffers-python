@@ -2711,6 +2711,45 @@ class BoxShape:
     def __str__(self) -> str: ...
     def __repr__(self) -> str: ...
 
+class ConsoleCommand:
+    """
+    A console command which will be executed inside Rocket League.
+    See https://wiki.rlbot.org/framework/console-commands/ for a list of known commands.
+    """
+
+    command: str
+
+    __match_args__ = (
+        "command",
+    )
+
+    def __new__(
+        cls,
+        command: str = "",
+    ) -> ConsoleCommand: ...
+    def __init__(
+        self,
+        command: str = "",
+    ) -> None:
+        """
+        NOTE: All field initialization before `__init__`, inside of `__new__`.
+        """
+    def pack(self) -> bytes:
+        """
+        Serializes this instance into a byte array
+        """
+
+    @staticmethod
+    def unpack(data: bytes) -> ConsoleCommand:
+        """
+        Deserializes the data into a new instance
+
+        :raises InvalidFlatbuffer: If the `data` is invalid for this type
+        """
+
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+
 class DisconnectSignal:
     """
     Sent to core to indicate that you want to disconnect.
@@ -3250,45 +3289,6 @@ class ConnectionSettings:
 
     @staticmethod
     def unpack(data: bytes) -> ConnectionSettings:
-        """
-        Deserializes the data into a new instance
-
-        :raises InvalidFlatbuffer: If the `data` is invalid for this type
-        """
-
-    def __str__(self) -> str: ...
-    def __repr__(self) -> str: ...
-
-class ConsoleCommand:
-    """
-    A console command which will be executed inside Rocket League.
-    See https://wiki.rlbot.org/framework/console-commands/ for a list of known commands.
-    """
-
-    command: str
-
-    __match_args__ = (
-        "command",
-    )
-
-    def __new__(
-        cls,
-        command: str = "",
-    ) -> ConsoleCommand: ...
-    def __init__(
-        self,
-        command: str = "",
-    ) -> None:
-        """
-        NOTE: All field initialization before `__init__`, inside of `__new__`.
-        """
-    def pack(self) -> bytes:
-        """
-        Serializes this instance into a byte array
-        """
-
-    @staticmethod
-    def unpack(data: bytes) -> ConsoleCommand:
         """
         Deserializes the data into a new instance
 
@@ -5298,17 +5298,11 @@ class DesiredGameState:
     """
     The desired game info.
     """
-    console_commands: Sequence[ConsoleCommand]
-    """
-    A list of console commands to execute.
-    See https://wiki.rlbot.org/framework/console-commands/ for a list of known commands.
-    """
 
     __match_args__ = (
         "ball_states",
         "car_states",
         "match_info",
-        "console_commands",
     )
 
     def __new__(
@@ -5316,14 +5310,12 @@ class DesiredGameState:
         ball_states: Sequence[DesiredBallState] = [],
         car_states: Sequence[DesiredCarState] = [],
         match_info: DesiredMatchInfo | None = None,
-        console_commands: Sequence[ConsoleCommand] = [],
     ) -> DesiredGameState: ...
     def __init__(
         self,
         ball_states: Sequence[DesiredBallState] = [],
         car_states: Sequence[DesiredCarState] = [],
         match_info: DesiredMatchInfo | None = None,
-        console_commands: Sequence[ConsoleCommand] = [],
     ) -> None:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.
@@ -6162,7 +6154,7 @@ class InterfacePacket:
     Packet containing a InterfaceMessage
     """
 
-    message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor
+    message: ConnectionSettings | ConsoleCommand | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor
 
     __match_args__ = (
         "message",
@@ -6170,11 +6162,11 @@ class InterfacePacket:
 
     def __new__(
         cls,
-        message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor = ConnectionSettings(),
+        message: ConnectionSettings | ConsoleCommand | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor = ConnectionSettings(),
     ) -> InterfacePacket: ...
     def __init__(
         self,
-        message: ConnectionSettings | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor = ConnectionSettings(),
+        message: ConnectionSettings | ConsoleCommand | DesiredGameState | DisconnectSignal | InitComplete | MatchComm | MatchConfiguration | PingRequest | PingResponse | PlayerInput | RemoveRenderGroup | RenderGroup | RenderingStatus | SetLoadout | StartCommand | StopCommand | UpdatePerformanceMonitor = ConnectionSettings(),
     ) -> None:
         """
         NOTE: All field initialization before `__init__`, inside of `__new__`.

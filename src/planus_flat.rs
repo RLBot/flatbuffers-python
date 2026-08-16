@@ -1027,6 +1027,10 @@ mod root {
                 UpdatePerformanceMonitor(
                     ::planus::alloc::boxed::Box<self::UpdatePerformanceMonitor>,
                 ),
+
+                ///  Run an Rocket League or Unreal console command.
+                ///  See https://wiki.rlbot.org/framework/console-commands/ for a list of known commands.
+                ConsoleCommand(::planus::alloc::boxed::Box<self::ConsoleCommand>),
             }
 
             impl InterfaceMessage {
@@ -1163,6 +1167,14 @@ mod root {
                 ) -> ::planus::UnionOffset<Self> {
                     ::planus::UnionOffset::new(16, value.prepare(builder).downcast())
                 }
+
+                #[inline]
+                pub fn create_console_command(
+                    builder: &mut ::planus::Builder,
+                    value: impl ::planus::WriteAsOffset<self::ConsoleCommand>,
+                ) -> ::planus::UnionOffset<Self> {
+                    ::planus::UnionOffset::new(17, value.prepare(builder).downcast())
+                }
             }
 
             impl ::planus::WriteAsUnion<InterfaceMessage> for InterfaceMessage {
@@ -1199,6 +1211,7 @@ mod root {
                         Self::UpdatePerformanceMonitor(value) => {
                             Self::create_update_performance_monitor(builder, value)
                         }
+                        Self::ConsoleCommand(value) => Self::create_console_command(builder, value),
                     }
                 }
             }
@@ -1409,6 +1422,18 @@ mod root {
                 ) -> InterfaceMessageBuilder<::planus::Initialized<16, T>>
                 where
                     T: ::planus::WriteAsOffset<self::UpdatePerformanceMonitor>,
+                {
+                    InterfaceMessageBuilder(::planus::Initialized(value))
+                }
+
+                /// Creates an instance of the [`ConsoleCommand` variant](InterfaceMessage#variant.ConsoleCommand).
+                #[inline]
+                pub fn console_command<T>(
+                    self,
+                    value: T,
+                ) -> InterfaceMessageBuilder<::planus::Initialized<17, T>>
+                where
+                    T: ::planus::WriteAsOffset<self::ConsoleCommand>,
                 {
                     InterfaceMessageBuilder(::planus::Initialized(value))
                 }
@@ -1876,6 +1901,34 @@ mod root {
                     ::core::option::Option::Some(::planus::WriteAsUnion::prepare(self, builder))
                 }
             }
+            impl<T> ::planus::WriteAsUnion<InterfaceMessage>
+                for InterfaceMessageBuilder<::planus::Initialized<17, T>>
+            where
+                T: ::planus::WriteAsOffset<self::ConsoleCommand>,
+            {
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::planus::UnionOffset<InterfaceMessage> {
+                    ::planus::UnionOffset::new(17, (self.0).0.prepare(builder).downcast())
+                }
+            }
+
+            impl<T> ::planus::WriteAsOptionalUnion<InterfaceMessage>
+                for InterfaceMessageBuilder<::planus::Initialized<17, T>>
+            where
+                T: ::planus::WriteAsOffset<self::ConsoleCommand>,
+            {
+                #[inline]
+                fn prepare(
+                    &self,
+                    builder: &mut ::planus::Builder,
+                ) -> ::core::option::Option<::planus::UnionOffset<InterfaceMessage>>
+                {
+                    ::core::option::Option::Some(::planus::WriteAsUnion::prepare(self, builder))
+                }
+            }
 
             /// Reference to a deserialized [InterfaceMessage].
             #[derive(Copy, Clone, Debug)]
@@ -1896,6 +1949,7 @@ mod root {
                 PingRequest(self::PingRequestRef<'a>),
                 PingResponse(self::PingResponseRef<'a>),
                 UpdatePerformanceMonitor(self::UpdatePerformanceMonitorRef<'a>),
+                ConsoleCommand(self::ConsoleCommandRef<'a>),
             }
 
             impl<'a> ::core::convert::TryFrom<InterfaceMessageRef<'a>> for InterfaceMessage {
@@ -1998,6 +2052,12 @@ mod root {
                                 ::core::convert::TryFrom::try_from(value)?,
                             ))
                         }
+
+                        InterfaceMessageRef::ConsoleCommand(value) => {
+                            Self::ConsoleCommand(::planus::alloc::boxed::Box::new(
+                                ::core::convert::TryFrom::try_from(value)?,
+                            ))
+                        }
                     })
                 }
             }
@@ -2057,6 +2117,9 @@ mod root {
                         16 => ::core::result::Result::Ok(Self::UpdatePerformanceMonitor(
                             ::planus::TableRead::from_buffer(buffer, field_offset)?,
                         )),
+                        17 => ::core::result::Result::Ok(Self::ConsoleCommand(
+                            ::planus::TableRead::from_buffer(buffer, field_offset)?,
+                        )),
                         _ => ::core::result::Result::Err(
                             ::planus::errors::ErrorKind::UnknownUnionTag { tag },
                         ),
@@ -2071,7 +2134,7 @@ mod root {
             ///  Packet containing a InterfaceMessage
             ///
             /// Generated from these locations:
-            /// * Table `InterfacePacket` in the file `flatbuffers-schema/schema/interfacepacket.fbs:66`
+            /// * Table `InterfacePacket` in the file `flatbuffers-schema/schema/interfacepacket.fbs:70`
             #[derive(Clone, Debug, PartialEq, PartialOrd)]
             pub struct InterfacePacket {
                 /// The field `message` in the table `InterfacePacket`
@@ -18896,9 +18959,6 @@ mod root {
                 ///  The desired game info.
                 pub match_info:
                     ::core::option::Option<::planus::alloc::boxed::Box<self::DesiredMatchInfo>>,
-                ///  A list of console commands to execute.
-                ///  See https://wiki.rlbot.org/framework/console-commands/ for a list of known commands.
-                pub console_commands: ::planus::alloc::vec::Vec<self::ConsoleCommand>,
             }
 
             #[allow(clippy::derivable_impls)]
@@ -18908,7 +18968,6 @@ mod root {
                         ball_states: ::core::default::Default::default(),
                         car_states: ::core::default::Default::default(),
                         match_info: ::core::default::Default::default(),
-                        console_commands: ::core::default::Default::default(),
                     }
                 }
             }
@@ -18932,14 +18991,10 @@ mod root {
                     field_match_info: impl ::planus::WriteAsOptional<
                         ::planus::Offset<self::DesiredMatchInfo>,
                     >,
-                    field_console_commands: impl ::planus::WriteAs<
-                        ::planus::Offset<[::planus::Offset<self::ConsoleCommand>]>,
-                    >,
                 ) -> ::planus::Offset<Self> {
                     let prepared_ball_states = field_ball_states.prepare(builder);
                     let prepared_car_states = field_car_states.prepare(builder);
                     let prepared_match_info = field_match_info.prepare(builder);
-                    let prepared_console_commands = field_console_commands.prepare(builder);
 
                     let mut table_writer: ::planus::table_writer::TableWriter<12> =
                         ::core::default::Default::default();
@@ -18951,10 +19006,6 @@ mod root {
                     if prepared_match_info.is_some() {
                         table_writer.write_entry::<::planus::Offset<self::DesiredMatchInfo>>(2);
                     }
-                    table_writer
-                        .write_entry::<::planus::Offset<[::planus::Offset<self::ConsoleCommand>]>>(
-                            3,
-                        );
 
                     unsafe {
                         table_writer.finish(builder, |object_writer| {
@@ -18965,7 +19016,6 @@ mod root {
                             {
                                 object_writer.write::<_, _, 4>(&prepared_match_info);
                             }
-                            object_writer.write::<_, _, 4>(&prepared_console_commands);
                         });
                     }
                     builder.current_offset()
@@ -19007,7 +19057,6 @@ mod root {
                         &self.ball_states,
                         &self.car_states,
                         &self.match_info,
-                        &self.console_commands,
                     )
                 }
             }
@@ -19069,24 +19118,6 @@ mod root {
             }
 
             impl<T0, T1, T2> DesiredGameStateBuilder<(T0, T1, T2)> {
-                /// Setter for the [`console_commands` field](DesiredGameState#structfield.console_commands).
-                #[inline]
-                #[allow(clippy::type_complexity)]
-                pub fn console_commands<T3>(
-                    self,
-                    value: T3,
-                ) -> DesiredGameStateBuilder<(T0, T1, T2, T3)>
-                where
-                    T3: ::planus::WriteAs<
-                            ::planus::Offset<[::planus::Offset<self::ConsoleCommand>]>,
-                        >,
-                {
-                    let (v0, v1, v2) = self.0;
-                    DesiredGameStateBuilder((v0, v1, v2, value))
-                }
-            }
-
-            impl<T0, T1, T2, T3> DesiredGameStateBuilder<(T0, T1, T2, T3)> {
                 /// Finish writing the builder to get an [Offset](::planus::Offset) to a serialized [DesiredGameState].
                 #[inline]
                 pub fn finish(
@@ -19104,9 +19135,8 @@ mod root {
                 T0: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::DesiredBallState>]>>,
                 T1: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::DesiredCarState>]>>,
                 T2: ::planus::WriteAsOptional<::planus::Offset<self::DesiredMatchInfo>>,
-                T3: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::ConsoleCommand>]>>,
             > ::planus::WriteAs<::planus::Offset<DesiredGameState>>
-                for DesiredGameStateBuilder<(T0, T1, T2, T3)>
+                for DesiredGameStateBuilder<(T0, T1, T2)>
             {
                 type Prepared = ::planus::Offset<DesiredGameState>;
 
@@ -19123,9 +19153,8 @@ mod root {
                 T0: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::DesiredBallState>]>>,
                 T1: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::DesiredCarState>]>>,
                 T2: ::planus::WriteAsOptional<::planus::Offset<self::DesiredMatchInfo>>,
-                T3: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::ConsoleCommand>]>>,
             > ::planus::WriteAsOptional<::planus::Offset<DesiredGameState>>
-                for DesiredGameStateBuilder<(T0, T1, T2, T3)>
+                for DesiredGameStateBuilder<(T0, T1, T2)>
             {
                 type Prepared = ::planus::Offset<DesiredGameState>;
 
@@ -19142,17 +19171,15 @@ mod root {
                 T0: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::DesiredBallState>]>>,
                 T1: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::DesiredCarState>]>>,
                 T2: ::planus::WriteAsOptional<::planus::Offset<self::DesiredMatchInfo>>,
-                T3: ::planus::WriteAs<::planus::Offset<[::planus::Offset<self::ConsoleCommand>]>>,
-            > ::planus::WriteAsOffset<DesiredGameState>
-                for DesiredGameStateBuilder<(T0, T1, T2, T3)>
+            > ::planus::WriteAsOffset<DesiredGameState> for DesiredGameStateBuilder<(T0, T1, T2)>
             {
                 #[inline]
                 fn prepare(
                     &self,
                     builder: &mut ::planus::Builder,
                 ) -> ::planus::Offset<DesiredGameState> {
-                    let (v0, v1, v2, v3) = &self.0;
-                    DesiredGameState::create(builder, v0, v1, v2, v3)
+                    let (v0, v1, v2) = &self.0;
+                    DesiredGameState::create(builder, v0, v1, v2)
                 }
             }
 
@@ -19189,17 +19216,6 @@ mod root {
                 {
                     self.0.access(2, "DesiredGameState", "match_info")
                 }
-
-                /// Getter for the [`console_commands` field](DesiredGameState#structfield.console_commands).
-                #[inline]
-                pub fn console_commands(
-                    &self,
-                ) -> ::planus::Result<
-                    ::planus::Vector<'a, ::planus::Result<self::ConsoleCommandRef<'a>>>,
-                > {
-                    self.0
-                        .access_required(3, "DesiredGameState", "console_commands")
-                }
             }
 
             impl<'a> ::core::fmt::Debug for DesiredGameStateRef<'a> {
@@ -19212,7 +19228,6 @@ mod root {
                     {
                         f.field("match_info", &field_match_info);
                     }
-                    f.field("console_commands", &self.console_commands());
                     f.finish()
                 }
             }
@@ -19234,7 +19249,6 @@ mod root {
                         } else {
                             ::core::option::Option::None
                         },
-                        console_commands: value.console_commands()?.to_vec_result()?,
                     })
                 }
             }

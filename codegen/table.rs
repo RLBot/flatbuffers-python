@@ -60,7 +60,7 @@ impl<'a> TableBindGenerator<'a> {
 
         write_fmt!(self, "pub struct {} {{", self.name);
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             let mut add_set = !self.is_frozen;
             let variable_type = match &field_info.type_.kind {
                 TypeKind::SimpleType(simple_type) => match simple_type {
@@ -119,7 +119,7 @@ impl<'a> TableBindGenerator<'a> {
         write_str!(self, "    fn py_default(py: Python) -> Py<Self> {");
         write_str!(self, "        Py::new(py, Self {");
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             if matches!(field_info.assign_mode, AssignMode::Optional) {
                 write_fmt!(self, "            {field_name}: None,");
                 continue;
@@ -185,7 +185,7 @@ impl<'a> TableBindGenerator<'a> {
         );
         write_fmt!(self, "        {} {{", self.name);
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             let end = match &field_info.type_.kind {
                 TypeKind::SimpleType(simple_type) => match simple_type {
                     SimpleType::Float(_) => {
@@ -325,7 +325,7 @@ impl<'a> TableBindGenerator<'a> {
         );
         write_str!(self, "        Self {");
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             let end = match &field_info.type_.kind {
                 TypeKind::SimpleType(simple_type) => match simple_type {
                     SimpleType::Float(_) => {
@@ -455,7 +455,7 @@ impl<'a> TableBindGenerator<'a> {
         let mut signature_parts = Vec::new();
         let mut needs_python = false;
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             if matches!(field_info.assign_mode, AssignMode::Optional) {
                 if let TypeKind::SimpleType(SimpleType::Struct(idx)) = &field_info.type_.kind {
                     let (path, _) = self.all_items.get_index(idx.0).unwrap();
@@ -489,7 +489,13 @@ impl<'a> TableBindGenerator<'a> {
         }
 
         let max_num_types = if needs_python { 6 } else { 7 };
-        if self.fields.len() > max_num_types {
+        if self
+            .fields
+            .iter()
+            .filter(|(_, field)| !field.deprecated)
+            .count()
+            > max_num_types
+        {
             write_str!(self, "    #[allow(clippy::too_many_arguments)]");
         }
 
@@ -504,7 +510,7 @@ impl<'a> TableBindGenerator<'a> {
             write_str!(self, "        py: Python,");
         }
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             let variable_type = match &field_info.type_.kind {
                 TypeKind::SimpleType(simple_type) => match simple_type {
                     SimpleType::Bool => Cow::Borrowed("bool"),
@@ -551,7 +557,7 @@ impl<'a> TableBindGenerator<'a> {
         write_str!(self, "    ) -> Self {");
         write_str!(self, "        Self {");
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             if matches!(field_info.assign_mode, AssignMode::Optional) {
                 match &field_info.type_.kind {
                     TypeKind::SimpleType(SimpleType::Struct(idx)) => {
@@ -628,7 +634,7 @@ impl<'a> TableBindGenerator<'a> {
             return;
         }
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             match &field_info.type_.kind {
                 TypeKind::SimpleType(simple_type) => match simple_type {
                     SimpleType::Float(_) => {}
@@ -685,6 +691,7 @@ impl<'a> TableBindGenerator<'a> {
         let repr_signature = self
             .fields
             .iter()
+            .filter(|(_, field)| !field.deprecated)
             .map(|(field_name, field_info)| match &field_info.type_.kind {
                 TypeKind::String => {
                     if matches!(field_info.assign_mode, AssignMode::Optional) {
@@ -711,7 +718,7 @@ impl<'a> TableBindGenerator<'a> {
             .join(", ");
         write_fmt!(self, "            \"{}({repr_signature})\",", self.name);
 
-        for (field_name, field_info) in self.fields {
+        for (field_name, field_info) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             match &field_info.type_.kind {
                 TypeKind::SimpleType(simple_type) => match simple_type {
                     SimpleType::Struct(idx) => match field_info.assign_mode {
@@ -940,7 +947,7 @@ impl<'a> TableBindGenerator<'a> {
         );
         write_str!(self, "        pyo3::types::PyTuple::new(py, [");
 
-        for field_name in self.fields.keys() {
+        for (field_name, _) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             write_fmt!(self, "            \"{field_name}\",");
         }
 
@@ -953,19 +960,24 @@ impl<'a> TableBindGenerator<'a> {
             return;
         }
 
-        if self.fields.len() > 12 {
+        let num_fields = self
+            .fields
+            .iter()
+            .filter(|(_, field)| !field.deprecated)
+            .count();
+        if num_fields > 12 {
             self.generate_long_args();
             return;
         }
 
-        let sig_parts: Vec<_> = repeat_n("&'static str", self.fields.len()).collect();
+        let sig_parts: Vec<_> = repeat_n("&'static str", num_fields).collect();
         let sig = sig_parts.join(", ");
 
         write_str!(self, "    #[classattr]");
         write_fmt!(self, "    fn __match_args__() -> ({sig},) {{");
         write_str!(self, "        (");
 
-        for field_name in self.fields.keys() {
+        for (field_name, _) in self.fields.iter().filter(|(_, field)| !field.deprecated) {
             write_fmt!(self, "            \"{field_name}\",");
         }
 

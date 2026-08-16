@@ -240,7 +240,9 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                 write_str!(file, "        \"\"\"\n");
             }
             DeclarationKind::Table(info) => {
-                for (field_name, field_info) in &info.fields {
+                for (field_name, field_info) in
+                    info.fields.iter().filter(|(_, field)| !field.deprecated)
+                {
                     let mut python_type = match &field_info.type_.kind {
                         TypeKind::SimpleType(simple_type) => Cow::Borrowed(match simple_type {
                             SimpleType::Bool => "bool",
@@ -326,7 +328,7 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                 write_str!(file, "");
                 write_str!(file, "    __match_args__ = (");
 
-                for field_name in info.fields.keys() {
+                for (field_name, _) in info.fields.iter().filter(|(_, field)| !field.deprecated) {
                     write_fmt!(file, "        \"{field_name}\",");
                 }
                 write_str!(file, "    )");
@@ -341,7 +343,9 @@ pub fn generator(type_data: &Declarations) -> io::Result<()> {
                     write_fmt!(file, "    def __{func}__(");
                     write_fmt!(file, "        {first_arg},");
 
-                    for (field_name, field_info) in &info.fields {
+                    for (field_name, field_info) in
+                        info.fields.iter().filter(|(_, field)| !field.deprecated)
+                    {
                         let mut python_type = match &field_info.type_.kind {
                             TypeKind::SimpleType(simple_type) => Cow::Borrowed(match simple_type {
                                 SimpleType::Bool => "bool",

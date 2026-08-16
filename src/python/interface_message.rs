@@ -19,6 +19,7 @@ pub enum InterfaceMessage {
     PingRequest(Py<super::PingRequest>),
     PingResponse(Py<super::PingResponse>),
     UpdatePerformanceMonitor(Py<super::UpdatePerformanceMonitor>),
+    ConsoleCommand(Py<super::ConsoleCommand>),
 }
 
 impl InterfaceMessage {
@@ -80,6 +81,9 @@ impl FromGil<&flat::InterfaceMessage> for InterfaceMessage {
                     Py::new(py, super::UpdatePerformanceMonitor::from_gil(py, &**item)).unwrap(),
                 )
             }
+            flat::InterfaceMessage::ConsoleCommand(item) => Self::ConsoleCommand(
+                Py::new(py, super::ConsoleCommand::from_gil(py, &**item)).unwrap(),
+            ),
         }
     }
 }
@@ -137,6 +141,9 @@ impl FromGil<&InterfaceMessage> for flat::InterfaceMessage {
                     py, item,
                 )))
             }
+            InterfaceMessage::ConsoleCommand(item) => {
+                flat::InterfaceMessage::ConsoleCommand(Box::new(crate::from_py_into(py, item)))
+            }
         }
     }
 }
@@ -160,6 +167,7 @@ impl InterfaceMessage {
             Self::PingRequest(item) => item.into_any(),
             Self::PingResponse(item) => item.into_any(),
             Self::UpdatePerformanceMonitor(item) => item.into_any(),
+            Self::ConsoleCommand(item) => item.into_any(),
         }
     }
 
@@ -181,6 +189,7 @@ impl InterfaceMessage {
             Self::PingRequest(item) => item.borrow(py).__repr__(py),
             Self::PingResponse(item) => item.borrow(py).__repr__(py),
             Self::UpdatePerformanceMonitor(item) => item.borrow(py).__repr__(py),
+            Self::ConsoleCommand(item) => item.borrow(py).__repr__(py),
         }
     }
 }

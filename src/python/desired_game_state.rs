@@ -10,8 +10,6 @@ pub struct DesiredGameState {
     pub car_states: Py<PyList>,
     #[pyo3(set)]
     pub match_info: Option<Py<super::DesiredMatchInfo>>,
-    #[pyo3(set)]
-    pub console_commands: Py<PyList>,
 }
 
 impl crate::PyDefault for DesiredGameState {
@@ -22,7 +20,6 @@ impl crate::PyDefault for DesiredGameState {
                 ball_states: PyList::empty(py).unbind(),
                 car_states: PyList::empty(py).unbind(),
                 match_info: None,
-                console_commands: PyList::empty(py).unbind(),
             },
         )
         .unwrap()
@@ -55,15 +52,6 @@ impl FromGil<&flat::DesiredGameState> for DesiredGameState {
                 .match_info
                 .as_ref()
                 .map(|x| crate::into_py_from(py, &**x)),
-            console_commands: PyList::new(
-                py,
-                flat_t
-                    .console_commands
-                    .iter()
-                    .map(|x| crate::into_py_from::<_, super::ConsoleCommand>(py, x)),
-            )
-            .unwrap()
-            .unbind(),
         }
     }
 }
@@ -88,12 +76,6 @@ impl FromGil<&DesiredGameState> for flat::DesiredGameState {
                 .match_info
                 .as_ref()
                 .map(|x| Box::new(crate::from_py_into(py, x))),
-            console_commands: py_type
-                .console_commands
-                .bind_borrowed(py)
-                .iter()
-                .map(|x| crate::from_pyany_into(py, x))
-                .collect(),
         }
     }
 }
@@ -101,19 +83,17 @@ impl FromGil<&DesiredGameState> for flat::DesiredGameState {
 #[pymethods]
 impl DesiredGameState {
     #[new]
-    #[pyo3(signature = (ball_states=None, car_states=None, match_info=None, console_commands=None))]
+    #[pyo3(signature = (ball_states=None, car_states=None, match_info=None))]
     pub fn new(
         py: Python,
         ball_states: Option<Py<PyList>>,
         car_states: Option<Py<PyList>>,
         match_info: Option<Py<super::DesiredMatchInfo>>,
-        console_commands: Option<Py<PyList>>,
     ) -> Self {
         Self {
             ball_states: ball_states.unwrap_or_else(|| PyList::empty(py).unbind()),
             car_states: car_states.unwrap_or_else(|| PyList::empty(py).unbind()),
             match_info,
-            console_commands: console_commands.unwrap_or_else(|| PyList::empty(py).unbind()),
         }
     }
 
@@ -124,7 +104,7 @@ impl DesiredGameState {
     #[allow(unused_variables)]
     pub fn __repr__(&self, py: Python) -> String {
         format!(
-            "DesiredGameState(ball_states=[{}], car_states=[{}], match_info={}, console_commands=[{}])",
+            "DesiredGameState(ball_states=[{}], car_states=[{}], match_info={})",
             self.ball_states
                 .bind_borrowed(py)
                 .iter()
@@ -148,27 +128,12 @@ impl DesiredGameState {
             self.match_info
                 .as_ref()
                 .map_or_else(crate::none_str, |x| x.borrow(py).__repr__(py)),
-            self.console_commands
-                .bind_borrowed(py)
-                .iter()
-                .map(|x| x
-                    .cast_into::<super::ConsoleCommand>()
-                    .unwrap()
-                    .borrow()
-                    .__repr__(py))
-                .collect::<Vec<String>>()
-                .join(", "),
         )
     }
 
     #[classattr]
-    fn __match_args__() -> (&'static str, &'static str, &'static str, &'static str) {
-        (
-            "ball_states",
-            "car_states",
-            "match_info",
-            "console_commands",
-        )
+    fn __match_args__() -> (&'static str, &'static str, &'static str) {
+        ("ball_states", "car_states", "match_info")
     }
 
     fn pack<'py>(&self, py: Python<'py>) -> Bound<'py, PyBytes> {
